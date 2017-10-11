@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NESemu", "NESemu.vcxproj", "{488E0B99-80B7-4F13-A08B-A0E96192CCB3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NESemuTests", "NESemuTests\NESemuTests.vcxproj", "{480247C6-6F86-4FD0-AE12-8342AE97D12B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{488E0B99-80B7-4F13-A08B-A0E96192CCB3}.Release|x64.Build.0 = Release|x64
 		{488E0B99-80B7-4F13-A08B-A0E96192CCB3}.Release|x86.ActiveCfg = Release|Win32
 		{488E0B99-80B7-4F13-A08B-A0E96192CCB3}.Release|x86.Build.0 = Release|Win32
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Debug|x64.ActiveCfg = Debug|x64
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Debug|x64.Build.0 = Debug|x64
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Debug|x86.ActiveCfg = Debug|Win32
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Debug|x86.Build.0 = Debug|Win32
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Release|x64.ActiveCfg = Release|x64
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Release|x64.Build.0 = Release|x64
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Release|x86.ActiveCfg = Release|Win32
+		{480247C6-6F86-4FD0-AE12-8342AE97D12B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
