@@ -13,7 +13,27 @@ namespace NESemuLibTests
 		TEST_METHOD(WriteMem)
 		{
 			RAM ram;
-			ram.WriteMem(0x0, 33);
+            ram.Reset();
+
+			ram.WriteMem(0x0, 64);
+            Assert::AreEqual((int)ram.ReadMem(0x0), 64);
+            Assert::AreEqual((int)ram.ReadMem(0x800), 64);
+            Assert::AreEqual((int)ram.ReadMem(0x1000), 64);
+            Assert::AreEqual((int)ram.ReadMem(0x1800), 64);
+            Assert::AreNotEqual((int)ram.ReadMem(0x0), 128);
+            Assert::AreNotEqual((int)ram.ReadMem(0x800), 128);
+            Assert::AreNotEqual((int)ram.ReadMem(0x1000), 128);
+            Assert::AreNotEqual((int)ram.ReadMem(0x1800), 128);
+
+            ram.WriteMem(0x1800, 128);
+            Assert::AreEqual((int)ram.ReadMem(0x0), 128);
+            Assert::AreEqual((int)ram.ReadMem(0x800), 128);
+            Assert::AreEqual((int)ram.ReadMem(0x1000), 128);
+            Assert::AreEqual((int)ram.ReadMem(0x1800), 128);
+            Assert::AreNotEqual((int)ram.ReadMem(0x0), 64);
+            Assert::AreNotEqual((int)ram.ReadMem(0x800), 64);
+            Assert::AreNotEqual((int)ram.ReadMem(0x1000), 64);
+            Assert::AreNotEqual((int)ram.ReadMem(0x1800), 64);
 		}
 
 	};

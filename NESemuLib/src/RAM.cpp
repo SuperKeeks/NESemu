@@ -27,3 +27,11 @@ uint16_t RAM::ConvertToRealAddress(uint16_t address) const
 	assert(address >= 0 && address < 0x2000);
 	return address % 2048; // Meant for Shadow RAM
 }
+
+void RAM::Reset()
+{
+    for (int i = 0; i < kRAMSize; ++i)
+    {
+        _ram[i] = 0;
+    }
+}
