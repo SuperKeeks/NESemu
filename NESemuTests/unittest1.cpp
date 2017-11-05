@@ -1,17 +1,21 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
+#include "RAM.h"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace NESemuTests
 {		
-	TEST_CLASS(UnitTest1)
+	TEST_CLASS(RAMTest)
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(ReadAndWrite)
 		{
-			Assert::AreEqual("abc", "abc");
+			RAM ram;
+			ram.WriteMem(0x0, 33);
+			Assert::AreEqual((int)ram.ReadMem(0x0), 33);
 		}
 
 	};
