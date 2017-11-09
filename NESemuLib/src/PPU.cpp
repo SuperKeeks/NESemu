@@ -1,0 +1,25 @@
+#include "PPU.h"
+
+#include "Assert.h"
+
+PPU::PPU()
+{
+}
+
+PPU::~PPU()
+{
+}
+
+uint8_t PPU::ReadMem(uint16_t address) const
+{
+	OMBAssert(false, "Unimplemented");
+	return 0;
+}
+
+void PPU::WriteMem(uint16_t address, uint8_t value)
+{
+}
+
+void PPU::Reset()
+{
+}
