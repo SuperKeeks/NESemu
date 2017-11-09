@@ -1,6 +1,6 @@
 .vs/
 x64/
 Debug/
-NESemu.vcxproj.user
+*.user
 NESemu.VC.db
 NESemu.VC.VC.opendb
