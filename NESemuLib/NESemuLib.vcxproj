@@ -147,17 +147,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\APU.h" />
     <ClInclude Include="src\Assert.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\MemoryHandler.h" />
+    <ClInclude Include="src\MM5.h" />
     <ClInclude Include="src\NESemu.h" />
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\RAM.h" />
+    <ClInclude Include="src\ROM.h" />
+    <ClInclude Include="src\SRAM.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\APU.cpp" />
+    <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
+    <ClCompile Include="src\ROM.cpp" />
+    <ClCompile Include="src\SRAM.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
