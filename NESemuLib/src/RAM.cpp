@@ -10,7 +10,7 @@ RAM::~RAM()
 {
 }
 
-uint8_t RAM::ReadMem(uint16_t address) const
+uint8_t RAM::ReadMem(uint16_t address)
 {
 	uint16_t realAddress = ConvertToRealAddress(address);
 	return _ram[realAddress];
