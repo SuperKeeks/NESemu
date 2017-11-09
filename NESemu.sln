@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NESemu", "NESemu.vcxproj", "{488E0B99-80B7-4F13-A08B-A0E96192CCB3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD430D2B-5563-4D47-A58B-36868563EA24} = {AD430D2B-5563-4D47-A58B-36868563EA24}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NESemuLib", "NESemuLib\NESemuLib.vcxproj", "{AD430D2B-5563-4D47-A58B-36868563EA24}"
 EndProject
