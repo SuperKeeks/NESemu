@@ -10,7 +10,7 @@ namespace NESemuLibTests
 	{
 	public:
 		
-		TEST_METHOD(WriteMem)
+		TEST_METHOD(WriteRAM)
 		{
 			RAM ram;
             ram.Reset();

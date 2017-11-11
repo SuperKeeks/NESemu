@@ -156,6 +156,7 @@
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\RAM.h" />
     <ClInclude Include="src\ROM.h" />
+    <ClInclude Include="src\SizeOfArray.h" />
     <ClInclude Include="src\SRAM.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
