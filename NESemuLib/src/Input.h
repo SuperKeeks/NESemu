@@ -37,6 +37,7 @@ public:
 
 	virtual uint8_t ReadMem(uint16_t address);
 	virtual void WriteMem(uint16_t address, uint8_t value);
+	virtual void PowerOn();
 	virtual void Reset();
 
 	void SetControllerState(int controllerNumber, const ControllerState& state);

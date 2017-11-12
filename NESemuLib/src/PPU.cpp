@@ -21,6 +21,11 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
 	OMBAssert(false, "Unimplemented");
 }
 
+void PPU::PowerOn()
+{
+	OMBAssert(false, "Unimplemented");
+}
+
 void PPU::Reset()
 {
 	OMBAssert(false, "Unimplemented");

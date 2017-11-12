@@ -69,6 +69,11 @@ void Input::WriteMem(uint16_t address, uint8_t value)
 	}
 }
 
+void Input::PowerOn()
+{
+	Reset();
+}
+
 void Input::Reset()
 {
 	for (int i = 0; i < sizeofarray(_4016); ++i)

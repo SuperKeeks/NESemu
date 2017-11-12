@@ -28,10 +28,15 @@ uint16_t RAM::ConvertToRealAddress(uint16_t address) const
 	return address % 2048; // Meant for Shadow RAM
 }
 
+void RAM::PowerOn()
+{
+	for (int i = 0; i < kRAMSize; ++i)
+	{
+		_ram[i] = 0;
+	}
+}
+
 void RAM::Reset()
 {
-    for (int i = 0; i < kRAMSize; ++i)
-    {
-        _ram[i] = 0;
-    }
+    // Do nothing
 }

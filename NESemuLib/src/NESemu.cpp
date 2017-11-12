@@ -2,6 +2,13 @@
 
 NESemu::NESemu()
 {
+	_ram.PowerOn();
+	_ppu.PowerOn();
+	_apu.PowerOn();
+	_input.PowerOn();
+	_mm5.PowerOn();
+	_sram.PowerOn();
+	_rom.PowerOn();
 }
 
 NESemu::~NESemu()

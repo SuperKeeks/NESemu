@@ -21,6 +21,11 @@ void SRAM::WriteMem(uint16_t address, uint8_t value)
 	OMBAssert(false, "Unimplemented");
 }
 
+void SRAM::PowerOn()
+{
+	OMBAssert(false, "Unimplemented");
+}
+
 void SRAM::Reset()
 {
 	OMBAssert(false, "Unimplemented");
