@@ -1,3 +1,6 @@
+#include "INESParser.h"
+#include "NESemu.h"
+
 #include <SDL.h>
 #include <stdio.h>
 
@@ -26,6 +29,11 @@ int main(int argc, char* args[])
 
 			bool quit = false;
 			SDL_Event e;
+
+			NESemu emu;
+			INESParser parser;
+			parser.Parse("demo1.nes", emu.GetROM());
+			parser.PrintInfo();
 
 			while (!quit)
 			{

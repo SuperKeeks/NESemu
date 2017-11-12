@@ -51,6 +51,9 @@
     <ClInclude Include="src\SizeOfArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\INESParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NESemu.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ROM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\INESParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

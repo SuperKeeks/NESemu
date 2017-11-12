@@ -46,7 +46,7 @@ void SRAM::SetEnabled(bool enabled)
 void SRAM::Load(const char* path)
 {
 	FILE* file;
-	fopen_s(&file, path, "r");
+	fopen_s(&file, path, "rb");
 	fread_s(_sram, sizeof(_sram), sizeof(uint8_t), sizeofarray(_sram), file);
 	fclose(file);
 }

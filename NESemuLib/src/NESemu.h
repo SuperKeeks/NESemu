@@ -16,6 +16,8 @@ public:
 	NESemu();
 	~NESemu();
 
+	ROM& GetROM() { return _rom; }
+
 private:
     RAM _ram;
 	PPU _ppu;

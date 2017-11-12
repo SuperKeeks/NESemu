@@ -23,10 +23,10 @@ void MM5::WriteMem(uint16_t address, uint8_t value)
 
 void MM5::PowerOn()
 {
-	OMBAssert(false, "Unimplemented");
+	// TODO
 }
 
 void MM5::Reset()
 {
-	OMBAssert(false, "Unimplemented");
+	// TODO
 }
