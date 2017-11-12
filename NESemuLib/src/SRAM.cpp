@@ -1,6 +1,9 @@
 #include "SRAM.h"
 
 #include "Assert.h"
+#include "SizeOfArray.h"
+
+#include <stdio.h>
 
 SRAM::SRAM()
 {
@@ -12,21 +15,59 @@ SRAM::~SRAM()
 
 uint8_t SRAM::ReadMem(uint16_t address)
 {
-	OMBAssert(false, "Unimplemented");
-	return 0;
+	uint16_t index = ConvertToIndex(address);
+	return _sram[index];
 }
 
 void SRAM::WriteMem(uint16_t address, uint8_t value)
 {
-	OMBAssert(false, "Unimplemented");
+	uint16_t index = ConvertToIndex(address);
+	_sram[index] = value;
 }
 
 void SRAM::PowerOn()
 {
-	OMBAssert(false, "Unimplemented");
+	for (int i = 0; i < sizeofarray(_sram); ++i)
+	{
+		_sram[i] = 0;
+	}
 }
 
 void SRAM::Reset()
 {
-	OMBAssert(false, "Unimplemented");
+	// Do nothing
+}
+
+void SRAM::SetEnabled(bool enabled)
+{
+	_enabled = enabled;
+}
+
+void SRAM::Load(const char* path)
+{
+	FILE* file;
+	fopen_s(&file, path, "r");
+	fread_s(_sram, sizeof(_sram), sizeof(uint8_t), sizeofarray(_sram), file);
+	fclose(file);
+}
+
+void SRAM::Save(const char* path)
+{
+	FILE* file;
+	fopen_s(&file, path, "wb");
+	fwrite(_sram, sizeof(uint8_t), sizeof(_sram), file);
+	fclose(file);
+}
+
+uint16_t SRAM::ConvertToIndex(uint16_t address) const
+{
+	if (address >= kStartAddress && address < kStartAddress + kSize)
+	{
+		return address - kStartAddress;
+	}
+	else
+	{
+		OMBAssert(false, "Address is not within the SRAM's address space");
+		return 0;
+	}
 }
