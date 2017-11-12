@@ -13,7 +13,12 @@ namespace NESemuLibTests
 		TEST_METHOD(WriteRAM)
 		{
 			RAM ram;
-            ram.Reset();
+			ram.PowerOn();
+
+			Assert::AreEqual((int)ram.ReadMem(0x0), 0);
+			Assert::AreEqual((int)ram.ReadMem(0x800), 0);
+			Assert::AreEqual((int)ram.ReadMem(0x1000), 0);
+			Assert::AreEqual((int)ram.ReadMem(0x1800), 0);
 
 			ram.WriteMem(0x0, 64);
             Assert::AreEqual((int)ram.ReadMem(0x0), 64);
