@@ -1,6 +1,7 @@
 .vs/
 x64/
 Debug/
+Release/
 *.user
 NESemu.VC.db
 NESemu.VC.VC.opendb
