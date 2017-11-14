@@ -1,6 +1,7 @@
 #pragma once
 
 #include "APU.h"
+#include "INESParser.h"
 #include "Input.h"
 #include "MM5.h"
 #include "PPU.h"
@@ -16,9 +17,10 @@ public:
 	NESemu();
 	~NESemu();
 
-	ROM& GetROM() { return _rom; }
+	void Load(const char* path);
 
 private:
+	INESParser _parser;
     RAM _ram;
 	PPU _ppu;
 	APU _apu;

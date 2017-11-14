@@ -15,6 +15,13 @@ NESemu::~NESemu()
 {
 }
 
+void NESemu::Load(const char* path)
+{
+	_parser.Parse(path, _rom);
+	_parser.PrintInfo();
+	_sram.SetEnabled(_parser.IsSRAMEnabled());
+}
+
 uint8_t NESemu::ReadMem(uint16_t address)
 {
 	MemoryHandler& handler = GetMemoryHandlerForAddress(address);
