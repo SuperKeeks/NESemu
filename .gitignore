@@ -4,5 +4,6 @@ Debug/
 Release/
 *.user
 *.nes
+*.filters
 NESemu.VC.db
 NESemu.VC.VC.opendb
