@@ -41,10 +41,10 @@ uint16_t ROM::ConvertToIndex(uint16_t address) const
 	OMBAssert(address >= kStartAddress && address < kStartAddress + sizeofarray(_rom), "Address is not within the ROM's address space");
 	if (_is16KBROM)
 	{
-		return address % 16384;
+		return (address - kStartAddress) % 16384;
 	}
 	else
 	{
-		return address;
+		return address - kStartAddress;
 	}
 }
