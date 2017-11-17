@@ -42,6 +42,8 @@ int main(int argc, char* args[])
 					}
 				}
 
+				emu.Update();
+
 				SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0x00, 0x77, 0x00));
 				SDL_UpdateWindowSurface(window);
 			}

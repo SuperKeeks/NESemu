@@ -2,6 +2,7 @@
 
 NESemu::NESemu()
 {
+	_cpu.PowerOn();
 	_ram.PowerOn();
 	_ppu.PowerOn();
 	_apu.PowerOn();
@@ -20,6 +21,13 @@ void NESemu::Load(const char* path)
 	_parser.Parse(path, _rom);
 	_parser.PrintInfo();
 	_sram.SetEnabled(_parser.IsSRAMEnabled());
+
+	Reset();
+}
+
+void NESemu::Update()
+{
+	_cpu.ExecuteNextInstruction();
 }
 
 uint8_t NESemu::ReadMem(uint16_t address)
@@ -36,6 +44,7 @@ void NESemu::WriteMem(uint16_t address, uint8_t value)
 
 void NESemu::Reset()
 {
+	_cpu.Reset(this);
     _ram.Reset();
 	_ppu.Reset();
 	_apu.Reset();

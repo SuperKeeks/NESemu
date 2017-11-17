@@ -1,6 +1,7 @@
 #pragma once
 
 #include "APU.h"
+#include "CPU.h"
 #include "INESParser.h"
 #include "Input.h"
 #include "MM5.h"
@@ -18,8 +19,10 @@ public:
 	~NESemu();
 
 	void Load(const char* path);
+	void Update();
 
 private:
+	CPU _cpu;
 	INESParser _parser;
     RAM _ram;
 	PPU _ppu;
