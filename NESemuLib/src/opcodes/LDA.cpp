@@ -4,6 +4,9 @@
 
 int CPU::LDA(AddressingMode mode)
 {
-	Log::Debug("LDA %d", mode);
-	return mode;
+	int cycles = 1;
+	const uint8_t value = GetValueWithMode(mode, cycles);
+	_accumulator = value;
+
+	return cycles;
 }

@@ -38,3 +38,23 @@ int CPU::ExecuteNextInstruction()
 
 	return 0;
 }
+
+uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
+{
+	uint8_t value = 0;
+	switch (mode)
+	{
+		case AddressingMode::Immediate:
+		{
+			value = _memoryHandler->ReadMem(_programCounter++);
+			cycles += 1;
+			break;
+		}
+		default:
+		{
+			OMBAssert(false, "Unimplemented AddressingMode!");
+		}
+	}
+
+	return value;
+}

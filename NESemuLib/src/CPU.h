@@ -39,11 +39,14 @@ private:
 	uint8_t _x;
 	uint8_t _y;
 	std::map<uint8_t, std::function<int()>> _opcodes = {
-		{0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
-		{0xAD, [this]() -> int { return LDA(AddressingMode::Absolute); } }
+
+		// LDA
+		{0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } }
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;
+
+	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
 
 	int LDA(AddressingMode mode);
 };
