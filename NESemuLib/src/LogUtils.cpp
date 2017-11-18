@@ -12,7 +12,7 @@ void Log::Debug(const char* fmt, ...)
 	const int bufferSize = 1024;
 	char buff[bufferSize];
 	vsnprintf(buff, bufferSize, fmt, args);
-	printf(buff);
 	printf("\n");
+	printf(buff);
 	va_end(args);
 }
