@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+#include <map>
 #include <stdint.h>
 
 class MemoryHandler;
@@ -10,6 +12,18 @@ public:
 	static const int kStackSize = 256;
 	static const int kResetVectorAddressL = 0xFFFC;
 	static const int kResetVectorAddressH = kResetVectorAddressL + 1;
+
+	enum AddressingMode
+	{
+		Immediate,
+		ZeroPage,
+		ZeroPageX,
+		Absolute,
+		AbsoluteX,
+		AbsoluteY,
+		IndirectX,
+		IndirectY
+	};
 
 	void PowerOn();
 	void Reset(MemoryHandler* memoryHandler);
@@ -24,6 +38,12 @@ private:
 	uint8_t _accumulator;
 	uint8_t _x;
 	uint8_t _y;
+	std::map<uint8_t, std::function<int()>> _opcodes = {
+		{0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
+		{0xAD, [this]() -> int { return LDA(AddressingMode::Absolute); } }
+	};
 
 	MemoryHandler* _memoryHandler = nullptr;
+
+	int LDA(AddressingMode mode);
 };

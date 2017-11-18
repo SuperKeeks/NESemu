@@ -25,7 +25,16 @@ int CPU::ExecuteNextInstruction()
 	// Fetch next opcode
 	uint8_t opcode = _memoryHandler->ReadMem(_programCounter++);
 
-	Log::Debug("Next opcode is: %d", opcode);
+	if (_opcodes.find(opcode) != _opcodes.end())
+	{
+		Log::Debug("Executing opcode: $%04X", opcode);
+		const int cycles = _opcodes[opcode]();
+		Log::Debug("Took %d cycles", cycles);
+	}
+	else
+	{
+		Log::Debug("Unknown opcode: $%04X", opcode);
+	}
 
 	return 0;
 }
