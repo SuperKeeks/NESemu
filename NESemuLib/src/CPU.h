@@ -10,8 +10,8 @@ class CPU
 {
 public:
 	static const int kStackSize = 256;
-	static const int kResetVectorAddressL = 0xFFFC;
-	static const int kResetVectorAddressH = kResetVectorAddressL + 1;
+	static const uint16_t kResetVectorAddressL = 0xFFFC;
+	static const uint16_t kResetVectorAddressH = kResetVectorAddressL + 1;
 
 	enum AddressingMode
 	{
@@ -39,9 +39,15 @@ private:
 	uint8_t _x;
 	uint8_t _y;
 	std::map<uint8_t, std::function<int()>> _opcodes = {
-
 		// LDA
-		{0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } }
+		{ 0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
+		{ 0xA5, [this]() -> int { return LDA(AddressingMode::ZeroPage); } },
+		{ 0xB5, [this]() -> int { return LDA(AddressingMode::ZeroPageX); } },
+		{ 0xAD, [this]() -> int { return LDA(AddressingMode::Absolute); } },
+		{ 0xBD, [this]() -> int { return LDA(AddressingMode::AbsoluteX); } },
+		{ 0xB9, [this]() -> int { return LDA(AddressingMode::AbsoluteY); } },
+		{ 0xA1, [this]() -> int { return LDA(AddressingMode::IndirectX); } },
+		{ 0xB1, [this]() -> int { return LDA(AddressingMode::IndirectY); } },
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;

@@ -8,5 +8,7 @@ int CPU::LDA(AddressingMode mode)
 	const uint8_t value = GetValueWithMode(mode, cycles);
 	_accumulator = value;
 
+	// TODO: Set flags
+
 	return cycles;
 }

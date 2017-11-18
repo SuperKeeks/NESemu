@@ -50,9 +50,70 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
 			cycles += 1;
 			break;
 		}
+		case AddressingMode::ZeroPage:
+		{
+			const uint16_t address = _memoryHandler->ReadMem(_programCounter++);
+			value = _memoryHandler->ReadMem(address);
+			cycles += 2;
+			break;
+		}
+		case AddressingMode::ZeroPageX:
+		{
+			const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+			value = _memoryHandler->ReadMem(address);
+			cycles += 3;
+			break;
+		}
+		case AddressingMode::Absolute:
+		{
+			const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + (_memoryHandler->ReadMem(_programCounter++) << 8);
+			value = _memoryHandler->ReadMem(address);
+			cycles += 3;
+			break;
+		}
+		case AddressingMode::AbsoluteX:
+		case AddressingMode::AbsoluteY:
+		{
+			const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
+			const uint8_t loByte = _memoryHandler->ReadMem(_programCounter++);
+			const uint16_t loBytePlusReg = loByte + regValue;
+			const uint8_t hiByte = _memoryHandler->ReadMem(_programCounter++);
+			const uint16_t address = loBytePlusReg + (hiByte << 8);
+			value = _memoryHandler->ReadMem(address);
+			cycles += 3;
+			if (loBytePlusReg != (uint8_t)loBytePlusReg)
+			{
+				// If page boundary crossed when adding low byte and register, it takes 1 more cycle due to carry
+				cycles += 1;
+			}
+			break;
+		}
+		case AddressingMode::IndirectX:
+		{
+			const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+			const uint16_t finalAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
+			value = _memoryHandler->ReadMem(finalAddress);
+			cycles += 5;
+			break;
+		}
+		case AddressingMode::IndirectY:
+		{
+			const uint8_t address = _memoryHandler->ReadMem(_programCounter++);
+			const uint8_t loByte = _memoryHandler->ReadMem(address);
+			const uint16_t loBytePlusReg = loByte + _y;
+			const uint8_t hiByte = _memoryHandler->ReadMem(address + 1);
+			const uint16_t finalAddress = loBytePlusReg + (hiByte << 8);
+			value = _memoryHandler->ReadMem(finalAddress);
+			cycles += 4;
+			if (loBytePlusReg != (uint8_t)loBytePlusReg)
+			{
+				cycles += 1;
+			}
+			break;
+		}
 		default:
 		{
-			OMBAssert(false, "Unimplemented AddressingMode!");
+			OMBAssert(false, "Can't get value with addressingMode %d", mode);
 		}
 	}
 
