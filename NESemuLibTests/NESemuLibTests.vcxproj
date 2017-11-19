@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="LDATest.cpp" />
     <ClCompile Include="InputTest.cpp" />
+    <ClCompile Include="LDXTest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="SRAMTest.cpp" />
   </ItemGroup>
