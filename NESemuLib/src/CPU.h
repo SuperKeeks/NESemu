@@ -43,7 +43,11 @@ public:
 	void Reset(MemoryHandler* memoryHandler);
 
 	int ExecuteNextInstruction(); // Returns number of CPU cycles taken
+
+	// For testing purposes
 	uint8_t GetAccumulatorValue() { return _accumulator; };
+	uint8_t GetXValue() { return _x; };
+	uint8_t GetYValue() { return _y; };
 	bool GetFlag(Flag flag);
 
 private:
