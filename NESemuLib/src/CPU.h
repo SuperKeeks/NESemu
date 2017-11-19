@@ -31,6 +31,7 @@ public:
 		Immediate,
 		ZeroPage,
 		ZeroPageX,
+		ZeroPageY,
 		Absolute,
 		AbsoluteX,
 		AbsoluteY,
@@ -60,6 +61,20 @@ private:
 		{ 0xB9, [this]() -> int { return LDA(AddressingMode::AbsoluteY); } },
 		{ 0xA1, [this]() -> int { return LDA(AddressingMode::IndirectX); } },
 		{ 0xB1, [this]() -> int { return LDA(AddressingMode::IndirectY); } },
+
+		// LDX
+		{ 0xA2, [this]() -> int { return LDX(AddressingMode::Immediate); } },
+		{ 0xA6, [this]() -> int { return LDX(AddressingMode::ZeroPage); } },
+		{ 0xB6, [this]() -> int { return LDX(AddressingMode::ZeroPageY); } },
+		{ 0xAE, [this]() -> int { return LDX(AddressingMode::Absolute); } },
+		{ 0xBE, [this]() -> int { return LDX(AddressingMode::AbsoluteY); } },
+
+		// LDY
+		{ 0xA0, [this]() -> int { return LDY(AddressingMode::Immediate); } },
+		{ 0xA4, [this]() -> int { return LDY(AddressingMode::ZeroPage); } },
+		{ 0xB4, [this]() -> int { return LDY(AddressingMode::ZeroPageX); } },
+		{ 0xAC, [this]() -> int { return LDY(AddressingMode::Absolute); } },
+		{ 0xBC, [this]() -> int { return LDY(AddressingMode::AbsoluteX); } },
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;
@@ -69,4 +84,6 @@ private:
 	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
 
 	int LDA(AddressingMode mode);
+	int LDX(AddressingMode mode);
+	int LDY(AddressingMode mode);
 };

@@ -176,6 +176,8 @@
     <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\opcodes\LDA.cpp" />
+    <ClCompile Include="src\opcodes\LDX.cpp" />
+    <ClCompile Include="src\opcodes\LDY.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
     <ClCompile Include="src\ROM.cpp" />

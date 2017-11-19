@@ -83,8 +83,10 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
 			break;
 		}
 		case AddressingMode::ZeroPageX:
+		case AddressingMode::ZeroPageY:
 		{
-			const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+			const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
+			const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + regValue;
 			value = _memoryHandler->ReadMem(address);
 			cycles += 3;
 			break;

@@ -1,7 +1,5 @@
 #include "CPU.h"
 
-#include "LogUtils.h"
-
 int CPU::LDA(AddressingMode mode)
 {
 	int cycles = 1;
