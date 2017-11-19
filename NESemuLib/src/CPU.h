@@ -81,14 +81,26 @@ private:
 		{ 0xB4, [this]() -> int { return LDY(AddressingMode::ZeroPageX); } },
 		{ 0xAC, [this]() -> int { return LDY(AddressingMode::Absolute); } },
 		{ 0xBC, [this]() -> int { return LDY(AddressingMode::AbsoluteX); } },
+
+        // STA
+        { 0x85, [this]() -> int { return STA(AddressingMode::ZeroPage); } },
+        { 0x95, [this]() -> int { return STA(AddressingMode::ZeroPageX); } },
+        { 0x8D, [this]() -> int { return STA(AddressingMode::Absolute); } },
+        { 0x9D, [this]() -> int { return STA(AddressingMode::AbsoluteX); } },
+        { 0x99, [this]() -> int { return STA(AddressingMode::AbsoluteY); } },
+        { 0x81, [this]() -> int { return STA(AddressingMode::IndirectX); } },
+        { 0x91, [this]() -> int { return STA(AddressingMode::IndirectY); } },
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;
 
 	void SetFlag(Flag flag, bool value);
 	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
+    void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
 
 	int LDA(AddressingMode mode);
 	int LDX(AddressingMode mode);
 	int LDY(AddressingMode mode);
+    
+    int STA(AddressingMode mode);
 };

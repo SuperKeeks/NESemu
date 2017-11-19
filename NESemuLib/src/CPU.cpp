@@ -147,3 +147,68 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
 
 	return value;
 }
+
+void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
+{
+    switch (mode)
+    {
+        case AddressingMode::ZeroPage:
+        {
+            const uint16_t address = _memoryHandler->ReadMem(_programCounter++);
+            _memoryHandler->WriteMem(address, value);
+            cycles += 2;
+            break;
+        }
+        case AddressingMode::ZeroPageX:
+        case AddressingMode::ZeroPageY:
+        {
+            const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
+            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + regValue;
+            _memoryHandler->WriteMem(address, value);
+            cycles += 3;
+            break;
+        }
+        case AddressingMode::Absolute:
+        {
+            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + (_memoryHandler->ReadMem(_programCounter++) << 8);
+            _memoryHandler->WriteMem(address, value);
+            cycles += 3;
+            break;
+        }
+        case AddressingMode::AbsoluteX:
+        case AddressingMode::AbsoluteY:
+        {
+            const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
+            const uint8_t loByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint16_t loBytePlusReg = loByte + regValue;
+            const uint8_t hiByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint16_t address = loBytePlusReg + (hiByte << 8);
+            _memoryHandler->WriteMem(address, value);
+            cycles += 4;
+            break;
+        }
+        case AddressingMode::IndirectX:
+        {
+            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+            const uint16_t finalAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
+            _memoryHandler->WriteMem(finalAddress, value);
+            cycles += 5;
+            break;
+        }
+        case AddressingMode::IndirectY:
+        {
+            const uint8_t address = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t loByte = _memoryHandler->ReadMem(address);
+            const uint16_t loBytePlusReg = loByte + _y;
+            const uint8_t hiByte = _memoryHandler->ReadMem(address + 1);
+            const uint16_t finalAddress = loBytePlusReg + (hiByte << 8);
+            _memoryHandler->WriteMem(finalAddress, value);
+            cycles += 5;
+            break;
+        }
+        default:
+        {
+            OMBAssert(false, "Can't set value with addressingMode %d", mode);
+        }
+    }
+}

@@ -28,7 +28,7 @@ namespace NESemuLibTests
 
             // Zero Page, X
             rom[codeIndex++] = 0xA9; // LDA (Immediate)
-            rom[codeIndex++] = 0x33; // #$66
+            rom[codeIndex++] = 0x66; // #$66
             rom[codeIndex++] = 0xA2; // LDX (Immediate)
             rom[codeIndex++] = 0x04; // #$4
             rom[codeIndex++] = 0x95; // STA (Zero Page, X)
@@ -139,7 +139,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction(); // LDA
             cpu.ExecuteNextInstruction(); // LDY
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0xDD, emu.ReadMem(0x1509));
+            Assert::AreEqual((uint8_t)0xEE, emu.ReadMem(0x1509));
             Assert::AreEqual(6, cycles);
         }
 
