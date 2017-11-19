@@ -6,6 +6,14 @@
 
 void CPU::PowerOn()
 {
+	_programCounter = 0;
+	_stackPointer = 0;
+	_status = 0;
+	_accumulator = 0;
+	_x = 0;
+	_y = 0;
+
+	SetFlag(Flag::Unused, true);
 }
 
 void CPU::Reset(MemoryHandler* memoryHandler)
@@ -37,6 +45,23 @@ int CPU::ExecuteNextInstruction()
 	}
 
 	return 0;
+}
+
+void CPU::SetFlag(Flag flag, bool value)
+{
+	if (value)
+	{
+		_status |= 1 << flag;
+	}
+	else
+	{
+		_status &= ~(1 << flag);
+	}
+}
+
+bool CPU::GetFlag(Flag flag)
+{
+	return (_status & (1 << flag)) != 0;
 }
 
 uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
