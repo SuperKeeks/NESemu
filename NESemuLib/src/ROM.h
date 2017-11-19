@@ -5,8 +5,8 @@
 class ROM : public MemoryHandler
 {
 public:
-	static const int kMaxROMSize = 32768;
-	static const int kStartAddress = 0x8000;
+	static const uint16_t kMaxROMSize = 32768;
+	static const uint16_t kStartAddress = 0x8000;
 
 	ROM();
 	virtual ~ROM();

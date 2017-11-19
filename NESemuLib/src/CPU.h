@@ -43,6 +43,8 @@ public:
 	void Reset(MemoryHandler* memoryHandler);
 
 	int ExecuteNextInstruction(); // Returns number of CPU cycles taken
+	uint8_t GetAccumulatorValue() { return _accumulator; };
+	bool GetFlag(Flag flag);
 
 private:
 	uint16_t _programCounter;
@@ -80,7 +82,6 @@ private:
 	MemoryHandler* _memoryHandler = nullptr;
 
 	void SetFlag(Flag flag, bool value);
-	bool GetFlag(Flag flag);
 	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
 
 	int LDA(AddressingMode mode);

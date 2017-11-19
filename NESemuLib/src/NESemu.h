@@ -19,7 +19,14 @@ public:
 	~NESemu();
 
 	void Load(const char* path);
+	void Load(const uint8_t rom[], uint16_t romSize); // For testing purposes
 	void Update();
+	virtual void Reset();
+
+	CPU* GetCPU() { return &_cpu; }
+
+	virtual uint8_t ReadMem(uint16_t address);
+	virtual void WriteMem(uint16_t address, uint8_t value);
 
 private:
 	CPU _cpu;
@@ -31,10 +38,6 @@ private:
 	MM5 _mm5;
 	SRAM _sram;
 	ROM _rom;
-
-    virtual uint8_t ReadMem(uint16_t address);
-    virtual void WriteMem(uint16_t address, uint8_t value);
-    virtual void Reset();
 
 	MemoryHandler& GetMemoryHandlerForAddress(uint16_t address);
 };

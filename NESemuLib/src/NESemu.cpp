@@ -1,5 +1,7 @@
 #include "NESemu.h"
 
+#include "SizeOfArray.h"
+
 NESemu::NESemu()
 {
 	_cpu.PowerOn();
@@ -21,6 +23,18 @@ void NESemu::Load(const char* path)
 	_parser.Parse(path, _rom);
 	_parser.PrintInfo();
 	_sram.SetEnabled(_parser.IsSRAMEnabled());
+
+	Reset();
+}
+
+void NESemu::Load(const uint8_t rom[], uint16_t romSize)
+{
+	OMBAssert(romSize == ROM::kMaxROMSize || romSize == ROM::kMaxROMSize / 2, "Unsupported ROM size");
+	for (int i = 0; i < romSize; ++i)
+	{
+		_rom.GetROMPtr()[i] = rom[i];
+	}
+	_rom.SetIs16KBROM(romSize == ROM::kMaxROMSize / 2);
 
 	Reset();
 }
