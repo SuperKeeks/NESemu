@@ -165,6 +165,7 @@
     <ClCompile Include="LDYTest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="SRAMTest.cpp" />
+    <ClCompile Include="STATest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
