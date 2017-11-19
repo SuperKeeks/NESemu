@@ -36,7 +36,7 @@ namespace NESemuLibTests
 			rom[codeIndex++] = 0xA6; // LDX (Zero Page)
 			rom[codeIndex++] = 0x44; // $44
 
-			// Zero Page, X
+			// Zero Page, Y
 			rom[codeIndex++] = 0xA0; // LDY (Immediate)
 			rom[codeIndex++] = 0x04; // #$4
 			rom[codeIndex++] = 0xB6; // LDX (Zero Page, Y)
