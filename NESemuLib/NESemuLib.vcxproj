@@ -179,6 +179,8 @@
     <ClCompile Include="src\opcodes\LDX.cpp" />
     <ClCompile Include="src\opcodes\LDY.cpp" />
     <ClCompile Include="src\opcodes\STA.cpp" />
+    <ClCompile Include="src\opcodes\STX.cpp" />
+    <ClCompile Include="src\opcodes\STY.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
     <ClCompile Include="src\ROM.cpp" />

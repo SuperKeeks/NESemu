@@ -90,6 +90,16 @@ private:
         { 0x99, [this]() -> int { return STA(AddressingMode::AbsoluteY); } },
         { 0x81, [this]() -> int { return STA(AddressingMode::IndirectX); } },
         { 0x91, [this]() -> int { return STA(AddressingMode::IndirectY); } },
+
+        // STX
+        { 0x86, [this]() -> int { return STX(AddressingMode::ZeroPage); } },
+        { 0x96, [this]() -> int { return STX(AddressingMode::ZeroPageY); } },
+        { 0x8E, [this]() -> int { return STX(AddressingMode::Absolute); } },
+
+        // STY
+        { 0x84, [this]() -> int { return STY(AddressingMode::ZeroPage); } },
+        { 0x94, [this]() -> int { return STY(AddressingMode::ZeroPageX); } },
+        { 0x8C, [this]() -> int { return STY(AddressingMode::Absolute); } },
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;
@@ -103,4 +113,6 @@ private:
 	int LDY(AddressingMode mode);
     
     int STA(AddressingMode mode);
+    int STX(AddressingMode mode);
+    int STY(AddressingMode mode);
 };
