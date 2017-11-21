@@ -118,6 +118,8 @@ private:
         { 0x58, [this]() -> int { return CLI(AddressingMode::Implied); } },
         { 0x78, [this]() -> int { return SEI(AddressingMode::Implied); } },
         { 0xB8, [this]() -> int { return CLV(AddressingMode::Implied); } },
+        { 0xD8, [this]() -> int { return CLD(AddressingMode::Implied); } },
+        { 0xF8, [this]() -> int { return SED(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -142,4 +144,6 @@ private:
     int CLI(AddressingMode mode);
     int SEI(AddressingMode mode);
     int CLV(AddressingMode mode);
+    int CLD(AddressingMode mode);
+    int SED(AddressingMode mode);
 };
