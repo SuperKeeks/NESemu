@@ -36,13 +36,13 @@ int CPU::ExecuteNextInstruction()
 
     if (_opcodes.find(opcode) != _opcodes.end())
     {
-        Log::Debug("Executing opcode: $%04X", opcode);
+        Log::Debug("Executing opcode: $%02X", opcode);
         cycles = _opcodes[opcode]();
         Log::Debug("Took %d cycles", cycles);
     }
     else
     {
-        Log::Debug("Unknown opcode: $%04X", opcode);
+        Log::Debug("Unknown opcode: $%02X", opcode);
     }
 
     return cycles;
