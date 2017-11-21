@@ -12,13 +12,13 @@
 #define OMBAssert(condition, errmsg, ...) \
 do \
 { \
-	if (!(condition)) \
-	{ \
-		std::printf("%s:%d: Assertion failed: ", (__FILE__), (__LINE__)); \
-		std::printf(errmsg, ##__VA_ARGS__); \
-		std::printf("\r"); \
-		__asm int 3 \
-	} \
+    if (!(condition)) \
+    { \
+        std::printf("%s:%d: Assertion failed: ", (__FILE__), (__LINE__)); \
+        std::printf(errmsg, ##__VA_ARGS__); \
+        std::printf("\r"); \
+        __asm int 3 \
+    } \
 } while(0) \
 
 #endif

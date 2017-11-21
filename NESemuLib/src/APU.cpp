@@ -12,21 +12,21 @@ APU::~APU()
 
 uint8_t APU::ReadMem(uint16_t address)
 {
-	OMBAssert(false, "Unimplemented");
-	return 0;
+    OMBAssert(false, "Unimplemented");
+    return 0;
 }
 
 void APU::WriteMem(uint16_t address, uint8_t value)
 {
-	OMBAssert(false, "Unimplemented");
+    OMBAssert(false, "Unimplemented");
 }
 
 void APU::PowerOn()
 {
-	// TODO
+    // TODO
 }
 
 void APU::Reset()
 {
-	// TODO
+    // TODO
 }

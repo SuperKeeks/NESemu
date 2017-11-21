@@ -7,12 +7,12 @@
 
 void Log::Debug(const char* fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	const int bufferSize = 1024;
-	char buff[bufferSize];
-	vsnprintf(buff, bufferSize, fmt, args);
-	printf("\n");
-	printf(buff);
-	va_end(args);
+    va_list args;
+    va_start(args, fmt);
+    const int bufferSize = 1024;
+    char buff[bufferSize];
+    vsnprintf(buff, bufferSize, fmt, args);
+    printf("\n");
+    printf(buff);
+    va_end(args);
 }

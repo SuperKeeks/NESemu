@@ -2,5 +2,5 @@
 
 namespace Log
 {
-	void Debug(const char* fmt, ...);
+    void Debug(const char* fmt, ...);
 }

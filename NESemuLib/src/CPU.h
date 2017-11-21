@@ -9,78 +9,78 @@ class MemoryHandler;
 class CPU
 {
 public:
-	static const int kStackSize = 256;
-	static const uint16_t kStackAddressStart = 0x100;
-	static const uint16_t kResetVectorAddressL = 0xFFFC;
-	static const uint16_t kResetVectorAddressH = kResetVectorAddressL + 1;
+    static const int kStackSize = 256;
+    static const uint16_t kStackAddressStart = 0x100;
+    static const uint16_t kResetVectorAddressL = 0xFFFC;
+    static const uint16_t kResetVectorAddressH = kResetVectorAddressL + 1;
 
-	enum Flag
-	{
-		Carry = 0,          // C
-		Zero,               // Z
-		InterruptDisable,   // I
-		DecimalMode,        // D
-		Break,              // B
-		Unused,             // 1
-		Overflow,           // V
-		Sign                // S (1 for Negative)
-	};
+    enum Flag
+    {
+        Carry = 0,          // C
+        Zero,               // Z
+        InterruptDisable,   // I
+        DecimalMode,        // D
+        Break,              // B
+        Unused,             // 1
+        Overflow,           // V
+        Sign                // S (1 for Negative)
+    };
 
-	enum AddressingMode
-	{
-		Immediate,
-		ZeroPage,
-		ZeroPageX,
-		ZeroPageY,
-		Absolute,
-		AbsoluteX,
-		AbsoluteY,
-		IndirectX,
-		IndirectY
-	};
+    enum AddressingMode
+    {
+        Immediate,
+        ZeroPage,
+        ZeroPageX,
+        ZeroPageY,
+        Absolute,
+        AbsoluteX,
+        AbsoluteY,
+        IndirectX,
+        IndirectY
+    };
 
-	void PowerOn();
-	void Reset(MemoryHandler* memoryHandler);
+    void PowerOn();
+    void Reset(MemoryHandler* memoryHandler);
 
-	int ExecuteNextInstruction(); // Returns number of CPU cycles taken
+    int ExecuteNextInstruction(); // Returns number of CPU cycles taken
 
-	// For testing purposes
-	uint8_t GetAccumulatorValue() { return _accumulator; };
-	uint8_t GetXValue() { return _x; };
-	uint8_t GetYValue() { return _y; };
-	bool GetFlag(Flag flag);
+    // For testing purposes
+    uint8_t GetAccumulatorValue() { return _accumulator; };
+    uint8_t GetXValue() { return _x; };
+    uint8_t GetYValue() { return _y; };
+    bool GetFlag(Flag flag);
 
 private:
-	uint16_t _programCounter;
-	uint8_t _stackPointer;
-	uint8_t _status;
-	uint8_t _accumulator;
-	uint8_t _x;
-	uint8_t _y;
-	std::map<uint8_t, std::function<int()>> _opcodes = {
-		// LDA
-		{ 0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
-		{ 0xA5, [this]() -> int { return LDA(AddressingMode::ZeroPage); } },
-		{ 0xB5, [this]() -> int { return LDA(AddressingMode::ZeroPageX); } },
-		{ 0xAD, [this]() -> int { return LDA(AddressingMode::Absolute); } },
-		{ 0xBD, [this]() -> int { return LDA(AddressingMode::AbsoluteX); } },
-		{ 0xB9, [this]() -> int { return LDA(AddressingMode::AbsoluteY); } },
-		{ 0xA1, [this]() -> int { return LDA(AddressingMode::IndirectX); } },
-		{ 0xB1, [this]() -> int { return LDA(AddressingMode::IndirectY); } },
+    uint16_t _programCounter;
+    uint8_t _stackPointer;
+    uint8_t _status;
+    uint8_t _accumulator;
+    uint8_t _x;
+    uint8_t _y;
+    std::map<uint8_t, std::function<int()>> _opcodes = {
+        // LDA
+        { 0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
+        { 0xA5, [this]() -> int { return LDA(AddressingMode::ZeroPage); } },
+        { 0xB5, [this]() -> int { return LDA(AddressingMode::ZeroPageX); } },
+        { 0xAD, [this]() -> int { return LDA(AddressingMode::Absolute); } },
+        { 0xBD, [this]() -> int { return LDA(AddressingMode::AbsoluteX); } },
+        { 0xB9, [this]() -> int { return LDA(AddressingMode::AbsoluteY); } },
+        { 0xA1, [this]() -> int { return LDA(AddressingMode::IndirectX); } },
+        { 0xB1, [this]() -> int { return LDA(AddressingMode::IndirectY); } },
 
-		// LDX
-		{ 0xA2, [this]() -> int { return LDX(AddressingMode::Immediate); } },
-		{ 0xA6, [this]() -> int { return LDX(AddressingMode::ZeroPage); } },
-		{ 0xB6, [this]() -> int { return LDX(AddressingMode::ZeroPageY); } },
-		{ 0xAE, [this]() -> int { return LDX(AddressingMode::Absolute); } },
-		{ 0xBE, [this]() -> int { return LDX(AddressingMode::AbsoluteY); } },
+        // LDX
+        { 0xA2, [this]() -> int { return LDX(AddressingMode::Immediate); } },
+        { 0xA6, [this]() -> int { return LDX(AddressingMode::ZeroPage); } },
+        { 0xB6, [this]() -> int { return LDX(AddressingMode::ZeroPageY); } },
+        { 0xAE, [this]() -> int { return LDX(AddressingMode::Absolute); } },
+        { 0xBE, [this]() -> int { return LDX(AddressingMode::AbsoluteY); } },
 
-		// LDY
-		{ 0xA0, [this]() -> int { return LDY(AddressingMode::Immediate); } },
-		{ 0xA4, [this]() -> int { return LDY(AddressingMode::ZeroPage); } },
-		{ 0xB4, [this]() -> int { return LDY(AddressingMode::ZeroPageX); } },
-		{ 0xAC, [this]() -> int { return LDY(AddressingMode::Absolute); } },
-		{ 0xBC, [this]() -> int { return LDY(AddressingMode::AbsoluteX); } },
+        // LDY
+        { 0xA0, [this]() -> int { return LDY(AddressingMode::Immediate); } },
+        { 0xA4, [this]() -> int { return LDY(AddressingMode::ZeroPage); } },
+        { 0xB4, [this]() -> int { return LDY(AddressingMode::ZeroPageX); } },
+        { 0xAC, [this]() -> int { return LDY(AddressingMode::Absolute); } },
+        { 0xBC, [this]() -> int { return LDY(AddressingMode::AbsoluteX); } },
 
         // STA
         { 0x85, [this]() -> int { return STA(AddressingMode::ZeroPage); } },
@@ -110,18 +110,18 @@ private:
         { 0x79, [this]() -> int { return ADC(AddressingMode::AbsoluteY); } },
         { 0x61, [this]() -> int { return ADC(AddressingMode::IndirectX); } },
         { 0x71, [this]() -> int { return ADC(AddressingMode::IndirectY); } },
-	};
+    };
 
-	MemoryHandler* _memoryHandler = nullptr;
+    MemoryHandler* _memoryHandler = nullptr;
 
-	void SetFlag(Flag flag, bool value);
-	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
+    void SetFlag(Flag flag, bool value);
+    uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
     bool IsValueNegative(uint8_t value) const;
 
-	int LDA(AddressingMode mode);
-	int LDX(AddressingMode mode);
-	int LDY(AddressingMode mode);
+    int LDA(AddressingMode mode);
+    int LDX(AddressingMode mode);
+    int LDY(AddressingMode mode);
     
     int STA(AddressingMode mode);
     int STX(AddressingMode mode);

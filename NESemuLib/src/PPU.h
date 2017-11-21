@@ -5,11 +5,11 @@
 class PPU : public MemoryHandler
 {
 public:
-	PPU();
-	virtual ~PPU();
+    PPU();
+    virtual ~PPU();
 
-	virtual uint8_t ReadMem(uint16_t address);
-	virtual void WriteMem(uint16_t address, uint8_t value);
-	virtual void PowerOn();
-	virtual void Reset();
+    virtual uint8_t ReadMem(uint16_t address);
+    virtual void WriteMem(uint16_t address, uint8_t value);
+    virtual void PowerOn();
+    virtual void Reset();
 };
