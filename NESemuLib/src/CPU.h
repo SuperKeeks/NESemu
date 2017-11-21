@@ -114,6 +114,7 @@ private:
 
         // CPU Flags
         { 0x18, [this]() -> int { return CLC(AddressingMode::Implied); } },
+        { 0x38, [this]() -> int { return SEC(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -134,4 +135,5 @@ private:
     int ADC(AddressingMode mode);
 
     int CLC(AddressingMode mode);
+    int SEC(AddressingMode mode);
 };

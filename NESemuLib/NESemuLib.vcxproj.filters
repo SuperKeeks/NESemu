@@ -36,6 +36,9 @@
     <ClCompile Include="src\opcodes\CLC.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\SEC.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
