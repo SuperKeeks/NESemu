@@ -212,3 +212,8 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         }
     }
 }
+
+bool CPU::IsValueNegative(uint8_t value) const
+{
+    return (value >> 7) > 0;
+}

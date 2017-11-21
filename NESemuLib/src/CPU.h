@@ -100,6 +100,16 @@ private:
         { 0x84, [this]() -> int { return STY(AddressingMode::ZeroPage); } },
         { 0x94, [this]() -> int { return STY(AddressingMode::ZeroPageX); } },
         { 0x8C, [this]() -> int { return STY(AddressingMode::Absolute); } },
+
+        // ADC
+        { 0x69, [this]() -> int { return ADC(AddressingMode::Immediate); } },
+        { 0x65, [this]() -> int { return ADC(AddressingMode::ZeroPage); } },
+        { 0x75, [this]() -> int { return ADC(AddressingMode::ZeroPageX); } },
+        { 0x6D, [this]() -> int { return ADC(AddressingMode::Absolute); } },
+        { 0x7D, [this]() -> int { return ADC(AddressingMode::AbsoluteX); } },
+        { 0x79, [this]() -> int { return ADC(AddressingMode::AbsoluteY); } },
+        { 0x61, [this]() -> int { return ADC(AddressingMode::IndirectX); } },
+        { 0x71, [this]() -> int { return ADC(AddressingMode::IndirectY); } },
 	};
 
 	MemoryHandler* _memoryHandler = nullptr;
@@ -107,6 +117,7 @@ private:
 	void SetFlag(Flag flag, bool value);
 	uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
+    bool IsValueNegative(uint8_t value) const;
 
 	int LDA(AddressingMode mode);
 	int LDX(AddressingMode mode);
@@ -115,4 +126,6 @@ private:
     int STA(AddressingMode mode);
     int STX(AddressingMode mode);
     int STY(AddressingMode mode);
+
+    int ADC(AddressingMode mode);
 };

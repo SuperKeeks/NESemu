@@ -159,6 +159,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ADCTest.cpp" />
     <ClCompile Include="LDATest.cpp" />
     <ClCompile Include="InputTest.cpp" />
     <ClCompile Include="LDXTest.cpp" />
