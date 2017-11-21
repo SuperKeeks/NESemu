@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ADCTest.cpp" />
+    <ClCompile Include="CLCTest.cpp" />
     <ClCompile Include="LDATest.cpp" />
     <ClCompile Include="InputTest.cpp" />
     <ClCompile Include="LDXTest.cpp" />
