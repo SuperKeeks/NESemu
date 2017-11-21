@@ -28,6 +28,7 @@ public:
 
     enum AddressingMode
     {
+        Implied,
         Immediate,
         ZeroPage,
         ZeroPageX,
@@ -110,6 +111,9 @@ private:
         { 0x79, [this]() -> int { return ADC(AddressingMode::AbsoluteY); } },
         { 0x61, [this]() -> int { return ADC(AddressingMode::IndirectX); } },
         { 0x71, [this]() -> int { return ADC(AddressingMode::IndirectY); } },
+
+        // CPU Flags
+        { 0x18, [this]() -> int { return CLC(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -128,4 +132,6 @@ private:
     int STY(AddressingMode mode);
 
     int ADC(AddressingMode mode);
+
+    int CLC(AddressingMode mode);
 };

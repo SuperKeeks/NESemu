@@ -138,7 +138,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
             cycles += cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x6, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x7, cpu.GetAccumulatorValue());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));

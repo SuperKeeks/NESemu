@@ -179,6 +179,7 @@
     <ClCompile Include="src\opcodes\LDA.cpp" />
     <ClCompile Include="src\opcodes\LDX.cpp" />
     <ClCompile Include="src\opcodes\LDY.cpp" />
+    <ClCompile Include="src\opcodes\CLC.cpp" />
     <ClCompile Include="src\opcodes\STA.cpp" />
     <ClCompile Include="src\opcodes\STX.cpp" />
     <ClCompile Include="src\opcodes\STY.cpp" />

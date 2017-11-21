@@ -21,6 +21,21 @@
     <ClCompile Include="src\opcodes\LDY.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\ADC.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\STA.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\STX.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\STY.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\CLC.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
