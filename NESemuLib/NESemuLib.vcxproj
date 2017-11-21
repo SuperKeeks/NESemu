@@ -176,12 +176,14 @@
     <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\opcodes\ADC.cpp" />
+    <ClCompile Include="src\opcodes\CLI.cpp" />
     <ClCompile Include="src\opcodes\CLV.cpp" />
     <ClCompile Include="src\opcodes\LDA.cpp" />
     <ClCompile Include="src\opcodes\LDX.cpp" />
     <ClCompile Include="src\opcodes\LDY.cpp" />
     <ClCompile Include="src\opcodes\CLC.cpp" />
     <ClCompile Include="src\opcodes\SEC.cpp" />
+    <ClCompile Include="src\opcodes\SEI.cpp" />
     <ClCompile Include="src\opcodes\STA.cpp" />
     <ClCompile Include="src\opcodes\STX.cpp" />
     <ClCompile Include="src\opcodes\STY.cpp" />
