@@ -14,7 +14,7 @@ do \
 { \
     if (!(condition)) \
     { \
-        std::printf("%s:%d: Assertion failed: ", (__FILE__), (__LINE__)); \
+        std::printf("\n%s:%d: Assertion failed: ", (__FILE__), (__LINE__)); \
         std::printf(errmsg, ##__VA_ARGS__); \
         std::printf("\r"); \
         __asm int 3 \
