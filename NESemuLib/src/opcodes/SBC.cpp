@@ -1,0 +1,19 @@
+#include "CPU.h"
+
+int CPU::SBC(AddressingMode mode)
+{
+    int cycles = 1;
+    const uint8_t value = GetValueWithMode(mode, cycles);
+    const bool isValueNegative = IsValueNegative(value);
+    const bool wasAccumulatorNegative = IsValueNegative(_accumulator);
+    uint16_t result16 = _accumulator - value - (GetFlag(Flag::Carry) ? 0 : 1);
+    _accumulator = (uint8_t)result16;
+    const bool isResultNegative = IsValueNegative(_accumulator);
+
+    SetFlag(Flag::Sign, IsValueNegative(_accumulator));
+    SetFlag(Flag::Overflow, (isValueNegative != wasAccumulatorNegative) && (isValueNegative == isResultNegative));
+    SetFlag(Flag::Zero, _accumulator == 0);
+    SetFlag(Flag::Carry, result16 == _accumulator);
+
+    return cycles;
+}

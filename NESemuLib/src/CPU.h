@@ -112,6 +112,16 @@ private:
         { 0x61, [this]() -> int { return ADC(AddressingMode::IndirectX); } },
         { 0x71, [this]() -> int { return ADC(AddressingMode::IndirectY); } },
 
+        // SBC
+        { 0xE9, [this]() -> int { return SBC(AddressingMode::Immediate); } },
+        { 0xE5, [this]() -> int { return SBC(AddressingMode::ZeroPage); } },
+        { 0xF5, [this]() -> int { return SBC(AddressingMode::ZeroPageX); } },
+        { 0xED, [this]() -> int { return SBC(AddressingMode::Absolute); } },
+        { 0xFD, [this]() -> int { return SBC(AddressingMode::AbsoluteX); } },
+        { 0xF9, [this]() -> int { return SBC(AddressingMode::AbsoluteY); } },
+        { 0xE1, [this]() -> int { return SBC(AddressingMode::IndirectX); } },
+        { 0xF1, [this]() -> int { return SBC(AddressingMode::IndirectY); } },
+
         // CPU Flags
         { 0x18, [this]() -> int { return CLC(AddressingMode::Implied); } },
         { 0x38, [this]() -> int { return SEC(AddressingMode::Implied); } },
@@ -138,6 +148,7 @@ private:
     int STY(AddressingMode mode);
 
     int ADC(AddressingMode mode);
+    int SBC(AddressingMode mode);
 
     int CLC(AddressingMode mode);
     int SEC(AddressingMode mode);

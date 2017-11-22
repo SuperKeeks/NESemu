@@ -186,6 +186,7 @@
     <ClCompile Include="src\opcodes\SEC.cpp" />
     <ClCompile Include="src\opcodes\SED.cpp" />
     <ClCompile Include="src\opcodes\SEI.cpp" />
+    <ClCompile Include="src\opcodes\SBC.cpp" />
     <ClCompile Include="src\opcodes\STA.cpp" />
     <ClCompile Include="src\opcodes\STX.cpp" />
     <ClCompile Include="src\opcodes\STY.cpp" />

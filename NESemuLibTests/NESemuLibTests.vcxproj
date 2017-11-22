@@ -169,6 +169,7 @@
     <ClCompile Include="LDXTest.cpp" />
     <ClCompile Include="LDYTest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
+    <ClCompile Include="SBCTest.cpp" />
     <ClCompile Include="SECTest.cpp" />
     <ClCompile Include="SRAMTest.cpp" />
     <ClCompile Include="STATest.cpp" />
