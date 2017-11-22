@@ -13,6 +13,8 @@ void CPU::PowerOn()
     _x = 0;
     _y = 0;
 
+    Log::Debug("CPU: %d of 151 opcodes implemented\n\n", _opcodes.size());
+
     SetFlag(Flag::Unused, true);
 }
 
