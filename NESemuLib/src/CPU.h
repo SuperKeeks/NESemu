@@ -58,7 +58,7 @@ private:
     uint8_t _accumulator;
     uint8_t _x;
     uint8_t _y;
-    std::map<uint8_t, std::function<int()>> _opcodes = {
+    const std::map<uint8_t, std::function<int()>> _opcodes = {
         // LDA
         { 0xA9, [this]() -> int { return LDA(AddressingMode::Immediate); } },
         { 0xA5, [this]() -> int { return LDA(AddressingMode::ZeroPage); } },
@@ -130,6 +130,10 @@ private:
         { 0xB8, [this]() -> int { return CLV(AddressingMode::Implied); } },
         { 0xD8, [this]() -> int { return CLD(AddressingMode::Implied); } },
         { 0xF8, [this]() -> int { return SED(AddressingMode::Implied); } },
+
+        // Increment/Decrement
+        { 0xCA, [this]() -> int { return DEX(AddressingMode::Implied); } },
+        { 0xE8, [this]() -> int { return INX(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -157,4 +161,7 @@ private:
     int CLV(AddressingMode mode);
     int CLD(AddressingMode mode);
     int SED(AddressingMode mode);
+
+    int DEX(AddressingMode mode);
+    int INX(AddressingMode mode);
 };

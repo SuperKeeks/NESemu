@@ -37,7 +37,7 @@ int CPU::ExecuteNextInstruction()
     if (_opcodes.find(opcode) != _opcodes.end())
     {
         Log::Debug("Executing opcode: $%02X", opcode);
-        cycles = _opcodes[opcode]();
+        cycles = _opcodes.at(opcode)();
         Log::Debug("Took %d cycles", cycles);
     }
     else

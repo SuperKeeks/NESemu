@@ -164,6 +164,7 @@
     <ClCompile Include="CLDTest.cpp" />
     <ClCompile Include="CLVTest.cpp" />
     <ClCompile Include="CLISEITest.cpp" />
+    <ClCompile Include="DEXINXTest.cpp" />
     <ClCompile Include="LDATest.cpp" />
     <ClCompile Include="InputTest.cpp" />
     <ClCompile Include="LDXTest.cpp" />
