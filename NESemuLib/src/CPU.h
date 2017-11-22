@@ -134,6 +134,8 @@ private:
         // Increment/Decrement
         { 0xCA, [this]() -> int { return DEX(AddressingMode::Implied); } },
         { 0xE8, [this]() -> int { return INX(AddressingMode::Implied); } },
+        { 0x88, [this]() -> int { return DEY(AddressingMode::Implied); } },
+        { 0xC8, [this]() -> int { return INY(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -164,4 +166,6 @@ private:
 
     int DEX(AddressingMode mode);
     int INX(AddressingMode mode);
+    int DEY(AddressingMode mode);
+    int INY(AddressingMode mode);
 };
