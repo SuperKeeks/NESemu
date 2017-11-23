@@ -69,6 +69,8 @@
     <ClCompile Include="src\opcodes\INY.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\DEC.cpp" />
+    <ClCompile Include="src\opcodes\INC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

@@ -136,6 +136,14 @@ private:
         { 0xE8, [this]() -> int { return INX(AddressingMode::Implied); } },
         { 0x88, [this]() -> int { return DEY(AddressingMode::Implied); } },
         { 0xC8, [this]() -> int { return INY(AddressingMode::Implied); } },
+        { 0xC6, [this]() -> int { return DEC(AddressingMode::ZeroPage); } },
+        { 0xD6, [this]() -> int { return DEC(AddressingMode::ZeroPageX); } },
+        { 0xCE, [this]() -> int { return DEC(AddressingMode::Absolute); } },
+        { 0xDE, [this]() -> int { return DEC(AddressingMode::AbsoluteX); } },
+        { 0xE6, [this]() -> int { return INC(AddressingMode::ZeroPage); } },
+        { 0xF6, [this]() -> int { return INC(AddressingMode::ZeroPageX); } },
+        { 0xEE, [this]() -> int { return INC(AddressingMode::Absolute); } },
+        { 0xFE, [this]() -> int { return INC(AddressingMode::AbsoluteX); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -168,4 +176,6 @@ private:
     int INX(AddressingMode mode);
     int DEY(AddressingMode mode);
     int INY(AddressingMode mode);
+    int DEC(AddressingMode mode);
+    int INC(AddressingMode mode);
 };

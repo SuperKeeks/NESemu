@@ -179,8 +179,10 @@
     <ClCompile Include="src\opcodes\CLD.cpp" />
     <ClCompile Include="src\opcodes\CLI.cpp" />
     <ClCompile Include="src\opcodes\CLV.cpp" />
+    <ClCompile Include="src\opcodes\DEC.cpp" />
     <ClCompile Include="src\opcodes\DEX.cpp" />
     <ClCompile Include="src\opcodes\DEY.cpp" />
+    <ClCompile Include="src\opcodes\INC.cpp" />
     <ClCompile Include="src\opcodes\INX.cpp" />
     <ClCompile Include="src\opcodes\INY.cpp" />
     <ClCompile Include="src\opcodes\LDA.cpp" />
