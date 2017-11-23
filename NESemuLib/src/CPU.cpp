@@ -36,10 +36,11 @@ int CPU::ExecuteNextInstruction()
     uint8_t opcode = _memoryHandler->ReadMem(_programCounter++);
     int cycles = 0;
 
-    if (_opcodes.find(opcode) != _opcodes.end())
+    auto opcodeFunction = _opcodes.find(opcode);
+    if (opcodeFunction != _opcodes.end())
     {
         Log::Debug("Executing opcode: $%02X", opcode);
-        cycles = _opcodes.at(opcode)();
+        cycles = opcodeFunction->second();
         Log::Debug("Took %d cycles", cycles);
     }
     else
