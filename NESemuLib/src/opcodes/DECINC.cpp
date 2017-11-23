@@ -2,13 +2,13 @@
 
 #include "Assert.h"
 
-int CPU::INC(AddressingMode mode)
+int CPU::DECINC(AddressingMode mode, int delta)
 {
     int cycles = 0;
     const uint16_t programCounterBeforeGetValue = _programCounter;
     uint8_t value = GetValueWithMode(mode, cycles);
     _programCounter = programCounterBeforeGetValue;
-    ++value;
+    value += delta;
     SetValueWithMode(mode, value, cycles);
     SetFlag(Flag::Sign, IsValueNegative(value) != 0);
     SetFlag(Flag::Zero, value == 0);

@@ -136,14 +136,14 @@ private:
         { 0xE8, [this]() -> int { return INX(AddressingMode::Implied); } },
         { 0x88, [this]() -> int { return DEY(AddressingMode::Implied); } },
         { 0xC8, [this]() -> int { return INY(AddressingMode::Implied); } },
-        { 0xC6, [this]() -> int { return DEC(AddressingMode::ZeroPage); } },
-        { 0xD6, [this]() -> int { return DEC(AddressingMode::ZeroPageX); } },
-        { 0xCE, [this]() -> int { return DEC(AddressingMode::Absolute); } },
-        { 0xDE, [this]() -> int { return DEC(AddressingMode::AbsoluteX); } },
-        { 0xE6, [this]() -> int { return INC(AddressingMode::ZeroPage); } },
-        { 0xF6, [this]() -> int { return INC(AddressingMode::ZeroPageX); } },
-        { 0xEE, [this]() -> int { return INC(AddressingMode::Absolute); } },
-        { 0xFE, [this]() -> int { return INC(AddressingMode::AbsoluteX); } },
+        { 0xC6, [this]() -> int { return DECINC(AddressingMode::ZeroPage, -1); } },
+        { 0xD6, [this]() -> int { return DECINC(AddressingMode::ZeroPageX, -1); } },
+        { 0xCE, [this]() -> int { return DECINC(AddressingMode::Absolute, -1); } },
+        { 0xDE, [this]() -> int { return DECINC(AddressingMode::AbsoluteX, -1); } },
+        { 0xE6, [this]() -> int { return DECINC(AddressingMode::ZeroPage, +1); } },
+        { 0xF6, [this]() -> int { return DECINC(AddressingMode::ZeroPageX, +1); } },
+        { 0xEE, [this]() -> int { return DECINC(AddressingMode::Absolute, +1); } },
+        { 0xFE, [this]() -> int { return DECINC(AddressingMode::AbsoluteX, +1); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -176,6 +176,5 @@ private:
     int INX(AddressingMode mode);
     int DEY(AddressingMode mode);
     int INY(AddressingMode mode);
-    int DEC(AddressingMode mode);
-    int INC(AddressingMode mode);
+    int DECINC(AddressingMode mode, int delta);
 };
