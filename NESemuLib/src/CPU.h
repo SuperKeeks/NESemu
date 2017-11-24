@@ -53,6 +53,7 @@ public:
     uint8_t GetXValue() const { return _x; };
     uint8_t GetYValue() const { return _y; };
     bool GetFlag(Flag flag) const;
+    uint8_t PeekStack(int index);
 
 private:
     uint16_t _programCounter;
@@ -151,6 +152,7 @@ private:
         // Routine instructions
         { 0x4C, [this]() -> int { return JMP(AddressingMode::Absolute); } },
         { 0x6C, [this]() -> int { return JMP(AddressingMode::Indirect); } },
+        { 0x20, [this]() -> int { return JSR(AddressingMode::Absolute); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -158,6 +160,11 @@ private:
     void SetFlag(Flag flag, bool value);
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
+    void Push(uint8_t value);
+    uint8_t Pop(uint8_t value);
+
+    uint8_t GetLowByte(uint16_t value) const;
+    uint8_t GetHighByte(uint16_t value) const;
     bool IsValueNegative(uint8_t value) const;
 
     int LDA(AddressingMode mode);
@@ -186,4 +193,5 @@ private:
     int DECINC(AddressingMode mode, int delta);
 
     int JMP(AddressingMode mode);
+    int JSR(AddressingMode mode);
 };

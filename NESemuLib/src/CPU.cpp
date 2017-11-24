@@ -6,8 +6,8 @@
 
 void CPU::PowerOn()
 {
-    _programCounter = 0;
-    _stackPointer = 0;
+    _programCounter = 0xFFFF;
+    _stackPointer = 0xFF;
     _status = 0;
     _accumulator = 0;
     _x = 0;
@@ -26,14 +26,13 @@ void CPU::Reset(MemoryHandler* memoryHandler)
     int temp1 = _memoryHandler->ReadMem(kResetVectorAddressH);
     int temp2 = _memoryHandler->ReadMem(kResetVectorAddressL);
 
-    _programCounter = _memoryHandler->ReadMem(kResetVectorAddressH) << 8;
-    _programCounter += _memoryHandler->ReadMem(kResetVectorAddressL);
+    _programCounter = _memoryHandler->ReadMem(kResetVectorAddressL) + (_memoryHandler->ReadMem(kResetVectorAddressH) << 8) - 1;
 }
 
 int CPU::ExecuteNextInstruction()
 {
     // Fetch next opcode
-    uint8_t opcode = _memoryHandler->ReadMem(_programCounter++);
+    uint8_t opcode = _memoryHandler->ReadMem(++_programCounter);
     int cycles = 0;
 
     auto opcodeFunction = _opcodes.find(opcode);
@@ -68,6 +67,11 @@ bool CPU::GetFlag(Flag flag) const
     return (_status & (1 << flag)) != 0;
 }
 
+uint8_t CPU::PeekStack(int index)
+{
+    return _memoryHandler->ReadMem(kStackAddressStart + _stackPointer + 1 + index);
+}
+
 uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
 {
     uint8_t value = 0;
@@ -75,13 +79,13 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
     {
         case AddressingMode::Immediate:
         {
-            value = _memoryHandler->ReadMem(_programCounter++);
+            value = _memoryHandler->ReadMem(++_programCounter);
             cycles += 1;
             break;
         }
         case AddressingMode::ZeroPage:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++);
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter);
             value = _memoryHandler->ReadMem(address);
             cycles += 2;
             break;
@@ -90,14 +94,14 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         case AddressingMode::ZeroPageY:
         {
             const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + regValue;
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + regValue;
             value = _memoryHandler->ReadMem(address);
             cycles += 3;
             break;
         }
         case AddressingMode::Absolute:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + (_memoryHandler->ReadMem(_programCounter++) << 8);
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8);
             value = _memoryHandler->ReadMem(address);
             cycles += 3;
             break;
@@ -106,9 +110,9 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         case AddressingMode::AbsoluteY:
         {
             const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
-            const uint8_t loByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t loByte = _memoryHandler->ReadMem(++_programCounter);
             const uint16_t loBytePlusReg = loByte + regValue;
-            const uint8_t hiByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t hiByte = _memoryHandler->ReadMem(++_programCounter);
             const uint16_t address = loBytePlusReg + (hiByte << 8);
             value = _memoryHandler->ReadMem(address);
             cycles += 3;
@@ -121,7 +125,7 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         }
         case AddressingMode::IndirectX:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + _x;
             const uint16_t finalAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
             value = _memoryHandler->ReadMem(finalAddress);
             cycles += 5;
@@ -129,7 +133,7 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         }
         case AddressingMode::IndirectY:
         {
-            const uint8_t address = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t address = _memoryHandler->ReadMem(++_programCounter);
             const uint8_t loByte = _memoryHandler->ReadMem(address);
             const uint16_t loBytePlusReg = loByte + _y;
             const uint8_t hiByte = _memoryHandler->ReadMem(address + 1);
@@ -157,7 +161,7 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
     {
         case AddressingMode::ZeroPage:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++);
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter);
             _memoryHandler->WriteMem(address, value);
             cycles += 2;
             break;
@@ -166,14 +170,14 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         case AddressingMode::ZeroPageY:
         {
             const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + regValue;
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + regValue;
             _memoryHandler->WriteMem(address, value);
             cycles += 3;
             break;
         }
         case AddressingMode::Absolute:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + (_memoryHandler->ReadMem(_programCounter++) << 8);
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8);
             _memoryHandler->WriteMem(address, value);
             cycles += 3;
             break;
@@ -182,9 +186,9 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         case AddressingMode::AbsoluteY:
         {
             const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
-            const uint8_t loByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t loByte = _memoryHandler->ReadMem(++_programCounter);
             const uint16_t loBytePlusReg = loByte + regValue;
-            const uint8_t hiByte = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t hiByte = _memoryHandler->ReadMem(++_programCounter);
             const uint16_t address = loBytePlusReg + (hiByte << 8);
             _memoryHandler->WriteMem(address, value);
             cycles += 4;
@@ -192,7 +196,7 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         }
         case AddressingMode::IndirectX:
         {
-            const uint16_t address = _memoryHandler->ReadMem(_programCounter++) + _x;
+            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + _x;
             const uint16_t finalAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
             _memoryHandler->WriteMem(finalAddress, value);
             cycles += 5;
@@ -200,7 +204,7 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         }
         case AddressingMode::IndirectY:
         {
-            const uint8_t address = _memoryHandler->ReadMem(_programCounter++);
+            const uint8_t address = _memoryHandler->ReadMem(++_programCounter);
             const uint8_t loByte = _memoryHandler->ReadMem(address);
             const uint16_t loBytePlusReg = loByte + _y;
             const uint8_t hiByte = _memoryHandler->ReadMem(address + 1);
@@ -214,6 +218,30 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
             OMBAssert(false, "Can't set value with addressingMode %d", mode);
         }
     }
+}
+
+void CPU::Push(uint8_t value)
+{
+    _memoryHandler->WriteMem(kStackAddressStart + _stackPointer, value);
+    OMBAssert(_stackPointer > 0, "Stack overflow!");
+    --_stackPointer;
+}
+
+uint8_t CPU::Pop(uint8_t value)
+{
+    OMBAssert(_stackPointer < 0xFF, "Stack overflow!");
+    ++_stackPointer;
+    return _memoryHandler->ReadMem(kStackAddressStart + _stackPointer);
+}
+
+uint8_t CPU::GetLowByte(uint16_t value) const
+{
+    return 0x00FF & value;
+}
+
+uint8_t CPU::GetHighByte(uint16_t value) const
+{
+    return value >> 8;
 }
 
 bool CPU::IsValueNegative(uint8_t value) const
