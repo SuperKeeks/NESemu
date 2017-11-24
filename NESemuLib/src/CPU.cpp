@@ -63,7 +63,7 @@ void CPU::SetFlag(Flag flag, bool value)
     }
 }
 
-bool CPU::GetFlag(Flag flag)
+bool CPU::GetFlag(Flag flag) const
 {
     return (_status & (1 << flag)) != 0;
 }

@@ -36,6 +36,7 @@ public:
         Absolute,
         AbsoluteX,
         AbsoluteY,
+        Indirect,
         IndirectX,
         IndirectY
     };
@@ -46,10 +47,12 @@ public:
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
 
     // For testing purposes
-    uint8_t GetAccumulatorValue() { return _accumulator; };
-    uint8_t GetXValue() { return _x; };
-    uint8_t GetYValue() { return _y; };
-    bool GetFlag(Flag flag);
+    uint16_t GetProgramCounter() const { return _programCounter; }
+    void SetProgramCounter(uint16_t value) { _programCounter = value; }
+    uint8_t GetAccumulatorValue() const { return _accumulator; };
+    uint8_t GetXValue() const { return _x; };
+    uint8_t GetYValue() const { return _y; };
+    bool GetFlag(Flag flag) const;
 
 private:
     uint16_t _programCounter;
@@ -144,6 +147,10 @@ private:
         { 0xF6, [this]() -> int { return DECINC(AddressingMode::ZeroPageX, +1); } },
         { 0xEE, [this]() -> int { return DECINC(AddressingMode::Absolute, +1); } },
         { 0xFE, [this]() -> int { return DECINC(AddressingMode::AbsoluteX, +1); } },
+
+        // Routine instructions
+        { 0x4C, [this]() -> int { return JMP(AddressingMode::Absolute); } },
+        { 0x6C, [this]() -> int { return JMP(AddressingMode::Indirect); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -177,4 +184,6 @@ private:
     int DEY(AddressingMode mode);
     int INY(AddressingMode mode);
     int DECINC(AddressingMode mode, int delta);
+
+    int JMP(AddressingMode mode);
 };

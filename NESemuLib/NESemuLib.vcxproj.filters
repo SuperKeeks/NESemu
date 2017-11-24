@@ -70,6 +70,9 @@
       <Filter>opcodes</Filter>
     </ClCompile>
     <ClCompile Include="src\opcodes\DECINC.cpp" />
+    <ClCompile Include="src\opcodes\JMP.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
