@@ -76,6 +76,9 @@
     <ClCompile Include="src\opcodes\JSR.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\RTS.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

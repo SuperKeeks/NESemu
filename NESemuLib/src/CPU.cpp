@@ -227,7 +227,7 @@ void CPU::Push(uint8_t value)
     --_stackPointer;
 }
 
-uint8_t CPU::Pop(uint8_t value)
+uint8_t CPU::Pop()
 {
     OMBAssert(_stackPointer < 0xFF, "Stack overflow!");
     ++_stackPointer;

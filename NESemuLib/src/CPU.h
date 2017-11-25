@@ -153,6 +153,7 @@ private:
         { 0x4C, [this]() -> int { return JMP(AddressingMode::Absolute); } },
         { 0x6C, [this]() -> int { return JMP(AddressingMode::Indirect); } },
         { 0x20, [this]() -> int { return JSR(AddressingMode::Absolute); } },
+        { 0x60, [this]() -> int { return RTS(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -161,7 +162,7 @@ private:
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
     void Push(uint8_t value);
-    uint8_t Pop(uint8_t value);
+    uint8_t Pop();
 
     uint8_t GetLowByte(uint16_t value) const;
     uint8_t GetHighByte(uint16_t value) const;
@@ -194,4 +195,5 @@ private:
 
     int JMP(AddressingMode mode);
     int JSR(AddressingMode mode);
+    int RTS(AddressingMode mode);
 };

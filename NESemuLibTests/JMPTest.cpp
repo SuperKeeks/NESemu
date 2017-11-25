@@ -40,7 +40,7 @@ namespace NESemuLibTests
             // 1. JMP Absolute
             uint16_t initialProgramCounter = cpu.GetProgramCounter();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(0x1234, (int)cpu.GetProgramCounter());
+            Assert::AreEqual(0x1234, (int)cpu.GetProgramCounter() + 1);
             Assert::AreEqual(3, cycles);
 
             // 2. JMP Indirect
@@ -48,7 +48,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x1122, 0x11);
             emu.WriteMem(0x1123, 0x11);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(0x1111, (int)cpu.GetProgramCounter());
+            Assert::AreEqual(0x1111, (int)cpu.GetProgramCounter() + 1);
             Assert::AreEqual(5, cycles);
 
             // 3. JMP Indirect, check carry doesn't work
@@ -57,7 +57,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x1100, 0x22);
             emu.WriteMem(0x1000, 0x66);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(0x6633, (int)cpu.GetProgramCounter());
+            Assert::AreEqual(0x6633, (int)cpu.GetProgramCounter() + 1);
             Assert::AreEqual(5, cycles);
         }
 

@@ -10,6 +10,7 @@ int CPU::JSR(AddressingMode mode)
     uint16_t nextOpAddress = _programCounter + 1;
     Push(GetHighByte(nextOpAddress));
     Push(GetLowByte(nextOpAddress));
-    _programCounter = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8);
+    // NOTE: Subtract 1 so next time PC is incremented it fetches the right opcode
+    _programCounter = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8) - 1;
     return 6;
 }

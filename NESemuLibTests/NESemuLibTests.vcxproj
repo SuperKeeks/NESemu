@@ -168,7 +168,7 @@
     <ClCompile Include="DEXINXTest.cpp" />
     <ClCompile Include="DEYINYTest.cpp" />
     <ClCompile Include="JMPTest.cpp" />
-    <ClCompile Include="JSRTest.cpp" />
+    <ClCompile Include="JSRRTSTest.cpp" />
     <ClCompile Include="LDATest.cpp" />
     <ClCompile Include="InputTest.cpp" />
     <ClCompile Include="LDXTest.cpp" />

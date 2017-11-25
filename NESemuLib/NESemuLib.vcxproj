@@ -190,6 +190,7 @@
     <ClCompile Include="src\opcodes\LDX.cpp" />
     <ClCompile Include="src\opcodes\LDY.cpp" />
     <ClCompile Include="src\opcodes\CLC.cpp" />
+    <ClCompile Include="src\opcodes\RTS.cpp" />
     <ClCompile Include="src\opcodes\SEC.cpp" />
     <ClCompile Include="src\opcodes\SED.cpp" />
     <ClCompile Include="src\opcodes\SEI.cpp" />
