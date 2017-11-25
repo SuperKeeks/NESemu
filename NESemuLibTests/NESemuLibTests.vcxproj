@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ADCTest.cpp" />
+    <ClCompile Include="BEQTest.cpp" />
     <ClCompile Include="BRKRTI.cpp" />
     <ClCompile Include="CLCTest.cpp" />
     <ClCompile Include="CLDTest.cpp" />

@@ -31,6 +31,7 @@ public:
     enum AddressingMode
     {
         Implied,
+        Relative,
         Immediate,
         ZeroPage,
         ZeroPageX,
@@ -48,13 +49,14 @@ public:
 
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
 
-    // For testing purposes
+    // Internal or for testing purposes (hence the publicness) Don't use these without a good reason
     uint16_t GetProgramCounter() const { return _programCounter; }
     void SetProgramCounter(uint16_t value) { _programCounter = value; }
     uint8_t GetStatus() const { return _status; }
     uint8_t GetAccumulatorValue() const { return _accumulator; };
     uint8_t GetXValue() const { return _x; };
     uint8_t GetYValue() const { return _y; };
+    void SetFlag(Flag flag, bool value);
     bool GetFlag(Flag flag) const;
     uint8_t PeekStack(int index);
 
@@ -159,13 +161,15 @@ private:
         { 0x60, [this]() -> int { return RTS(AddressingMode::Implied); } },
         { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
 
+        // Branch-on-condition instructions
+        { 0xF0, [this]() -> int { return BEQ(AddressingMode::Relative); } },
+
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
 
-    void SetFlag(Flag flag, bool value);
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
     void Push(uint8_t value);
@@ -204,6 +208,8 @@ private:
     int JSR(AddressingMode mode);
     int RTS(AddressingMode mode);
     int RTI(AddressingMode mode);
+
+    int BEQ(AddressingMode mode);
 
     int BRK(AddressingMode mode);
 };
