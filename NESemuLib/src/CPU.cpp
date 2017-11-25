@@ -14,8 +14,6 @@ void CPU::PowerOn()
     _y = 0;
 
     Log::Debug("CPU: %d of 151 opcodes implemented\n\n", _opcodes.size());
-
-    SetFlag(Flag::Unused, true);
 }
 
 void CPU::Reset(MemoryHandler* memoryHandler)
@@ -23,10 +21,10 @@ void CPU::Reset(MemoryHandler* memoryHandler)
     _memoryHandler = memoryHandler;
 
     // Load program start address in program counter
-    int temp1 = _memoryHandler->ReadMem(kResetVectorAddressH);
-    int temp2 = _memoryHandler->ReadMem(kResetVectorAddressL);
-
     _programCounter = _memoryHandler->ReadMem(kResetVectorAddressL) + (_memoryHandler->ReadMem(kResetVectorAddressH) << 8) - 1;
+    
+    // https://stackoverflow.com/questions/16913423/why-is-the-initial-state-of-the-interrupt-flag-of-the-6502-a-1
+    SetFlag(Flag::InterruptDisable, true);
 }
 
 int CPU::ExecuteNextInstruction()
@@ -52,6 +50,12 @@ int CPU::ExecuteNextInstruction()
 
 void CPU::SetFlag(Flag flag, bool value)
 {
+    if (flag == Flag::Unused || flag == Flag::Break)
+    {
+        OMBAssert(false, "Can't set flag %d", flag);
+        return;
+    }
+
     if (value)
     {
         _status |= 1 << flag;
@@ -64,7 +68,20 @@ void CPU::SetFlag(Flag flag, bool value)
 
 bool CPU::GetFlag(Flag flag) const
 {
-    return (_status & (1 << flag)) != 0;
+    if (flag == Flag::Unused)
+    {
+        OMBAssert(false, "Unused flag only exists in the stack!");
+        return true;
+    }
+    else if (flag == Flag::Break)
+    {
+        OMBAssert(false, "Break flag only exists in the stack!");
+        return false;
+    }
+    else
+    {
+        return (_status & (1 << flag)) != 0;
+    }
 }
 
 uint8_t CPU::PeekStack(int index)

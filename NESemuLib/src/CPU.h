@@ -13,6 +13,8 @@ public:
     static const uint16_t kStackAddressStart = 0x100;
     static const uint16_t kResetVectorAddressL = 0xFFFC;
     static const uint16_t kResetVectorAddressH = kResetVectorAddressL + 1;
+    static const uint16_t kInterruptBreakVectorAddressL = 0xFFFE;
+    static const uint16_t kInterruptBreakVectorAddressH = kInterruptBreakVectorAddressL + 1;
 
     enum Flag
     {
@@ -49,6 +51,7 @@ public:
     // For testing purposes
     uint16_t GetProgramCounter() const { return _programCounter; }
     void SetProgramCounter(uint16_t value) { _programCounter = value; }
+    uint8_t GetStatus() const { return _status; }
     uint8_t GetAccumulatorValue() const { return _accumulator; };
     uint8_t GetXValue() const { return _x; };
     uint8_t GetYValue() const { return _y; };
@@ -154,6 +157,10 @@ private:
         { 0x6C, [this]() -> int { return JMP(AddressingMode::Indirect); } },
         { 0x20, [this]() -> int { return JSR(AddressingMode::Absolute); } },
         { 0x60, [this]() -> int { return RTS(AddressingMode::Implied); } },
+        { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
+
+        // Other
+        { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -196,4 +203,7 @@ private:
     int JMP(AddressingMode mode);
     int JSR(AddressingMode mode);
     int RTS(AddressingMode mode);
+    int RTI(AddressingMode mode);
+
+    int BRK(AddressingMode mode);
 };

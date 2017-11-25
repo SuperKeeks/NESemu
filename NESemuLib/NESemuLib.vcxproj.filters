@@ -69,7 +69,6 @@
     <ClCompile Include="src\opcodes\INY.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\opcodes\DECINC.cpp" />
     <ClCompile Include="src\opcodes\JMP.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
@@ -77,6 +76,15 @@
       <Filter>opcodes</Filter>
     </ClCompile>
     <ClCompile Include="src\opcodes\RTS.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\BRK.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\DECINC.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\RTI.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
   </ItemGroup>
