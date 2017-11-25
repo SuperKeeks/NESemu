@@ -162,10 +162,12 @@ private:
         { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
 
         // Branch-on-condition instructions
-        { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },   // BEQ
-        { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },  // BNE
-        { 0xB0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Carry)); } },  // BCS
-        { 0x90, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry)); } }, // BCC
+        { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
+        { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },     // BNE
+        { 0xB0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Carry)); } },     // BCS
+        { 0x90, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry)); } },    // BCC
+        { 0x70, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Overflow)); } },  // BVS
+        { 0x50, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Overflow)); } }, // BVC
 
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
