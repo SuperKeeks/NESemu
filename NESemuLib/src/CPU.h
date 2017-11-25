@@ -162,8 +162,10 @@ private:
         { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
 
         // Branch-on-condition instructions
-        { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },  // BEQ
-        { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } }, // BNE
+        { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },   // BEQ
+        { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },  // BNE
+        { 0xB0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Carry)); } },  // BCS
+        { 0x90, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry)); } }, // BCC
 
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
