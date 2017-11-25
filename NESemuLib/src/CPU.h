@@ -168,6 +168,8 @@ private:
         { 0x90, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry)); } },    // BCC
         { 0x70, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Overflow)); } },  // BVS
         { 0x50, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Overflow)); } }, // BVC
+        { 0x30, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Sign)); } },      // BMI
+        { 0x10, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Sign)); } },     // BPL
 
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },

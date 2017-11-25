@@ -163,7 +163,9 @@
     <ClCompile Include="BCCTest.cpp" />
     <ClCompile Include="BCSTest.cpp" />
     <ClCompile Include="BEQTest.cpp" />
+    <ClCompile Include="BMITest.cpp" />
     <ClCompile Include="BNETest.cpp" />
+    <ClCompile Include="BPLTest.cpp" />
     <ClCompile Include="BRKRTI.cpp" />
     <ClCompile Include="BVCTest.cpp" />
     <ClCompile Include="BVSTest.cpp" />
