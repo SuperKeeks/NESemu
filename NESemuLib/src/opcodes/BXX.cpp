@@ -2,13 +2,13 @@
 
 #include "MemoryHandler.h"
 
-int CPU::BEQ(AddressingMode mode)
+int CPU::BXX(AddressingMode mode, bool condition)
 {
     OMBAssert(mode == AddressingMode::Relative, "Only Relative addressing mode is supported on branch instructions!");
     const uint8_t relativeAddress = _memoryHandler->ReadMem(++_programCounter);
 
     int cycles = 2;
-    if (GetFlag(Flag::Zero))
+    if (condition)
     {
         ++cycles;
         const uint8_t oldPCHigh = GetHighByte(_programCounter);

@@ -176,7 +176,7 @@
     <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\opcodes\ADC.cpp" />
-    <ClCompile Include="src\opcodes\BEQ.cpp" />
+    <ClCompile Include="src\opcodes\BXX.cpp" />
     <ClCompile Include="src\opcodes\BRK.cpp" />
     <ClCompile Include="src\opcodes\CLD.cpp" />
     <ClCompile Include="src\opcodes\CLI.cpp" />

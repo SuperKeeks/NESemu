@@ -87,7 +87,7 @@
     <ClCompile Include="src\opcodes\RTI.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\opcodes\BEQ.cpp">
+    <ClCompile Include="src\opcodes\BXX.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
   </ItemGroup>
