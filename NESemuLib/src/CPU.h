@@ -167,14 +167,20 @@ private:
         { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
 
         // Compare instructions
-        { 0xC9, [this]() -> int { return CMP(AddressingMode::Immediate, _accumulator); } },
-        { 0xC5, [this]() -> int { return CMP(AddressingMode::ZeroPage, _accumulator); } },
-        { 0xD5, [this]() -> int { return CMP(AddressingMode::ZeroPageX, _accumulator); } },
-        { 0xCD, [this]() -> int { return CMP(AddressingMode::Absolute, _accumulator); } },
-        { 0xDD, [this]() -> int { return CMP(AddressingMode::AbsoluteX, _accumulator); } },
-        { 0xD9, [this]() -> int { return CMP(AddressingMode::AbsoluteY, _accumulator); } },
-        { 0xC1, [this]() -> int { return CMP(AddressingMode::IndirectX, _accumulator); } },
-        { 0xD1, [this]() -> int { return CMP(AddressingMode::IndirectY, _accumulator); } },
+        { 0xC9, [this]() -> int { return CMP(AddressingMode::Immediate, _accumulator); } }, // CMP
+        { 0xC5, [this]() -> int { return CMP(AddressingMode::ZeroPage, _accumulator); } },  // CMP
+        { 0xD5, [this]() -> int { return CMP(AddressingMode::ZeroPageX, _accumulator); } }, // CMP
+        { 0xCD, [this]() -> int { return CMP(AddressingMode::Absolute, _accumulator); } },  // CMP
+        { 0xDD, [this]() -> int { return CMP(AddressingMode::AbsoluteX, _accumulator); } }, // CMP
+        { 0xD9, [this]() -> int { return CMP(AddressingMode::AbsoluteY, _accumulator); } }, // CMP
+        { 0xC1, [this]() -> int { return CMP(AddressingMode::IndirectX, _accumulator); } }, // CMP
+        { 0xD1, [this]() -> int { return CMP(AddressingMode::IndirectY, _accumulator); } }, // CMP
+        { 0xE0, [this]() -> int { return CMP(AddressingMode::Immediate, _x); } },           // CPX
+        { 0xE4, [this]() -> int { return CMP(AddressingMode::ZeroPage, _x); } },            // CPX
+        { 0xEC, [this]() -> int { return CMP(AddressingMode::Absolute, _x); } },            // CPX
+        { 0xC0, [this]() -> int { return CMP(AddressingMode::Immediate, _y); } },           // CPY
+        { 0xC4, [this]() -> int { return CMP(AddressingMode::ZeroPage, _y); } },            // CPY
+        { 0xCC, [this]() -> int { return CMP(AddressingMode::Absolute, _y); } },            // CPY
 
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
