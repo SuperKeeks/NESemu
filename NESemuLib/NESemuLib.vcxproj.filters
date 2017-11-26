@@ -93,6 +93,9 @@
     <ClCompile Include="src\opcodes\TXX.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\CMP.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

@@ -166,6 +166,16 @@ private:
         { 0x60, [this]() -> int { return RTS(AddressingMode::Implied); } },
         { 0x40, [this]() -> int { return RTI(AddressingMode::Implied); } },
 
+        // Compare instructions
+        { 0xC9, [this]() -> int { return CMP(AddressingMode::Immediate, _accumulator); } },
+        { 0xC5, [this]() -> int { return CMP(AddressingMode::ZeroPage, _accumulator); } },
+        { 0xD5, [this]() -> int { return CMP(AddressingMode::ZeroPageX, _accumulator); } },
+        { 0xCD, [this]() -> int { return CMP(AddressingMode::Absolute, _accumulator); } },
+        { 0xDD, [this]() -> int { return CMP(AddressingMode::AbsoluteX, _accumulator); } },
+        { 0xD9, [this]() -> int { return CMP(AddressingMode::AbsoluteY, _accumulator); } },
+        { 0xC1, [this]() -> int { return CMP(AddressingMode::IndirectX, _accumulator); } },
+        { 0xD1, [this]() -> int { return CMP(AddressingMode::IndirectY, _accumulator); } },
+
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
         { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },     // BNE
@@ -229,9 +239,11 @@ private:
     int RTS(AddressingMode mode);
     int RTI(AddressingMode mode);
 
-    int BXX(AddressingMode mode, bool condition);
+    int CMP(AddressingMode mode, uint8_t registerValue); // Used for all compare instructions
 
-    int TXX(AddressingMode mode, uint8_t from, uint8_t& to);
+    int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
+
+    int TXX(AddressingMode mode, uint8_t from, uint8_t& to); // Used for all transfer instructions
 
     int BRK(AddressingMode mode);
 };

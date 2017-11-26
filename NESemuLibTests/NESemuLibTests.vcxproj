@@ -173,6 +173,7 @@
     <ClCompile Include="CLDTest.cpp" />
     <ClCompile Include="CLVTest.cpp" />
     <ClCompile Include="CLISEITest.cpp" />
+    <ClCompile Include="CMPTest.cpp" />
     <ClCompile Include="DECINCTest.cpp" />
     <ClCompile Include="DEXINXTest.cpp" />
     <ClCompile Include="DEYINYTest.cpp" />
