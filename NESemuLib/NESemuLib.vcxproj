@@ -201,6 +201,7 @@
     <ClCompile Include="src\opcodes\STA.cpp" />
     <ClCompile Include="src\opcodes\STX.cpp" />
     <ClCompile Include="src\opcodes\STY.cpp" />
+    <ClCompile Include="src\opcodes\TXX.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
     <ClCompile Include="src\ROM.cpp" />

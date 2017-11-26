@@ -77,7 +77,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x53, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x53, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
@@ -89,7 +89,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x04, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x04, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
@@ -101,7 +101,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Zero));
@@ -113,7 +113,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x80, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x80, cpu.GetAccumulator());
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
@@ -125,7 +125,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x7F, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x7F, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
@@ -138,7 +138,7 @@ namespace NESemuLibTests
             cpu.ExecuteNextInstruction();
             cycles = cpu.ExecuteNextInstruction();
             cycles += cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x7, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x7, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Overflow));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));

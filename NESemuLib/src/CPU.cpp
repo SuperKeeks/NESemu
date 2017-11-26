@@ -48,6 +48,13 @@ int CPU::ExecuteNextInstruction()
     return cycles;
 }
 
+void CPU::SetAccumulator(uint8_t value)
+{
+    _accumulator = value;
+    SetFlag(Flag::Sign, IsValueNegative(_accumulator));
+    SetFlag(Flag::Zero, _accumulator == 0);
+}
+
 void CPU::SetFlag(Flag flag, bool value)
 {
     if (flag == Flag::Unused || flag == Flag::Break)

@@ -87,21 +87,21 @@ namespace NESemuLibTests
 
             // Positive number
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x33, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x33, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(2, cycles);
 
             // Zero
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulator());
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(2, cycles);
 
             // Negative number
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(2, cycles);
@@ -113,7 +113,7 @@ namespace NESemuLibTests
             // Positive number
             emu.WriteMem(0x44, 0x12);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x12, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x12, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(3, cycles);
@@ -121,7 +121,7 @@ namespace NESemuLibTests
             // Zero
             emu.WriteMem(0x44, 0x0);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x0, cpu.GetAccumulator());
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(3, cycles);
@@ -129,7 +129,7 @@ namespace NESemuLibTests
             // Negative number
             emu.WriteMem(0x44, 0xFF);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(3, cycles);
@@ -140,7 +140,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x44, 0x66);
             cpu.ExecuteNextInstruction(); // LDX
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x66, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x66, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(4, cycles);
@@ -150,7 +150,7 @@ namespace NESemuLibTests
             ///////////
             emu.WriteMem(0x1234, 0x77);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x77, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x77, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(4, cycles);
@@ -161,7 +161,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x1234, 0xFC);
             cpu.ExecuteNextInstruction(); // LDX
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0xFC, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0xFC, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(5, cycles);
@@ -172,7 +172,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x1234, 0x22);
             cpu.ExecuteNextInstruction(); // LDY
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x22, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x22, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(4, cycles);
@@ -185,7 +185,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x1F11, 0x63);
             cpu.ExecuteNextInstruction(); // LDX
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x63, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x63, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(6, cycles);
@@ -198,7 +198,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x38, 0xFF);
             cpu.ExecuteNextInstruction(); // LDY
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0xFF, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(5, cycles);
@@ -211,7 +211,7 @@ namespace NESemuLibTests
             emu.WriteMem(0x132, 0x01);
             cpu.ExecuteNextInstruction(); // LDY
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual((uint8_t)0x01, cpu.GetAccumulatorValue());
+            Assert::AreEqual((uint8_t)0x01, cpu.GetAccumulator());
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(6, cycles);

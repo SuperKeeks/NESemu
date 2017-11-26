@@ -53,12 +53,17 @@ public:
     uint16_t GetProgramCounter() const { return _programCounter; }
     void SetProgramCounter(uint16_t value) { _programCounter = value; }
     uint8_t GetStatus() const { return _status; }
-    uint8_t GetAccumulatorValue() const { return _accumulator; };
-    uint8_t GetXValue() const { return _x; };
-    uint8_t GetYValue() const { return _y; };
+    uint8_t GetAccumulator() const { return _accumulator; }
+    uint8_t GetX() const { return _x; }
+    uint8_t GetY() const { return _y; }
+    void SetAccumulator(uint8_t value);
+    void SetX(uint8_t value) { _x = value; }
+    void SetY(uint8_t value) { _y = value; }
     void SetFlag(Flag flag, bool value);
     bool GetFlag(Flag flag) const;
     uint8_t PeekStack(int index);
+    uint8_t GetStackPointer() const { return _stackPointer; }
+    void SetStackPointer(uint8_t value) { _stackPointer = value; }
 
 private:
     uint16_t _programCounter;
@@ -171,6 +176,14 @@ private:
         { 0x30, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Sign)); } },      // BMI
         { 0x10, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Sign)); } },     // BPL
 
+        // Transfer instructions
+        { 0x9A, [this]() -> int { return TXX(AddressingMode::Implied, _x, _stackPointer); } }, // TXS
+        { 0xBA, [this]() -> int { return TXX(AddressingMode::Implied, _stackPointer, _x); } }, // TSX
+        { 0xAA, [this]() -> int { return TXX(AddressingMode::Implied, _accumulator, _x); } },  // TAX
+        { 0x8A, [this]() -> int { return TXX(AddressingMode::Implied, _x, _accumulator); } },  // TXA
+        { 0xA8, [this]() -> int { return TXX(AddressingMode::Implied, _accumulator, _y); } },  // TAY
+        { 0x98, [this]() -> int { return TXX(AddressingMode::Implied, _y, _accumulator); } },  // TYA
+
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
     };
@@ -217,6 +230,8 @@ private:
     int RTI(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition);
+
+    int TXX(AddressingMode mode, uint8_t from, uint8_t& to);
 
     int BRK(AddressingMode mode);
 };
