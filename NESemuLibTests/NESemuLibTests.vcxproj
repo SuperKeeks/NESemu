@@ -187,6 +187,7 @@
     <ClCompile Include="InputTest.cpp" />
     <ClCompile Include="LDXTest.cpp" />
     <ClCompile Include="LDYTest.cpp" />
+    <ClCompile Include="ORATest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="SBCTest.cpp" />
     <ClCompile Include="SECTest.cpp" />

@@ -193,6 +193,14 @@ private:
         { 0x39, [this]() -> int { return AND(AddressingMode::AbsoluteY); } },
         { 0x21, [this]() -> int { return AND(AddressingMode::IndirectX); } },
         { 0x31, [this]() -> int { return AND(AddressingMode::IndirectX); } },
+        { 0x09, [this]() -> int { return ORA(AddressingMode::Immediate); } },
+        { 0x05, [this]() -> int { return ORA(AddressingMode::ZeroPage); } },
+        { 0x15, [this]() -> int { return ORA(AddressingMode::ZeroPageX); } },
+        { 0x0D, [this]() -> int { return ORA(AddressingMode::Absolute); } },
+        { 0x1D, [this]() -> int { return ORA(AddressingMode::AbsoluteX); } },
+        { 0x19, [this]() -> int { return ORA(AddressingMode::AbsoluteY); } },
+        { 0x01, [this]() -> int { return ORA(AddressingMode::IndirectX); } },
+        { 0x11, [this]() -> int { return ORA(AddressingMode::IndirectX); } },
 
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
@@ -261,6 +269,7 @@ private:
 
     int BIT(AddressingMode mode);
     int AND(AddressingMode mode);
+    int ORA(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 
