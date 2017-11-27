@@ -99,6 +99,7 @@
     <ClCompile Include="src\opcodes\BIT.cpp" />
     <ClCompile Include="src\opcodes\AND.cpp" />
     <ClCompile Include="src\opcodes\ORA.cpp" />
+    <ClCompile Include="src\opcodes\EOR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

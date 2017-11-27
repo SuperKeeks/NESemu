@@ -187,6 +187,7 @@
     <ClCompile Include="src\opcodes\DECINC.cpp" />
     <ClCompile Include="src\opcodes\DEX.cpp" />
     <ClCompile Include="src\opcodes\DEY.cpp" />
+    <ClCompile Include="src\opcodes\EOR.cpp" />
     <ClCompile Include="src\opcodes\INX.cpp" />
     <ClCompile Include="src\opcodes\INY.cpp" />
     <ClCompile Include="src\opcodes\JMP.cpp" />
