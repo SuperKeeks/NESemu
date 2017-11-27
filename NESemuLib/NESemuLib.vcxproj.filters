@@ -97,6 +97,7 @@
       <Filter>opcodes</Filter>
     </ClCompile>
     <ClCompile Include="src\opcodes\BIT.cpp" />
+    <ClCompile Include="src\opcodes\AND.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

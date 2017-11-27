@@ -185,6 +185,14 @@ private:
         // Logic instructions
         { 0x24, [this]() -> int { return BIT(AddressingMode::ZeroPage); } },
         { 0x2C, [this]() -> int { return BIT(AddressingMode::Absolute); } },
+        { 0x29, [this]() -> int { return AND(AddressingMode::Immediate); } },
+        { 0x25, [this]() -> int { return AND(AddressingMode::ZeroPage); } },
+        { 0x35, [this]() -> int { return AND(AddressingMode::ZeroPageX); } },
+        { 0x2D, [this]() -> int { return AND(AddressingMode::Absolute); } },
+        { 0x3D, [this]() -> int { return AND(AddressingMode::AbsoluteX); } },
+        { 0x39, [this]() -> int { return AND(AddressingMode::AbsoluteY); } },
+        { 0x21, [this]() -> int { return AND(AddressingMode::IndirectX); } },
+        { 0x31, [this]() -> int { return AND(AddressingMode::IndirectX); } },
 
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
@@ -252,6 +260,7 @@ private:
     int CMP(AddressingMode mode, uint8_t registerValue); // Used for all compare instructions
 
     int BIT(AddressingMode mode);
+    int AND(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 
