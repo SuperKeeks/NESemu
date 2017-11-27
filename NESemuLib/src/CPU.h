@@ -182,6 +182,10 @@ private:
         { 0xC4, [this]() -> int { return CMP(AddressingMode::ZeroPage, _y); } },            // CPY
         { 0xCC, [this]() -> int { return CMP(AddressingMode::Absolute, _y); } },            // CPY
 
+        // Logic instructions
+        { 0x24, [this]() -> int { return BIT(AddressingMode::ZeroPage); } },
+        { 0x2C, [this]() -> int { return BIT(AddressingMode::Absolute); } },
+
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
         { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },     // BNE
@@ -246,6 +250,8 @@ private:
     int RTI(AddressingMode mode);
 
     int CMP(AddressingMode mode, uint8_t registerValue); // Used for all compare instructions
+
+    int BIT(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 
