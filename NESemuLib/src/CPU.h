@@ -31,6 +31,7 @@ public:
     enum AddressingMode
     {
         Implied,
+        Accumulator,
         Relative,
         Immediate,
         ZeroPage,
@@ -210,6 +211,13 @@ private:
         { 0x41, [this]() -> int { return EOR(AddressingMode::IndirectX); } },
         { 0x51, [this]() -> int { return EOR(AddressingMode::IndirectX); } },
 
+        // Shift instructions
+        { 0x0A, [this]() -> int { return ASL(AddressingMode::Accumulator); } },
+        { 0x06, [this]() -> int { return ASL(AddressingMode::ZeroPage); } },
+        { 0x16, [this]() -> int { return ASL(AddressingMode::ZeroPageX); } },
+        { 0x0E, [this]() -> int { return ASL(AddressingMode::Absolute); } },
+        { 0x1E, [this]() -> int { return ASL(AddressingMode::AbsoluteX); } },
+
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
         { 0xD0, [this]() -> int { return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero)); } },     // BNE
@@ -279,6 +287,8 @@ private:
     int AND(AddressingMode mode);
     int ORA(AddressingMode mode);
     int EOR(AddressingMode mode);
+
+    int ASL(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 

@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="ADCTest.cpp" />
     <ClCompile Include="ANDTest.cpp" />
+    <ClCompile Include="ASLTest.cpp" />
     <ClCompile Include="BCCTest.cpp" />
     <ClCompile Include="BCSTest.cpp" />
     <ClCompile Include="BEQTest.cpp" />

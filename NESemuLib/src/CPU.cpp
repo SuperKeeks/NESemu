@@ -101,6 +101,12 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
     uint8_t value = 0;
     switch (mode)
     {
+        case AddressingMode::Accumulator:
+        {
+            value = _accumulator;
+            cycles += 0; // Not sure about this one. Only used for shift and rotate instructions.
+            break;
+        }
         case AddressingMode::Immediate:
         {
             value = _memoryHandler->ReadMem(++_programCounter);
