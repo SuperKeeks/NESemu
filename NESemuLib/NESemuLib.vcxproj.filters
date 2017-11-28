@@ -101,6 +101,7 @@
     <ClCompile Include="src\opcodes\ORA.cpp" />
     <ClCompile Include="src\opcodes\EOR.cpp" />
     <ClCompile Include="src\opcodes\ASL.cpp" />
+    <ClCompile Include="src\opcodes\LSR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

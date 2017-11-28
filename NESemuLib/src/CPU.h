@@ -217,6 +217,11 @@ private:
         { 0x16, [this]() -> int { return ASL(AddressingMode::ZeroPageX); } },
         { 0x0E, [this]() -> int { return ASL(AddressingMode::Absolute); } },
         { 0x1E, [this]() -> int { return ASL(AddressingMode::AbsoluteX); } },
+        { 0x4A, [this]() -> int { return LSR(AddressingMode::Accumulator); } },
+        { 0x46, [this]() -> int { return LSR(AddressingMode::ZeroPage); } },
+        { 0x56, [this]() -> int { return LSR(AddressingMode::ZeroPageX); } },
+        { 0x4E, [this]() -> int { return LSR(AddressingMode::Absolute); } },
+        { 0x5E, [this]() -> int { return LSR(AddressingMode::AbsoluteX); } },
 
         // Branch-on-condition instructions
         { 0xF0, [this]() -> int { return BXX(AddressingMode::Relative, GetFlag(Flag::Zero)); } },      // BEQ
@@ -289,6 +294,7 @@ private:
     int EOR(AddressingMode mode);
 
     int ASL(AddressingMode mode);
+    int LSR(AddressingMode mode);
 
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 
