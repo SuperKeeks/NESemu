@@ -193,6 +193,7 @@
     <ClCompile Include="ORATest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="ROLTest.cpp" />
+    <ClCompile Include="RORTest.cpp" />
     <ClCompile Include="SBCTest.cpp" />
     <ClCompile Include="SECTest.cpp" />
     <ClCompile Include="SRAMTest.cpp" />
