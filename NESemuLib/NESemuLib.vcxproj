@@ -199,6 +199,7 @@
     <ClCompile Include="src\opcodes\CLC.cpp" />
     <ClCompile Include="src\opcodes\LSR.cpp" />
     <ClCompile Include="src\opcodes\ORA.cpp" />
+    <ClCompile Include="src\opcodes\ROL.cpp" />
     <ClCompile Include="src\opcodes\RTI.cpp" />
     <ClCompile Include="src\opcodes\RTS.cpp" />
     <ClCompile Include="src\opcodes\SEC.cpp" />

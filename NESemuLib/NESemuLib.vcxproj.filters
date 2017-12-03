@@ -96,12 +96,27 @@
     <ClCompile Include="src\opcodes\CMP.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\opcodes\BIT.cpp" />
-    <ClCompile Include="src\opcodes\AND.cpp" />
-    <ClCompile Include="src\opcodes\ORA.cpp" />
-    <ClCompile Include="src\opcodes\EOR.cpp" />
-    <ClCompile Include="src\opcodes\ASL.cpp" />
-    <ClCompile Include="src\opcodes\LSR.cpp" />
+    <ClCompile Include="src\opcodes\ROL.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\AND.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\ASL.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\BIT.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\EOR.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\LSR.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\ORA.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
