@@ -120,6 +120,12 @@
     <ClCompile Include="src\opcodes\ROR.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\opcodes\PHA.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcodes\PLA.cpp">
+      <Filter>opcodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />

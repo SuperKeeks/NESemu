@@ -191,6 +191,7 @@
     <ClCompile Include="LDYTest.cpp" />
     <ClCompile Include="LSRTest.cpp" />
     <ClCompile Include="ORATest.cpp" />
+    <ClCompile Include="PHAPLATest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="ROLTest.cpp" />
     <ClCompile Include="RORTest.cpp" />

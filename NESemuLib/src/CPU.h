@@ -250,6 +250,8 @@ private:
         { 0x8A, [this]() -> int { return TXX(AddressingMode::Implied, _x, _accumulator); } },  // TXA
         { 0xA8, [this]() -> int { return TXX(AddressingMode::Implied, _accumulator, _y); } },  // TAY
         { 0x98, [this]() -> int { return TXX(AddressingMode::Implied, _y, _accumulator); } },  // TYA
+        { 0x48, [this]() -> int { return PHA(AddressingMode::Absolute); } },                   // PHA
+        { 0x68, [this]() -> int { return PLA(AddressingMode::AbsoluteX); } },                  // PLA
 
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
@@ -311,6 +313,8 @@ private:
     int BXX(AddressingMode mode, bool condition); // Used for all branch instructions
 
     int TXX(AddressingMode mode, uint8_t from, uint8_t& to); // Used for all transfer instructions
+    int PHA(AddressingMode mode);
+    int PLA(AddressingMode mode);
 
     int BRK(AddressingMode mode);
 };
