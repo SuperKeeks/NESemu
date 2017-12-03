@@ -190,6 +190,7 @@
     <ClCompile Include="LDXTest.cpp" />
     <ClCompile Include="LDYTest.cpp" />
     <ClCompile Include="LSRTest.cpp" />
+    <ClCompile Include="NOPTest.cpp" />
     <ClCompile Include="ORATest.cpp" />
     <ClCompile Include="PHAPLATest.cpp" />
     <ClCompile Include="PHPPLPTest.cpp" />

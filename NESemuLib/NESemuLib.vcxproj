@@ -198,6 +198,7 @@
     <ClCompile Include="src\opcodes\LDY.cpp" />
     <ClCompile Include="src\opcodes\CLC.cpp" />
     <ClCompile Include="src\opcodes\LSR.cpp" />
+    <ClCompile Include="src\opcodes\NOP.cpp" />
     <ClCompile Include="src\opcodes\ORA.cpp" />
     <ClCompile Include="src\opcodes\PHA.cpp" />
     <ClCompile Include="src\opcodes\PHP.cpp" />

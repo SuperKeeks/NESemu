@@ -257,6 +257,7 @@ private:
 
         // Other
         { 0x00, [this]() -> int { return BRK(AddressingMode::Implied); } },
+        { 0xEA, [this]() -> int { return NOP(AddressingMode::Implied); } },
     };
 
     MemoryHandler* _memoryHandler = nullptr;
@@ -321,4 +322,5 @@ private:
     int PLP(AddressingMode mode);
 
     int BRK(AddressingMode mode);
+    int NOP(AddressingMode mode);
 };
