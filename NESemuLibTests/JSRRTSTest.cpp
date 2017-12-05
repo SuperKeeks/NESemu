@@ -33,11 +33,11 @@ namespace NESemuLibTests
             Assert::AreEqual(0x9234, (int)cpu.GetProgramCounter() + 1);
             Assert::AreEqual(6, cycles);
             const uint16_t pushedAddress = cpu.PeekStack(0) + (cpu.PeekStack(1) << 8);
-            Assert::AreEqual(initialProgramCounter + 2, (int)pushedAddress);
+            Assert::AreEqual(initialProgramCounter + 3, (int)pushedAddress);
 
             // RTS
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(initialProgramCounter + 2, (int)cpu.GetProgramCounter());
+            Assert::AreEqual(initialProgramCounter + 3, (int)cpu.GetProgramCounter());
             Assert::AreEqual(6, cycles);
         }
 

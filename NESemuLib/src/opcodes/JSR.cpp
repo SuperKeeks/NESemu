@@ -7,7 +7,7 @@ int CPU::JSR(AddressingMode mode)
 {
     OMBAssert(mode == AddressingMode::Absolute, "Only supported addressing mode is Absolute");
 
-    uint16_t nextOpAddress = _programCounter + 1;
+    uint16_t nextOpAddress = _programCounter + 2;
     Push(GetHighByte(nextOpAddress));
     Push(GetLowByte(nextOpAddress));
     // NOTE: Subtract 1 so next time PC is incremented it fetches the right opcode
