@@ -5,7 +5,9 @@
 class PPU : public MemoryHandler
 {
 public:
-    static const int kVRAMSize = 16384;
+    static const int kVRAMSize = 2048;
+    static const int kSpriteSize = 4;
+    static const int kSpriteCount = 64;
 
     PPU();
     virtual ~PPU();
@@ -25,6 +27,7 @@ private:
     uint16_t _ppuAddr;
 
     uint8_t _vram[kVRAMSize];
+    uint8_t _oam[kSpriteSize * kSpriteCount];
 
     uint16_t ConvertToRealVRAMAddress(uint16_t address) const;
     uint8_t GetAddressIncrement() const;
