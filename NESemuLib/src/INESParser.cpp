@@ -1,6 +1,7 @@
 #include "INESParser.h"
 
 #include "Assert.h"
+#include "CHRROM.h"
 #include "ROM.h"
 #include "SizeOfArray.h"
 
@@ -11,7 +12,7 @@ INESParser::~INESParser()
 {
 }
 
-void INESParser::Parse(const char* path, ROM& rom)
+void INESParser::Parse(const char* path, ROM& rom, CHRROM& chrRom)
 {
     FILE* file;
     fopen_s(&file, path, "rb");
@@ -36,7 +37,10 @@ void INESParser::Parse(const char* path, ROM& rom)
     rom.SetIs16KBROM(GetPRGROMPageCount() == 1);
 
     // CHR-ROM
-    // TODO
+    const size_t chrROMSize = CHRROM::kPageCHRROMSize * GetCHRROMPageCount();
+    OMBAssert(chrROMSize <= CHRROM::kMaxCHRROMSize, "Trying to load CHR-ROM bigger than it is supported");
+    const size_t readCHRROMSize = fread_s(chrRom.GetCHRROMPtr(), CHRROM::kMaxCHRROMSize, sizeof(uint8_t), chrROMSize, file);
+    OMBAssert(readCHRROMSize == chrROMSize, "Unexpected CHR-ROM size");
     
     fclose(file);
 }

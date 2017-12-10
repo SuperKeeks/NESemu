@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+class CHRROM;
 class ROM;
 
 class INESParser
@@ -14,7 +15,7 @@ public:
     };
 
     ~INESParser();
-    void Parse(const char* path, ROM& rom);
+    void Parse(const char* path, ROM& rom, CHRROM& chrRom);
 
     void PrintInfo() const;
     uint8_t GetPRGROMPageCount() const;

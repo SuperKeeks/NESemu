@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
     <ClInclude Include="src\Assert.h" />
+    <ClInclude Include="src\CHRROM.h" />
     <ClInclude Include="src\CPU.h" />
     <ClInclude Include="src\INESParser.h" />
     <ClInclude Include="src\Input.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\APU.cpp" />
+    <ClCompile Include="src\CHRROM.cpp" />
     <ClCompile Include="src\CPU.cpp" />
     <ClCompile Include="src\INESParser.cpp" />
     <ClCompile Include="src\Input.cpp" />

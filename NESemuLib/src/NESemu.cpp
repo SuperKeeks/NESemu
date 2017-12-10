@@ -12,6 +12,7 @@ NESemu::NESemu()
     _mm5.PowerOn();
     _sram.PowerOn();
     _rom.PowerOn();
+    _chrRom.PowerOn();
 }
 
 NESemu::~NESemu()
@@ -20,7 +21,7 @@ NESemu::~NESemu()
 
 void NESemu::Load(const char* path)
 {
-    _parser.Parse(path, _rom);
+    _parser.Parse(path, _rom, _chrRom);
     _parser.PrintInfo();
     _sram.SetEnabled(_parser.IsSRAMEnabled());
 
@@ -66,6 +67,7 @@ void NESemu::Reset()
     _mm5.Reset();
     _sram.Reset();
     _rom.Reset();
+    _chrRom.Reset();
 }
 
 MemoryHandler& NESemu::GetMemoryHandlerForAddress(uint16_t address)

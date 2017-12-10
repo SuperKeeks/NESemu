@@ -135,6 +135,7 @@
     <ClCompile Include="src\opcodes\NOP.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
+    <ClCompile Include="src\CHRROM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="src\SRAM.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="src\LogUtils.h" />
+    <ClInclude Include="src\CHRROM.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

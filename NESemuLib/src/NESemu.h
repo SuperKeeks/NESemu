@@ -1,6 +1,7 @@
 #pragma once
 
 #include "APU.h"
+#include "CHRROM.h"
 #include "CPU.h"
 #include "INESParser.h"
 #include "Input.h"
@@ -38,6 +39,7 @@ private:
     MM5 _mm5;
     SRAM _sram;
     ROM _rom;
+    CHRROM _chrRom;
 
     MemoryHandler& GetMemoryHandlerForAddress(uint16_t address);
 };
