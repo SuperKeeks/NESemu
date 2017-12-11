@@ -159,6 +159,7 @@
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\LogUtils.h" />
     <ClInclude Include="src\MemoryHandler.h" />
+    <ClInclude Include="src\MirroringMode.h" />
     <ClInclude Include="src\MM5.h" />
     <ClInclude Include="src\NESemu.h" />
     <ClInclude Include="src\PPU.h" />

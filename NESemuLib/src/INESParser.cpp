@@ -68,7 +68,7 @@ uint8_t INESParser::GetCHRROMPageCount() const
     return _header[5];
 }
 
-INESParser::MirroringMode INESParser::GetMirroringMode() const
+MirroringMode INESParser::GetMirroringMode() const
 {
     if ((_header[6] & 1 << 0) == 1)
     {

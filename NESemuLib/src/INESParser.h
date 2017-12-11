@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MirroringMode.h"
+
 #include <stdint.h>
 
 class CHRROM;
@@ -8,12 +10,6 @@ class ROM;
 class INESParser
 {
 public:
-    enum MirroringMode
-    {
-        Horizontal,
-        Vertical
-    };
-
     ~INESParser();
     void Parse(const char* path, ROM& rom, CHRROM& chrRom);
 

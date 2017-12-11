@@ -1,6 +1,8 @@
 #include "PPU.h"
 
 #include "Assert.h"
+#include "CHRROM.h"
+#include "SizeOfArray.h"
 
 PPU::PPU()
 {
@@ -24,9 +26,9 @@ uint8_t PPU::ReadMem(uint16_t address)
     }
     else if (address == 0x2007)
     {
-        const uint16_t address = ConvertToRealVRAMAddress(_ppuAddr);
+        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_ppuAddr);
         _ppuAddr += GetAddressIncrement();
-        return _vram[address];
+        return ReadPPUMem(ppuAddress);
     }
     else if (address >= 0x2008 && address < 0x4000)
     {
@@ -69,9 +71,9 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x2007)
     {
-        const uint16_t address = ConvertToRealVRAMAddress(_ppuAddr);
+        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_ppuAddr);
         _ppuAddr += GetAddressIncrement();
-        _vram[address] = value;
+        WritePPUMem(ppuAddress, value);
     }
     else if (address >= 0x2008 && address < 0x4000)
     {
@@ -86,24 +88,33 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
 
 void PPU::PowerOn()
 {
-    // TODO
+    _ppuCtrl = 0;
+    _ppuMask = 0;
+    _ppuStatus = 0;
+    _oamAddr = 0;
+    _ppuScroll = 0;
+    _ppuAddr = 0;
+
+    for (int i = 0; i < sizeofarray(_vram); ++i)
+    {
+        _vram[i] = 0;
+    }
+
+    for (int i = 0; i < sizeofarray(_oam); ++i)
+    {
+        _oam[i] = 0;
+    }
 }
 
-void PPU::Reset()
+void PPU::Reset(CHRROM* chrRom, MirroringMode mirroringMode)
 {
-    // TODO
+    _chrRom = chrRom;
+    _mirroringMode = mirroringMode;
 }
 
 uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
 {
-    if (address >= 0x3F10 && address < 0x4000)
-    {
-        return ((address - 0x3F00) % (0x3F20 - 0x3F00)) + 0x3F00; // Shadow palette
-    }
-    else
-    {
-        return address % kVRAMSize; // Shadow VRAM
-    }
+    return address % kShadowVRAMStartAddress; // Shadow VRAM
 }
 
 uint8_t PPU::GetAddressIncrement() const
@@ -115,5 +126,94 @@ uint8_t PPU::GetAddressIncrement() const
     else
     {
         return 32;
+    }
+}
+
+uint8_t* PPU::GetNametableMem(uint16_t address)
+{
+    if (address >= kNametable0StartAddress && address < kNametable1StartAddress)
+    {
+        return &_vram[address - kNametable0StartAddress];
+    }
+    else if (address >= kNametable1StartAddress && address < kNametable2StartAddress)
+    {
+        const int offset = address % kNametable1StartAddress;
+        if (_mirroringMode == MirroringMode::Vertical)
+        {
+            return &_vram[kNametableSize + offset];
+        }
+        else
+        {
+            return &_vram[offset];
+        }
+    }
+    else if (address >= kNametable2StartAddress && address < kNametable3StartAddress)
+    {
+        const int offset = address % kNametable2StartAddress;
+        if (_mirroringMode == MirroringMode::Vertical)
+        {
+            return &_vram[offset];
+        }
+        else
+        {
+            return &_vram[kNametableSize + offset];
+        }
+    }
+    else if (address >= kNametable3StartAddress && address < kMirrorStartAddress)
+    {
+        const int offset = address % kNametable3StartAddress;
+        return &_vram[kNametableSize + offset];
+    }
+    else
+    {
+        OMBAssert(false, "$%04X address is not a nametable address", address);
+        return 0;
+    }
+}
+
+uint8_t PPU::ReadPPUMem(uint16_t address)
+{
+    if (address < kNametable0StartAddress)
+    {
+        return _chrRom->ReadMem(address);
+    }
+    else if (address < kMirrorStartAddress)
+    {
+        return *GetNametableMem(address);
+    }
+    else if (address < kPaletteStartAddress)
+    {
+        return *GetNametableMem(address - 0x1000);
+    }
+    else if (address < 0x3F20)
+    {
+        OMBAssert(false, "TODO Palette");
+        return 0;
+    }
+    else if (address < 0x4000)
+    {
+        OMBAssert(false, "TODO Shadow Palette");
+        return 0;
+    }
+    else
+    {
+        OMBAssert(false, "Unimplemented");
+        return 0;
+    }
+}
+
+void PPU::WritePPUMem(uint16_t address, uint8_t value)
+{
+    if (address >= kNametable0StartAddress && address < kMirrorStartAddress)
+    {
+        *GetNametableMem(address) = value;
+    }
+    else if (address >= kMirrorStartAddress && address < kPaletteStartAddress)
+    {
+        *GetNametableMem(address - 0x1000) = value;
+    }
+    else
+    {
+        OMBAssert(false, "PPU memory at $%04X is not writtable", address);
     }
 }
