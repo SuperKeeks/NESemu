@@ -42,6 +42,7 @@ private:
 
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];
+    uint8_t _palettes[1 + 3*4 + 1*3 + 4*3]; // 1 for Bkg color + 4 Background palettes with extra data between them + 4 Sprite palettes
 
     CHRROM* _chrRom;
     MirroringMode _mirroringMode;
@@ -51,4 +52,5 @@ private:
     void WritePPUMem(uint16_t address, uint8_t value);
     uint16_t ConvertToRealVRAMAddress(uint16_t address) const;
     uint8_t GetAddressIncrement() const;
+    uint8_t ConvertAddressToPaletteIndex(uint16_t address) const;
 };

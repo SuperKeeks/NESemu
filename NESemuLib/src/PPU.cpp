@@ -185,15 +185,10 @@ uint8_t PPU::ReadPPUMem(uint16_t address)
     {
         return *GetNametableMem(address - 0x1000);
     }
-    else if (address < 0x3F20)
-    {
-        OMBAssert(false, "TODO Palette");
-        return 0;
-    }
     else if (address < 0x4000)
     {
-        OMBAssert(false, "TODO Shadow Palette");
-        return 0;
+        const uint8_t index = ConvertAddressToPaletteIndex(address);
+        return _palettes[index];
     }
     else
     {
@@ -212,8 +207,59 @@ void PPU::WritePPUMem(uint16_t address, uint8_t value)
     {
         *GetNametableMem(address - 0x1000) = value;
     }
+    else if (address >= kPaletteStartAddress && address < 0x4000)
+    {
+        const uint8_t index = ConvertAddressToPaletteIndex(address);
+        _palettes[index] = value;
+    }
     else
     {
         OMBAssert(false, "PPU memory at $%04X is not writtable", address);
     }
+}
+
+uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
+{
+    const uint16_t realAddress = ((address - kPaletteStartAddress) % 0x20) + kPaletteStartAddress;
+    int index = -1;
+    if (realAddress == 0x3F00 || realAddress == 0x3F10)
+    {
+        index = 0;
+    }
+    else if (realAddress >= 0x3F01 && realAddress <= 0x3F0F)
+    {
+        // Background palettes 0-3 + their extra data
+        index = realAddress - kPaletteStartAddress;
+    }
+    else if (realAddress == 0x3F10 || realAddress == 0x3F14 || realAddress == 0x3F18 || realAddress == 0x3F1C)
+    {
+        index = realAddress - 0x3F10; // Mirrors
+    }
+    else if (realAddress >= 0x3F11 && realAddress <= 0x3F13)
+    {
+        // Sprite palette 0
+        index = realAddress - 0x3F11 + 0xF;
+    }
+    else if (realAddress >= 0x3F15 && realAddress <= 0x3F17)
+    {
+        // Sprite palette 1
+        index = realAddress - 0x3F11 + 0x12;
+    }
+    else if (realAddress >= 0x3F19 && realAddress <= 0x3F1B)
+    {
+        // Sprite palette 2
+        index = realAddress - 0x3F11 + 0x15;
+    }
+    else if (realAddress >= 0x3F1D && realAddress <= 0x3F1F)
+    {
+        // Sprite palette 3
+        index = realAddress - 0x3F11 + 0x18;
+    }
+    else
+    {
+        OMBAssert(false, "Address out of palette space");
+    }
+
+    OMBAssert(index >= 0 && index <= sizeofarray(_palettes), "Index out of bounds!");
+    return index;
 }
