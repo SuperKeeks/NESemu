@@ -16,6 +16,7 @@ uint8_t PPU::ReadMem(uint16_t address)
 {
     if (address == 0x2002)
     {
+        // TODO: Reset VBlank flag
         return _ppuStatus;
     }
     else if (address == 0x2004)
@@ -26,6 +27,7 @@ uint8_t PPU::ReadMem(uint16_t address)
     }
     else if (address == 0x2007)
     {
+        // TODO: The first 0x0000-0x3EFF data read after setting the address via 0x2006 will return a buffered value
         const uint16_t ppuAddress = ConvertToRealVRAMAddress(_ppuAddr);
         _ppuAddr += GetAddressIncrement();
         return ReadPPUMem(ppuAddress);
