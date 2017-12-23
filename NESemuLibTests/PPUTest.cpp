@@ -84,9 +84,29 @@ namespace NESemuLibTests
                 Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
 
+            // Check Nametable 0 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x30);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
             // Check Nametable 1
             emu.ReadMem(PPU::kPPUStatusAddress);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x24);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
+            // Check Nametable 1 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x34);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
             emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
             for (int i = 0; i < PPU::kNametableSize; ++i)
@@ -104,12 +124,32 @@ namespace NESemuLibTests
                 Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
 
+            // Check Nametable 2 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x38);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
             // Check Nametable 3
             emu.ReadMem(PPU::kPPUStatusAddress);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x2C);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
             emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
             for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
+            // Check Nametable 3 (Shadow, partial)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x3C);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < 0x2FF; ++i)
             {
                 Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
@@ -129,9 +169,29 @@ namespace NESemuLibTests
                 Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
 
+            // Check Nametable 0 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x30);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
             // Check Nametable 1
             emu.ReadMem(PPU::kPPUStatusAddress);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x24);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x33, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
+            // Check Nametable 1 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x34);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
             emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
             for (int i = 0; i < PPU::kNametableSize; ++i)
@@ -149,12 +209,32 @@ namespace NESemuLibTests
                 Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
 
+            // Check Nametable 2 (Shadow)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x38);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
             // Check Nametable 3
             emu.ReadMem(PPU::kPPUStatusAddress);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x2C);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
             emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
             for (int i = 0; i < PPU::kNametableSize; ++i)
+            {
+                Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
+            // Check Nametable 3 (Shadow, partial)
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x2C);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            emu.ReadMem(PPU::kPPUDataAddress); // Dummy read
+            for (int i = 0; i < 0x2FF; ++i)
             {
                 Assert::AreEqual(0x66, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
