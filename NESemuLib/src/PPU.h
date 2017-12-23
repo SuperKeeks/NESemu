@@ -19,6 +19,9 @@ public:
     static const int kMirrorStartAddress = 0x3000;
     static const int kPaletteStartAddress = 0x3F00;
     static const int kShadowVRAMStartAddress = 0x4000;
+    static const int kPPUStatusAddress = 0x2002;
+    static const int kPPUAddrAddress = 0x2006;
+    static const int kPPUDataAddress = 0x2007;
 
     PPU();
     virtual ~PPU();
@@ -30,6 +33,9 @@ public:
 
     virtual void PowerOn();
     virtual void Reset(CHRROM* chrRom, MirroringMode mirroringMode);
+
+    // For testing purposes
+    void SetMirroringMode(MirroringMode mirroringMode);
 
 private:
     // Registers

@@ -136,6 +136,11 @@ void PPU::Reset(CHRROM* chrRom, MirroringMode mirroringMode)
     _mirroringMode = mirroringMode;
 }
 
+void PPU::SetMirroringMode(MirroringMode mirroringMode)
+{
+    _mirroringMode = mirroringMode;
+}
+
 uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
 {
     return address % kShadowVRAMStartAddress; // Shadow VRAM
