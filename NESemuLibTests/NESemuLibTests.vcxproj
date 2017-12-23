@@ -194,6 +194,7 @@
     <ClCompile Include="ORATest.cpp" />
     <ClCompile Include="PHAPLATest.cpp" />
     <ClCompile Include="PHPPLPTest.cpp" />
+    <ClCompile Include="PPUTest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
     <ClCompile Include="ROLTest.cpp" />
     <ClCompile Include="RORTest.cpp" />

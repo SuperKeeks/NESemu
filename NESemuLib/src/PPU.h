@@ -40,6 +40,9 @@ private:
     uint16_t _ppuScroll;
     uint16_t _ppuAddr;
 
+    int _ppuAddrStatus; // 1: next write to 0x2006 sets upper byte, 0: next write sets lower byte, -1: needs reset (through 0x2002 read)
+    uint8_t _readBuffer;
+
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];
     uint8_t _palettes[1 + 3*4 + 1*3 + 4*3]; // 1 for Bkg color + 4 Background palettes with extra data between them + 4 Sprite palettes

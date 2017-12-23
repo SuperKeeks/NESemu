@@ -21,6 +21,7 @@ public:
 
     void Load(const char* path);
     void Load(const uint8_t rom[], uint16_t romSize); // For testing purposes
+    void Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize); // For testing purposes
     void Update();
     virtual void Reset();
 

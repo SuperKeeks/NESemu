@@ -17,6 +17,10 @@ uint8_t PPU::ReadMem(uint16_t address)
     if (address == 0x2002)
     {
         // TODO: Reset VBlank flag
+        // TODO: Reset PPUScroll
+
+        _ppuAddrStatus = 1; // Reset PPU Addr status so next write to it sets the high byte
+
         return _ppuStatus;
     }
     else if (address == 0x2004)
@@ -27,10 +31,19 @@ uint8_t PPU::ReadMem(uint16_t address)
     }
     else if (address == 0x2007)
     {
-        // TODO: The first 0x0000-0x3EFF data read after setting the address via 0x2006 will return a buffered value
         const uint16_t ppuAddress = ConvertToRealVRAMAddress(_ppuAddr);
         _ppuAddr += GetAddressIncrement();
-        return ReadPPUMem(ppuAddress);
+        const uint8_t prevReadBuffer = _readBuffer;
+        _readBuffer = ReadPPUMem(ppuAddress);
+
+        if (ppuAddress < kPaletteStartAddress)
+        {
+            return prevReadBuffer;
+        }
+        else
+        {
+            return _readBuffer;
+        }
     }
     else if (address >= 0x2008 && address < 0x4000)
     {
@@ -69,7 +82,16 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x2006)
     {
-        OMBAssert(false, "TODO");
+        OMBAssert(_ppuAddrStatus >= 0, "Can't set PPU Addr in this state. Requires a read of 0x2002 to reset status");
+        if (_ppuAddrStatus == 1)
+        {
+            _ppuAddr = value << 8;
+        }
+        else if (_ppuAddrStatus == 0)
+        {
+            _ppuAddr += value;
+        }
+        --_ppuAddrStatus;
     }
     else if (address == 0x2007)
     {

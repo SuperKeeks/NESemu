@@ -40,6 +40,17 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize)
     Reset();
 }
 
+void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize)
+{
+    OMBAssert(chrRomSize == CHRROM::kMaxCHRROMSize, "Unsupported CHR-ROM size");
+    for (int i = 0; i < chrRomSize; ++i)
+    {
+        _chrRom.GetCHRROMPtr()[i] = chrRom[i];
+    }
+
+    Load(rom, romSize);
+}
+
 void NESemu::Update()
 {
     _cpu.ExecuteNextInstruction();
