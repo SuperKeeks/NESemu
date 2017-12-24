@@ -21,6 +21,7 @@ public:
     static const int kMirrorStartAddress = 0x3000;
     static const int kPaletteStartAddress = 0x3F00;
     static const int kShadowVRAMStartAddress = 0x4000;
+    static const int kDMARegisterAddress = 0x4014;
     static const int kPPUStatusAddress = 0x2002;
     static const int kOAMAddress = 0x2003;
     static const int kOAMData = 0x2004;
@@ -36,7 +37,7 @@ public:
     virtual void WriteMem(uint16_t address, uint8_t value);
 
     virtual void PowerOn();
-    virtual void Reset(CHRROM* chrRom, MirroringMode mirroringMode);
+    virtual void Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirroringMode);
 
     // For testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
@@ -57,6 +58,7 @@ private:
     uint8_t _oam[kSpriteSize * kSpriteCount];
     uint8_t _palettes[kPaletteArraySize];
 
+    MemoryHandler* _memoryHandler;
     CHRROM* _chrRom;
     MirroringMode _mirroringMode;
 

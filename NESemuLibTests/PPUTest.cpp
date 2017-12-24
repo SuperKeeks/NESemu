@@ -336,5 +336,34 @@ namespace NESemuLibTests
                 Assert::AreEqual(i, (int)emu.ReadMem(PPU::kOAMData));
             }
         }
+
+        TEST_METHOD(PPUDMA)
+        {
+            NESemu emu;
+            CPU& cpu = *emu.GetCPU();
+            uint8_t rom[ROM::kMaxROMSize];
+
+            emu.Load(rom, ROM::kMaxROMSize);
+
+            // Init RAM with values to transfer
+            for (int i = 0; i <= 0x0700; i += 0x100)
+            {
+                for (int j = 0; j < 0x100; ++j)
+                {
+                    emu.WriteMem(i + j, i / 0x100);
+                }
+            }
+
+            // Test DMA
+            for (int i = 0; i <= 7; ++i)
+            {
+                emu.WriteMem(PPU::kDMARegisterAddress, i);
+                for (int j = 0; j < PPU::kOAMSize; ++j)
+                {
+                    emu.WriteMem(PPU::kOAMAddress, j); // Reads do not increment OAM address, so set for each read
+                    Assert::AreEqual(i, (int)emu.ReadMem(PPU::kOAMData));
+                }
+            }
+        }
     };
 }

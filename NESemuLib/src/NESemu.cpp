@@ -72,7 +72,7 @@ void NESemu::Reset()
 {
     _cpu.Reset(this);
     _ram.Reset();
-    _ppu.Reset(&_chrRom, _parser.GetMirroringMode());
+    _ppu.Reset(this, &_chrRom, _parser.GetMirroringMode());
     _apu.Reset();
     _input.Reset();
     _mm5.Reset();

@@ -103,6 +103,13 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
         // Shadow PPU Registers
         WriteMem(((address - 0x2000) % (0x2008 - 0x2000)) + 0x2000, value);
     }
+    else if (address == kDMARegisterAddress)
+    {
+        for (int i = 0; i < sizeofarray(_oam); ++i)
+        {
+            _oam[i] = _memoryHandler->ReadMem((value << 8) + i);
+        }
+    }
     else
     {
         OMBAssert(false, "Unimplemented");
@@ -129,8 +136,9 @@ void PPU::PowerOn()
     }
 }
 
-void PPU::Reset(CHRROM* chrRom, MirroringMode mirroringMode)
+void PPU::Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirroringMode)
 {
+    _memoryHandler = memoryHandler;
     _chrRom = chrRom;
     _mirroringMode = mirroringMode;
 }
