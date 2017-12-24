@@ -17,9 +17,10 @@ uint8_t PPU::ReadMem(uint16_t address)
     if (address == 0x2002)
     {
         // TODO: Reset VBlank flag
-        // TODO: Reset PPUScroll
 
-        _ppuAddrStatus = 1; // Reset PPU Addr status so next write to it sets the high byte
+        // Reset PPU Scroll and Addr status so next write to them sets the high byte
+        _ppuScrollStatus = 1;
+        _ppuAddrStatus = 1;
 
         return _ppuStatus;
     }
@@ -77,7 +78,16 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x2005)
     {
-        OMBAssert(false, "TODO");
+        OMBAssert(_ppuScrollStatus >= 0, "Can't set PPU Scroll in this state. Requires a read of 0x2002 to reset status");
+        if (_ppuScrollStatus == 1)
+        {
+            _ppuScroll = value << 8;
+        }
+        else if (_ppuScrollStatus == 0)
+        {
+            _ppuScroll += value;
+        }
+        --_ppuScrollStatus;
     }
     else if (address == 0x2006)
     {

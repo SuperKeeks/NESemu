@@ -51,7 +51,10 @@ private:
     uint16_t _ppuScroll;
     uint16_t _ppuAddr;
 
-    int _ppuAddrStatus; // 1: next write to 0x2006 sets upper byte, 0: next write sets lower byte, -1: needs reset (through 0x2002 read)
+    // Status variables legend: 1: next write to 0x2005 sets upper byte, 0: next write sets lower byte, -1: needs reset (through 0x2002 read)
+    int _ppuScrollStatus;
+    int _ppuAddrStatus;
+
     uint8_t _readBuffer;
 
     uint8_t _vram[kVRAMSize];
