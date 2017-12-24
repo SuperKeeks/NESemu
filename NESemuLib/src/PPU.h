@@ -11,6 +11,7 @@ public:
     static const int kVRAMSize = 2048;
     static const int kSpriteSize = 4;
     static const int kSpriteCount = 64;
+    static const int kPaletteArraySize = 1 + 4*3 + 1*3 + 4*3; // 1 for Bkg color + 4 Background palettes with extra data between them + 4 Sprite palettes
     static const int kNametable0StartAddress = 0x2000;
     static const int kNametable1StartAddress = 0x2400;
     static const int kNametable2StartAddress = 0x2800;
@@ -51,7 +52,7 @@ private:
 
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];
-    uint8_t _palettes[1 + 3*4 + 1*3 + 4*3]; // 1 for Bkg color + 4 Background palettes with extra data between them + 4 Sprite palettes
+    uint8_t _palettes[kPaletteArraySize];
 
     CHRROM* _chrRom;
     MirroringMode _mirroringMode;

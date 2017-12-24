@@ -240,5 +240,79 @@ namespace NESemuLibTests
             }
         }
 
+        TEST_METHOD(PPUPalette)
+        {
+            NESemu emu;
+            CPU& cpu = *emu.GetCPU();
+            uint8_t rom[ROM::kMaxROMSize];
+
+            emu.Load(rom, ROM::kMaxROMSize);
+
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x3F);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            
+            int nextValue = 0x10;
+
+            // Bkg color
+            emu.WriteMem(PPU::kPPUDataAddress, nextValue++);
+
+            // Background palettes + extra data
+            for (int i = 0; i < 4*3 + 3*1; ++i)
+            {
+                emu.WriteMem(PPU::kPPUDataAddress, nextValue++);
+            }
+
+            emu.ReadMem(PPU::kPPUDataAddress); // Skip background mirror
+
+            // Sprite palettes
+            for (int i = 1; i < 4*4 - 1; ++i)
+            {
+                if (i % 4 != 0)
+                {
+                    emu.WriteMem(PPU::kPPUDataAddress, nextValue++);
+                }
+                else
+                {
+                    // Do not write mirror data
+                    emu.ReadMem(PPU::kPPUDataAddress);
+                }
+            }
+
+            // Verify written data
+            nextValue = 0x10;
+            emu.ReadMem(PPU::kPPUStatusAddress);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x3F);
+            emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
+            
+            // Bkg color
+            const int bkgValue = nextValue++;
+            Assert::AreEqual(bkgValue, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            
+            // Background palettes + extra data
+            for (int i = 0; i < 4 * 3 + 3 * 1; ++i)
+            {
+                Assert::AreEqual(nextValue++, (int)emu.ReadMem(PPU::kPPUDataAddress));
+            }
+
+            // Bkg color mirror
+            Assert::AreEqual(bkgValue, (int)emu.ReadMem(PPU::kPPUDataAddress));
+
+            // Sprite palettes + mirrors
+            for (int i = 1; i < 4*4 - 1; ++i)
+            {
+                if (i % 4 != 0)
+                {
+                    // Sprite palettes
+                    Assert::AreEqual(nextValue++, (int)emu.ReadMem(PPU::kPPUDataAddress));
+                }
+                else
+                {
+                    // Mirrors
+                    Assert::AreEqual(0x10 + i/4 * 4, (int)emu.ReadMem(PPU::kPPUDataAddress));
+                }
+            }
+        }
+
     };
 }

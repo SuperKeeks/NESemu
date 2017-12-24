@@ -38,10 +38,12 @@ uint8_t PPU::ReadMem(uint16_t address)
 
         if (ppuAddress < kPaletteStartAddress)
         {
+            // Non-palette values are buffered, so it requires 2 reads after address set (via 0x2006) to get the value you expect
             return prevReadBuffer;
         }
         else
         {
+            // Palette values are returned immediately (although also cached)
             return _readBuffer;
         }
     }
@@ -267,22 +269,22 @@ uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
     else if (realAddress >= 0x3F11 && realAddress <= 0x3F13)
     {
         // Sprite palette 0
-        index = realAddress - 0x3F11 + 0xF;
+        index = realAddress - 0x3F11 + 16;
     }
     else if (realAddress >= 0x3F15 && realAddress <= 0x3F17)
     {
         // Sprite palette 1
-        index = realAddress - 0x3F11 + 0x12;
+        index = realAddress - 0x3F11 - 1 + 16;
     }
     else if (realAddress >= 0x3F19 && realAddress <= 0x3F1B)
     {
         // Sprite palette 2
-        index = realAddress - 0x3F11 + 0x15;
+        index = realAddress - 0x3F11 - 2 + 16;
     }
     else if (realAddress >= 0x3F1D && realAddress <= 0x3F1F)
     {
         // Sprite palette 3
-        index = realAddress - 0x3F11 + 0x18;
+        index = realAddress - 0x3F11 - 3 + 16;
     }
     else
     {
