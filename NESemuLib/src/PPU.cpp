@@ -25,9 +25,7 @@ uint8_t PPU::ReadMem(uint16_t address)
     }
     else if (address == 0x2004)
     {
-        _oamAddr++;
-        OMBAssert(false, "TODO");
-        return 0;
+        return _oam[_oamAddr];
     }
     else if (address == 0x2007)
     {
@@ -75,8 +73,7 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x2004)
     {
-        _oamAddr++;
-        OMBAssert(false, "TODO");
+        _oam[_oamAddr++] = value;
     }
     else if (address == 0x2005)
     {
