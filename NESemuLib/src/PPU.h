@@ -62,6 +62,8 @@ private:
     int _ppuAddrStatus;
 
     uint8_t _readBuffer;
+    int _currentScanline = -1;
+    int _ticksUntilNextScanline = 0;
 
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];

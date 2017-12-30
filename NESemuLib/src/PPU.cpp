@@ -16,13 +16,18 @@ uint8_t PPU::ReadMem(uint16_t address)
 {
     if (address == 0x2002)
     {
-        // TODO: Reset VBlank flag
-
         // Reset PPU Scroll and Addr status so next write to them sets the high byte
         _ppuScrollStatus = 1;
         _ppuAddrStatus = 1;
 
-        return _ppuStatus;
+        // Reset VBlank flag
+        const uint8_t statusBeforeVBlankReset = _ppuStatus;
+        if (_ppuStatus != 0)
+        {
+            _ppuStatus &= ~(1 << 7);
+        }
+
+        return statusBeforeVBlankReset;
     }
     else if (address == 0x2004)
     {
@@ -155,6 +160,36 @@ void PPU::Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirr
 
 void PPU::Tick()
 {
+    // Main reference for this function implementation: http://wiki.nesdev.com/w/index.php/PPU_rendering
+    --_ticksUntilNextScanline;
+    if (_ticksUntilNextScanline <= 0)
+    {
+        ++_currentScanline;
+        if (_currentScanline > 260)
+        {
+            _currentScanline = -1;
+        }
+
+        if (_currentScanline == -1)
+        {
+        }
+        else if (_currentScanline >= 0 && _currentScanline <= 239)
+        {
+        }
+        else if (_currentScanline == 240)
+        {
+        }
+        else if (_currentScanline == 241)
+        {
+            _ppuStatus |= (1 << 7); // Set VBlank flag
+            // TODO: NMI
+        }
+        else
+        {
+        }
+
+        _ticksUntilNextScanline = 341 - 1;
+    }
 }
 
 void PPU::SetMirroringMode(MirroringMode mirroringMode)
