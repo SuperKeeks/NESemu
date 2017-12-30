@@ -48,6 +48,7 @@ public:
     void PowerOn();
     void Reset(MemoryHandler* memoryHandler);
 
+    void Tick();
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
 
     // Internal or for testing purposes (hence the publicness) Don't use these without a good reason
@@ -261,6 +262,7 @@ private:
     };
 
     MemoryHandler* _memoryHandler = nullptr;
+    int _remainingCyclesToTick = 0;
 
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);

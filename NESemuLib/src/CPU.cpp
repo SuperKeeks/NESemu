@@ -25,6 +25,15 @@ void CPU::Reset(MemoryHandler* memoryHandler)
     SetFlag(Flag::InterruptDisable, true);
 }
 
+void CPU::Tick()
+{
+    --_remainingCyclesToTick;
+    if (_remainingCyclesToTick <= 0)
+    {
+        _remainingCyclesToTick = ExecuteNextInstruction() - 1;
+    }
+}
+
 int CPU::ExecuteNextInstruction()
 {
     // Fetch next opcode

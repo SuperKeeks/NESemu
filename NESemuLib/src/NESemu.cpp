@@ -51,9 +51,20 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[],
     Load(rom, romSize);
 }
 
-void NESemu::Update()
+void NESemu::Update(double delta)
 {
-    _cpu.ExecuteNextInstruction();
+    const double masterDelta = kMasterClockSpeed * 1000000 * delta;
+    const uint64_t ppuDelta = (uint64_t)std::round(masterDelta / 4); // The PPU runs 4x slower than the master clock
+
+    for (int i = 0; i < ppuDelta; ++i)
+    {
+        if (i % 3 == 0)
+        {
+            _cpu.Tick(); // For every 3 PPU cycles, the CPU runs one
+        }
+
+        _ppu.Tick();
+    }
 }
 
 uint8_t NESemu::ReadMem(uint16_t address)

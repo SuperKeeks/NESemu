@@ -39,6 +39,8 @@ public:
     virtual void PowerOn();
     virtual void Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirroringMode);
 
+    void Tick();
+
     // For testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
 

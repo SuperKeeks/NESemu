@@ -32,8 +32,17 @@ int main(int argc, char* args[])
             NESemu emu;
             emu.Load("demo1.nes");
 
+            // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
+            Uint64 now = SDL_GetPerformanceCounter();
+            Uint64 last = 0;
+            double deltaTime = 0; // In seconds
+
             while (!quit)
             {
+                last = now;
+                now = SDL_GetPerformanceCounter();
+                deltaTime = ((now - last) * 1000/(double)SDL_GetPerformanceFrequency()) * 0.001;
+
                 while (SDL_PollEvent(&e) != 0)
                 {
                     if (e.type == SDL_QUIT)
@@ -42,7 +51,7 @@ int main(int argc, char* args[])
                     }
                 }
 
-                emu.Update();
+                emu.Update(deltaTime);
 
                 SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0x00, 0x77, 0x00));
                 SDL_UpdateWindowSurface(window);

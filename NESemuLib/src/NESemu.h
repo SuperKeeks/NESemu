@@ -22,7 +22,7 @@ public:
     void Load(const char* path);
     void Load(const uint8_t rom[], uint16_t romSize); // For testing purposes
     void Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize); // For testing purposes
-    void Update();
+    void Update(double delta);
     virtual void Reset();
 
     CPU* GetCPU() { return &_cpu; }
@@ -32,6 +32,8 @@ public:
     virtual void WriteMem(uint16_t address, uint8_t value);
 
 private:
+    const double kMasterClockSpeed = 21.477272; // MHz
+
     CPU _cpu;
     INESParser _parser;
     RAM _ram;

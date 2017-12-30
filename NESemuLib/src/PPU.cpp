@@ -153,6 +153,10 @@ void PPU::Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirr
     _mirroringMode = mirroringMode;
 }
 
+void PPU::Tick()
+{
+}
+
 void PPU::SetMirroringMode(MirroringMode mirroringMode)
 {
     _mirroringMode = mirroringMode;
