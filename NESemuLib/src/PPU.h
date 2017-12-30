@@ -8,6 +8,8 @@ class CHRROM;
 class PPU : public MemoryHandler
 {
 public:
+    static const int kHorizontalResolution = 256;
+    static const int kVerticalResolution = 240;
     static const int kVRAMSize = 2048;
     static const int kSpriteSize = 4;
     static const int kSpriteCount = 64;
@@ -41,6 +43,8 @@ public:
 
     void Tick();
 
+    uint32_t* GetFrameBuffer() { return _frameBuffer; }
+
     // For testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
 
@@ -62,6 +66,7 @@ private:
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];
     uint8_t _palettes[kPaletteArraySize];
+    uint32_t _frameBuffer[PPU::kHorizontalResolution * PPU::kVerticalResolution];
 
     MemoryHandler* _memoryHandler;
     CHRROM* _chrRom;

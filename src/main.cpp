@@ -3,13 +3,13 @@
 #include <SDL.h>
 #include <stdio.h>
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCALE = 2;
 
 int main(int argc, char* args[])
 {
     SDL_Window* window = NULL;
-    SDL_Surface* screenSurface = NULL;
+    SDL_Renderer* renderer = NULL;
+    SDL_Texture* texture = NULL;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -17,14 +17,21 @@ int main(int argc, char* args[])
     }
     else
     {
-        window = SDL_CreateWindow("NESemu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow(
+            "NESemu",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            PPU::kHorizontalResolution * SCALE,
+            PPU::kVerticalResolution * SCALE,
+            SDL_WINDOW_SHOWN);
         if (window == NULL)
         {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
         else
         {
-            screenSurface = SDL_GetWindowSurface(window);
+            renderer = SDL_CreateRenderer(window, -1, 0);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
 
             bool quit = false;
             SDL_Event e;
@@ -52,13 +59,17 @@ int main(int argc, char* args[])
                 }
 
                 emu.Update(deltaTime);
-
-                SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0x00, 0x77, 0x00));
-                SDL_UpdateWindowSurface(window);
+                
+                SDL_UpdateTexture(texture, NULL, emu.GetPPU()->GetFrameBuffer(), PPU::kHorizontalResolution * sizeof(Uint32));
+                SDL_RenderClear(renderer);
+                SDL_RenderCopy(renderer, texture, NULL, NULL);
+                SDL_RenderPresent(renderer);
             }
         }
     }
 
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 
