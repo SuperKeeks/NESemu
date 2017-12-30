@@ -27,10 +27,10 @@ void CPU::Reset(MemoryHandler* memoryHandler)
 
 void CPU::Tick()
 {
-    --_remainingCyclesToTick;
-    if (_remainingCyclesToTick <= 0)
+    --_ticksUntilNextInstruction;
+    if (_ticksUntilNextInstruction <= 0)
     {
-        _remainingCyclesToTick = ExecuteNextInstruction() - 1;
+        _ticksUntilNextInstruction = ExecuteNextInstruction() - 1;
     }
 }
 

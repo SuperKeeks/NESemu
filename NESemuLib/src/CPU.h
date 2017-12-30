@@ -262,7 +262,7 @@ private:
     };
 
     MemoryHandler* _memoryHandler = nullptr;
-    int _remainingCyclesToTick = 0;
+    int _ticksUntilNextInstruction = 0;
 
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
