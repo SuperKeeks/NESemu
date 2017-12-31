@@ -24,6 +24,7 @@ public:
     void Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize); // For testing purposes
     void Update(double delta);
     virtual void Reset();
+    void SetControllerState(int controllerNumber, const Input::ControllerState& state);
 
     CPU* GetCPU() { return &_cpu; }
     PPU* GetPPU() { return &_ppu; }
@@ -32,7 +33,7 @@ public:
     virtual void WriteMem(uint16_t address, uint8_t value);
 
 private:
-    const double kMasterClockSpeed = 21.477272; // MHz
+    const int kMasterClockSpeed = 21477272; // Hz
 
     CPU _cpu;
     INESParser _parser;

@@ -61,7 +61,7 @@ void NESemu::Update(double delta)
     }
 #endif
 
-    const double masterDelta = kMasterClockSpeed * 1000000 * delta;
+    const double masterDelta = kMasterClockSpeed * delta;
     const uint64_t ppuDelta = (uint64_t)std::round(masterDelta / 4); // The PPU runs 4x slower than the master clock
 
     for (int i = 0; i < ppuDelta; ++i)
@@ -98,6 +98,11 @@ void NESemu::Reset()
     _sram.Reset();
     _rom.Reset();
     _chrRom.Reset();
+}
+
+void NESemu::SetControllerState(int controllerNumber, const Input::ControllerState& state)
+{
+    _input.SetControllerState(controllerNumber, state);
 }
 
 MemoryHandler& NESemu::GetMemoryHandlerForAddress(uint16_t address)
