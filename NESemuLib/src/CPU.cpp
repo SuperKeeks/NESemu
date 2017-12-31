@@ -55,6 +55,17 @@ int CPU::ExecuteNextInstruction()
     return cycles;
 }
 
+void CPU::ExecuteNMI()
+{
+    const uint8_t statusPlusBFlag = _status | (1 << Flag::Break) | (1 << Flag::Unused);
+    Push(GetHighByte(_programCounter));
+    Push(GetLowByte(_programCounter));
+    Push(statusPlusBFlag);
+    SetFlag(Flag::InterruptDisable, true);
+    _programCounter = _memoryHandler->ReadMem(kNMIVectorAddressL) +
+        (_memoryHandler->ReadMem(kNMIVectorAddressH) << 8) - 1;
+}
+
 void CPU::SetAccumulator(uint8_t value)
 {
     _accumulator = value;

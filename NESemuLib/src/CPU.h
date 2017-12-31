@@ -11,6 +11,8 @@ class CPU
 public:
     static const int kStackSize = 256;
     static const uint16_t kStackAddressStart = 0x100;
+    static const uint16_t kNMIVectorAddressL = 0xFFFA;
+    static const uint16_t kNMIVectorAddressH = kNMIVectorAddressL + 1;
     static const uint16_t kResetVectorAddressL = 0xFFFC;
     static const uint16_t kResetVectorAddressH = kResetVectorAddressL + 1;
     static const uint16_t kInterruptBreakVectorAddressL = 0xFFFE;
@@ -50,6 +52,7 @@ public:
 
     void Tick();
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
+    void ExecuteNMI();
 
     // Internal or for testing purposes (hence the publicness) Don't use these without a good reason
     uint16_t GetProgramCounter() const { return _programCounter; }

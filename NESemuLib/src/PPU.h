@@ -4,6 +4,7 @@
 #include "MirroringMode.h"
 
 class CHRROM;
+class CPU;
 
 class PPU : public MemoryHandler
 {
@@ -39,7 +40,7 @@ public:
     virtual void WriteMem(uint16_t address, uint8_t value);
 
     virtual void PowerOn();
-    virtual void Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirroringMode);
+    virtual void Reset(MemoryHandler* memoryHandler, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode);
 
     void Tick();
 
@@ -76,6 +77,7 @@ private:
 
     MemoryHandler* _memoryHandler;
     CHRROM* _chrRom;
+    CPU* _cpu;
     MirroringMode _mirroringMode;
 
     uint8_t* GetNametableMem(uint16_t address);

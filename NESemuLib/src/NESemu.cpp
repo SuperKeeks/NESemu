@@ -53,6 +53,14 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[],
 
 void NESemu::Update(double delta)
 {
+// Prevent big deltas while debugging (otherwise we might get stuck here for too long)
+#if _DEBUG
+    if (delta > 1.0f / 30)
+    {
+        delta = 1.0f / 30;
+    }
+#endif
+
     const double masterDelta = kMasterClockSpeed * 1000000 * delta;
     const uint64_t ppuDelta = (uint64_t)std::round(masterDelta / 4); // The PPU runs 4x slower than the master clock
 
@@ -83,7 +91,7 @@ void NESemu::Reset()
 {
     _cpu.Reset(this);
     _ram.Reset();
-    _ppu.Reset(this, &_chrRom, _parser.GetMirroringMode());
+    _ppu.Reset(this, &_cpu, &_chrRom, _parser.GetMirroringMode());
     _apu.Reset();
     _input.Reset();
     _mm5.Reset();

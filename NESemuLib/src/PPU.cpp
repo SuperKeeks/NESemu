@@ -2,6 +2,7 @@
 
 #include "Assert.h"
 #include "CHRROM.h"
+#include "CPU.h"
 #include "SizeOfArray.h"
 
 PPU::PPU()
@@ -151,9 +152,10 @@ void PPU::PowerOn()
     }
 }
 
-void PPU::Reset(MemoryHandler* memoryHandler, CHRROM* chrRom, MirroringMode mirroringMode)
+void PPU::Reset(MemoryHandler* memoryHandler, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode)
 {
     _memoryHandler = memoryHandler;
+    _cpu = cpu;
     _chrRom = chrRom;
     _mirroringMode = mirroringMode;
 }
@@ -186,9 +188,11 @@ void PPU::Tick()
                 _waitingToShowFrameBuffer = true;
             }
             _ppuStatus |= (1 << 7); // Set VBlank flag
+
+            // Execute NMI on VBlank
             if ((_ppuCtrl & (1 << 7)) != 0)
             {
-                // TODO: Execute NMI on VBlank
+                _cpu->ExecuteNMI();
             }
         }
         else
