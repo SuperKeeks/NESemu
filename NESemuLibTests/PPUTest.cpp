@@ -254,7 +254,7 @@ namespace NESemuLibTests
             
             int nextValue = 0x10;
 
-            // Bkg color
+            // Bkg colour
             emu.WriteMem(PPU::kPPUDataAddress, nextValue++);
 
             // Background palettes + extra data
@@ -285,7 +285,7 @@ namespace NESemuLibTests
             emu.WriteMem(PPU::kPPUAddrAddress, 0x3F);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x00);
             
-            // Bkg color
+            // Bkg colour
             const int bkgValue = nextValue++;
             Assert::AreEqual(bkgValue, (int)emu.ReadMem(PPU::kPPUDataAddress));
             
@@ -295,7 +295,7 @@ namespace NESemuLibTests
                 Assert::AreEqual(nextValue++, (int)emu.ReadMem(PPU::kPPUDataAddress));
             }
 
-            // Bkg color mirror
+            // Bkg colour mirror
             Assert::AreEqual(bkgValue, (int)emu.ReadMem(PPU::kPPUDataAddress));
 
             // Sprite palettes + mirrors
