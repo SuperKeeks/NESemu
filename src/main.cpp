@@ -5,6 +5,8 @@
 
 const int SCALE = 2;
 
+void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event);
+
 int main(int argc, char* args[])
 {
     SDL_Window* window = NULL;
@@ -44,6 +46,7 @@ int main(int argc, char* args[])
             Uint64 now = SDL_GetPerformanceCounter();
             Uint64 last = 0;
             double deltaTime = 0; // In seconds
+            Input::ControllerState controller1State;
 
             while (!quit)
             {
@@ -57,8 +60,13 @@ int main(int argc, char* args[])
                     {
                         quit = true;
                     }
+                    else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+                    {
+                        HandleKeyboardInput(controller1State, e);
+                    }
                 }
 
+                emu.SetControllerState(1, controller1State);
                 emu.Update(deltaTime);
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
@@ -78,4 +86,41 @@ int main(int argc, char* args[])
     SDL_Quit();
 
     return 0;
+}
+
+void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event)
+{
+    bool newKeyState = false;
+    if (event.type == SDL_KEYDOWN)
+    {
+        newKeyState = true;
+    }
+
+    switch (event.key.keysym.sym)
+    {
+        case SDLK_LEFT:
+            controllerState.Left = newKeyState;
+            break;
+        case SDLK_RIGHT:
+            controllerState.Right = newKeyState;
+            break;
+        case SDLK_UP:
+            controllerState.Up = newKeyState;
+            break;
+        case SDLK_DOWN:
+            controllerState.Down = newKeyState;
+            break;
+        case SDLK_z:
+            controllerState.B = newKeyState;
+            break;
+        case SDLK_x:
+            controllerState.A = newKeyState;
+            break;
+        case SDLK_n:
+            controllerState.Select = newKeyState;
+            break;
+        case SDLK_m:
+            controllerState.Start = newKeyState;
+            break;
+    }
 }
