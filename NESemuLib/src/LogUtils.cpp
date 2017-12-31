@@ -7,6 +7,7 @@
 
 void Log::Debug(const char* fmt, ...)
 {
+#if _DEBUG
     va_list args;
     va_start(args, fmt);
     const int bufferSize = 1024;
@@ -15,4 +16,5 @@ void Log::Debug(const char* fmt, ...)
     printf("\n");
     printf(buff);
     va_end(args);
+#endif
 }
