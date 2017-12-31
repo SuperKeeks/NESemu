@@ -47,6 +47,5 @@ private:
     bool _4017[24];
     uint8_t _current4016Index;
     uint8_t _current4017Index;
-    uint8_t _4016LastWrittenValue;
-    uint8_t _4017LastWrittenValue;
+    uint8_t _lastWrittenValue;
 };

@@ -66,11 +66,11 @@ namespace NESemuLibTests
             controller2State.Left = true;
             input.SetControllerState(2, controller2State);
 
-            input.WriteMem(Input::kController2Address, 0x1);
-            input.WriteMem(Input::kController2Address, 0x1);
-            input.WriteMem(Input::kController2Address, 0x1);
-            input.WriteMem(Input::kController2Address, 0x1);
-            input.WriteMem(Input::kController2Address, 0x0);
+            input.WriteMem(Input::kController1Address, 0x1);
+            input.WriteMem(Input::kController1Address, 0x1);
+            input.WriteMem(Input::kController1Address, 0x1);
+            input.WriteMem(Input::kController1Address, 0x1);
+            input.WriteMem(Input::kController1Address, 0x0);
             Assert::AreEqual((int)input.ReadMem(Input::kController2Address), 0x0); // A
             Assert::AreEqual((int)input.ReadMem(Input::kController2Address), 0x1); // B
             Assert::AreEqual((int)input.ReadMem(Input::kController2Address), 0x1); // Select
@@ -126,8 +126,8 @@ namespace NESemuLibTests
             controllerState.Select = true;
             input.SetControllerState(4, controllerState);
 
-            input.WriteMem(Input::kController2Address, 0x1);
-            input.WriteMem(Input::kController2Address, 0x0);
+            input.WriteMem(Input::kController1Address, 0x1);
+            input.WriteMem(Input::kController1Address, 0x0);
             for (int i = 0; i < 8; ++i)
             {
                 // Skip Controller 2 info

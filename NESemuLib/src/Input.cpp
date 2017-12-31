@@ -47,26 +47,13 @@ uint8_t Input::ReadMem(uint16_t address)
 
 void Input::WriteMem(uint16_t address, uint8_t value)
 {
-    if (address == kController1Address)
+    OMBAssert(address == kController1Address, "Address %#06x is not part of Input!", address);
+    if (_lastWrittenValue == 0x1 && value == 0x0)
     {
-        if (_4016LastWrittenValue == 0x1 && value == 0x0)
-        {
-            _current4016Index = 0;
-        }
-        _4016LastWrittenValue = value;
+        _current4016Index = 0;
+        _current4017Index = 0;
     }
-    else if (address == kController2Address)
-    {
-        if (_4017LastWrittenValue == 0x1 && value == 0x0)
-        {
-            _current4017Index = 0;
-        }
-        _4017LastWrittenValue = value;
-    }
-    else
-    {
-        OMBAssert(false, "Address %#06x is not part of Input!", address);
-    }
+    _lastWrittenValue = value;
 }
 
 void Input::PowerOn()
@@ -88,8 +75,7 @@ void Input::Reset()
 
     _current4016Index = 0;
     _current4017Index = 0;
-    _4016LastWrittenValue = 0x0;
-    _4017LastWrittenValue = 0x0;
+    _lastWrittenValue = 0x0;
 }
 
 void Input::SetControllerState(int controllerNumber, const ControllerState& state)
