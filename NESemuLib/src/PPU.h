@@ -154,9 +154,7 @@ private:
     uint16_t _ppuScroll;
     uint16_t _ppuAddr;
 
-    // Status variables legend: 1: next write to 0x2005 sets upper byte, 0: next write sets lower byte, -1: needs reset (through 0x2002 read)
-    int _ppuScrollStatus;
-    int _ppuAddrStatus;
+    bool _writeToggle; // false: Next write to 0x2005 and 0x2006 sets upper byte, true: Next write sets lower byte
 
     uint8_t _readBuffer;
     int _currentScanline = -1;
@@ -181,6 +179,7 @@ private:
     uint8_t GetAddressIncrement() const;
     uint8_t ConvertAddressToPaletteIndex(uint16_t address) const;
     bool IsFlagSet(uint8_t registerValue, int shift) const;
+    void WriteToggleableRegister(uint16_t& reg, uint8_t value);
     void RenderScanline(int index);
     void RenderPixel(int x, int y, uint8_t paletteIndex);
 };

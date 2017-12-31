@@ -17,9 +17,8 @@ uint8_t PPU::ReadMem(uint16_t address)
 {
     if (address == 0x2002)
     {
-        // Reset PPU Scroll and Addr status so next write to them sets the high byte
-        _ppuScrollStatus = 1;
-        _ppuAddrStatus = 1;
+        // Reset PPU Scroll and Addr write toggle so next write to any of them sets the high byte
+        _writeToggle = false;
 
         // Reset VBlank flag
         const uint8_t statusBeforeVBlankReset = _ppuStatus;
@@ -84,29 +83,11 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x2005)
     {
-        OMBAssert(_ppuScrollStatus >= 0, "Can't set PPU Scroll in this state. Requires a read of 0x2002 to reset status");
-        if (_ppuScrollStatus == 1)
-        {
-            _ppuScroll = value << 8;
-        }
-        else if (_ppuScrollStatus == 0)
-        {
-            _ppuScroll += value;
-        }
-        --_ppuScrollStatus;
+        WriteToggleableRegister(_ppuScroll, value);
     }
     else if (address == 0x2006)
     {
-        OMBAssert(_ppuAddrStatus >= 0, "Can't set PPU Addr in this state. Requires a read of 0x2002 to reset status");
-        if (_ppuAddrStatus == 1)
-        {
-            _ppuAddr = value << 8;
-        }
-        else if (_ppuAddrStatus == 0)
-        {
-            _ppuAddr += value;
-        }
-        --_ppuAddrStatus;
+        WriteToggleableRegister(_ppuAddr, value);
     }
     else if (address == 0x2007)
     {
@@ -370,6 +351,19 @@ uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
 bool PPU::IsFlagSet(uint8_t registerValue, int shift) const
 {
     return (registerValue & (1 << shift)) != 0;
+}
+
+void PPU::WriteToggleableRegister(uint16_t& reg, uint8_t value)
+{
+    if (_writeToggle)
+    {
+        reg = value + (reg & 0xFF00);
+    }
+    else
+    {
+        reg = (value << 8) + (reg & 0xFF);
+    }
+    _writeToggle = !_writeToggle;
 }
 
 void PPU::RenderScanline(int index)
