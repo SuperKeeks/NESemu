@@ -56,7 +56,7 @@ int main(int argc, char* args[])
 
                 while (SDL_PollEvent(&e) != 0)
                 {
-                    if (e.type == SDL_QUIT)
+                    if (e.type == SDL_QUIT || (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE))
                     {
                         quit = true;
                     }
