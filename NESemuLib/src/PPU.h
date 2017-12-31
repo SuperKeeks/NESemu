@@ -43,7 +43,9 @@ public:
 
     void Tick();
 
-    uint32_t* GetFrameBuffer() { return _frameBuffer; }
+    uint32_t* GetFrameBuffer();
+    void SetWaitToShowFrameBuffer(bool value) { _waitToShowFrameBuffer = value; }
+    bool IsWaitingToShowFrameBuffer() const { return _waitingToShowFrameBuffer; }
 
     // For testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
@@ -64,6 +66,8 @@ private:
     uint8_t _readBuffer;
     int _currentScanline = -1;
     int _ticksUntilNextScanline = 0;
+    bool _waitingToShowFrameBuffer = false;
+    bool _waitToShowFrameBuffer = false; // If true, the PPU won't start rendering the next frame until GetFrameBuffer() is called
 
     uint8_t _vram[kVRAMSize];
     uint8_t _oam[kSpriteSize * kSpriteCount];

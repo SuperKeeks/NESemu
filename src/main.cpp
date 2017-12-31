@@ -38,6 +38,7 @@ int main(int argc, char* args[])
 
             NESemu emu;
             emu.Load("demo1.nes");
+            emu.GetPPU()->SetWaitToShowFrameBuffer(true);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint64 now = SDL_GetPerformanceCounter();
@@ -60,10 +61,13 @@ int main(int argc, char* args[])
 
                 emu.Update(deltaTime);
                 
-                SDL_UpdateTexture(texture, NULL, emu.GetPPU()->GetFrameBuffer(), PPU::kHorizontalResolution * sizeof(Uint32));
-                SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, texture, NULL, NULL);
-                SDL_RenderPresent(renderer);
+                if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
+                {
+                    SDL_UpdateTexture(texture, NULL, emu.GetPPU()->GetFrameBuffer(), PPU::kHorizontalResolution * sizeof(Uint32));
+                    SDL_RenderClear(renderer);
+                    SDL_RenderCopy(renderer, texture, NULL, NULL);
+                    SDL_RenderPresent(renderer);
+                }
             }
         }
     }

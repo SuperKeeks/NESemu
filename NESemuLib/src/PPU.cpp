@@ -165,7 +165,7 @@ void PPU::Tick()
     if (_ticksUntilNextScanline <= 0)
     {
         ++_currentScanline;
-        if (_currentScanline > 260)
+        if (_currentScanline > 260 && !_waitingToShowFrameBuffer)
         {
             _currentScanline = -1;
         }
@@ -181,8 +181,15 @@ void PPU::Tick()
         }
         else if (_currentScanline == 241)
         {
+            if (_waitToShowFrameBuffer)
+            {
+                _waitingToShowFrameBuffer = true;
+            }
             _ppuStatus |= (1 << 7); // Set VBlank flag
-            // TODO: NMI
+            if ((_ppuCtrl & (1 << 7)) != 0)
+            {
+                // TODO: Execute NMI on VBlank
+            }
         }
         else
         {
@@ -190,6 +197,12 @@ void PPU::Tick()
 
         _ticksUntilNextScanline = 341 - 1;
     }
+}
+
+uint32_t* PPU::GetFrameBuffer()
+{
+    _waitingToShowFrameBuffer = false;
+    return _frameBuffer;
 }
 
 void PPU::SetMirroringMode(MirroringMode mirroringMode)
