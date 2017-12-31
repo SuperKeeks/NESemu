@@ -177,6 +177,7 @@ void PPU::Tick()
         }
         else if (_currentScanline >= 0 && _currentScanline <= 239)
         {
+            RenderScanline(_currentScanline);
         }
         else if (_currentScanline == 240)
         {
@@ -190,7 +191,7 @@ void PPU::Tick()
             _ppuStatus |= (1 << 7); // Set VBlank flag
 
             // Execute NMI on VBlank
-            if ((_ppuCtrl & (1 << 7)) != 0)
+            if (IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
             {
                 _cpu->ExecuteNMI();
             }
@@ -221,7 +222,7 @@ uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
 
 uint8_t PPU::GetAddressIncrement() const
 {
-    if ((_ppuCtrl & (1 << 2)) == 0)
+    if (!IsFlagSet(_ppuCtrl, PPUCtrlFlags::AddressIncrement))
     {
         return 1;
     }
@@ -364,4 +365,39 @@ uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
 
     OMBAssert(index >= 0 && index <= sizeofarray(_palettes), "Index out of bounds!");
     return index;
+}
+
+bool PPU::IsFlagSet(uint8_t registerValue, int shift) const
+{
+    return (registerValue & (1 << shift)) != 0;
+}
+
+void PPU::RenderScanline(int index)
+{
+    OMBAssert(index >= 0 && index < kHorizontalResolution, "Scanline index out of bounds!");
+
+    if (IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
+    {
+        const uint8_t bkgPaletteIndex = ReadPPUMem(kBkgColourAddress);
+        
+        if (IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping))
+        {
+            for (int i = 0; i < kLeftClippingPixelCount; ++i)
+            {
+                RenderPixel(i, index, bkgPaletteIndex);
+            }
+        }
+
+        for (int i = kLeftClippingPixelCount; i < kHorizontalResolution; ++i)
+        {
+            RenderPixel(i, index, bkgPaletteIndex);
+        }
+    }
+}
+
+void PPU::RenderPixel(int x, int y, uint8_t paletteIndex)
+{
+    OMBAssert(paletteIndex < sizeofarray(kOutputPalette), "Palette index is out of bounds!");
+    const int pixelIndex = y * kHorizontalResolution + x;
+    _frameBuffer[pixelIndex] = kOutputPalette[paletteIndex];
 }
