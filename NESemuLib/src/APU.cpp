@@ -18,7 +18,7 @@ uint8_t APU::ReadMem(uint16_t address)
 
 void APU::WriteMem(uint16_t address, uint8_t value)
 {
-    OMBAssert(false, "Unimplemented");
+    // TODO
 }
 
 void APU::PowerOn()
