@@ -90,37 +90,37 @@ int main(int argc, char* args[])
 
 void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event)
 {
-    bool newKeyState = false;
+    bool keyState = false;
     if (event.type == SDL_KEYDOWN)
     {
-        newKeyState = true;
+        keyState = true;
     }
 
     switch (event.key.keysym.sym)
     {
         case SDLK_LEFT:
-            controllerState.Left = newKeyState;
+            controllerState.Left = keyState;
             break;
         case SDLK_RIGHT:
-            controllerState.Right = newKeyState;
+            controllerState.Right = keyState;
             break;
         case SDLK_UP:
-            controllerState.Up = newKeyState;
+            controllerState.Up = keyState;
             break;
         case SDLK_DOWN:
-            controllerState.Down = newKeyState;
+            controllerState.Down = keyState;
             break;
         case SDLK_z:
-            controllerState.B = newKeyState;
+            controllerState.B = keyState;
             break;
         case SDLK_x:
-            controllerState.A = newKeyState;
+            controllerState.A = keyState;
             break;
         case SDLK_n:
-            controllerState.Select = newKeyState;
+            controllerState.Select = keyState;
             break;
         case SDLK_m:
-            controllerState.Start = newKeyState;
+            controllerState.Start = keyState;
             break;
     }
 }
