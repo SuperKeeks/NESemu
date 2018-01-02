@@ -1,6 +1,7 @@
 #include "CPU.h"
 
 #include "Assert.h"
+#include "BitwiseUtils.h"
 #include "LogUtils.h"
 #include "MemoryHandler.h"
 
@@ -81,14 +82,7 @@ void CPU::SetFlag(Flag flag, bool value)
         return;
     }
 
-    if (value)
-    {
-        _status |= 1 << flag;
-    }
-    else
-    {
-        _status &= ~(1 << flag);
-    }
+    BitwiseUtils::SetFlag(_status, flag, value);
 }
 
 bool CPU::GetFlag(Flag flag) const
@@ -105,7 +99,7 @@ bool CPU::GetFlag(Flag flag) const
     }
     else
     {
-        return (_status & (1 << flag)) != 0;
+        return BitwiseUtils::IsFlagSet(_status, flag);
     }
 }
 

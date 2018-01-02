@@ -1,6 +1,7 @@
 #include "PPU.h"
 
 #include "Assert.h"
+#include "BitwiseUtils.h"
 #include "CHRROM.h"
 #include "CPU.h"
 #include "SizeOfArray.h"
@@ -24,7 +25,7 @@ uint8_t PPU::ReadMem(uint16_t address)
         const uint8_t statusBeforeVBlankReset = _ppuStatus;
         if (_ppuStatus != 0)
         {
-            _ppuStatus &= ~(1 << 7);
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
         }
 
         return statusBeforeVBlankReset;
@@ -67,7 +68,15 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
 {
     if (address == 0x2000)
     {
+        const bool wasNMIFlagSet = BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank);
         _ppuCtrl = value;
+
+        // "When turning on the NMI flag in bit 7, if the PPU is currently in vertical blank 
+        // and the PPUSTATUS ($2002) vblank flag is set, an NMI will be generated immediately"
+        if (!wasNMIFlagSet && BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank) && BitwiseUtils::IsFlagSet(_ppuStatus, PPUStatusFlags::VBlank))
+        {
+            _cpu->ExecuteNMI();
+        }
     }
     else if (address == 0x2001)
     {
@@ -155,6 +164,7 @@ void PPU::Tick()
 
         if (_currentScanline == -1)
         {
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
         }
         else if (_currentScanline >= 0 && _currentScanline <= 239)
         {
@@ -169,10 +179,10 @@ void PPU::Tick()
             {
                 _waitingToShowFrameBuffer = true;
             }
-            _ppuStatus |= (1 << 7); // Set VBlank flag
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, true);
 
             // Execute NMI on VBlank
-            if (IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
+            if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
             {
                 _cpu->ExecuteNMI();
             }
@@ -203,7 +213,7 @@ uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
 
 uint8_t PPU::GetAddressIncrement() const
 {
-    if (!IsFlagSet(_ppuCtrl, PPUCtrlFlags::AddressIncrement))
+    if (!BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::AddressIncrement))
     {
         return 1;
     }
@@ -348,11 +358,6 @@ uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
     return index;
 }
 
-bool PPU::IsFlagSet(uint8_t registerValue, int shift) const
-{
-    return (registerValue & (1 << shift)) != 0;
-}
-
 void PPU::WriteToggleableRegister(uint16_t& reg, uint8_t value)
 {
     if (_writeToggle)
@@ -370,11 +375,11 @@ void PPU::RenderScanline(int index)
 {
     OMBAssert(index >= 0 && index < kHorizontalResolution, "Scanline index out of bounds!");
 
-    if (IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
+    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
     {
         const uint8_t bkgPaletteIndex = ReadPPUMem(kBkgColourAddress);
         
-        if (IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping))
+        if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping))
         {
             for (int i = 0; i < kLeftClippingPixelCount; ++i)
             {

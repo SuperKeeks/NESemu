@@ -125,6 +125,13 @@ public:
         // 5 to 7 represent colour mask
     };
 
+    enum PPUStatusFlags
+    {
+        SpriteOverflow = 5,
+        Sprite0Hit = 6,
+        VBlank = 7
+    };
+
     PPU();
     virtual ~PPU();
 
@@ -178,7 +185,6 @@ private:
     uint16_t ConvertToRealVRAMAddress(uint16_t address) const;
     uint8_t GetAddressIncrement() const;
     uint8_t ConvertAddressToPaletteIndex(uint16_t address) const;
-    bool IsFlagSet(uint8_t registerValue, int shift) const;
     void WriteToggleableRegister(uint16_t& reg, uint8_t value);
     void RenderScanline(int index);
     void RenderPixel(int x, int y, uint8_t paletteIndex);
