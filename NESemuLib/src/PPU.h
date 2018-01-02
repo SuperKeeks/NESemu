@@ -33,6 +33,14 @@ public:
     static const int kPPUAddrAddress = 0x2006;
     static const int kPPUDataAddress = 0x2007;
 
+    static const int kCyclesPerScanline = 341;
+    static const int kPreRenderScanline = -1;
+    static const int kVisibleScanlinesStart = 0;
+    static const int kVisibleScanlinesEnd = 239;
+    static const int kPostRenderScanline = 240;
+    static const int kVerticalBlankingScanlinesStart = 241;
+    static const int kVerticalBlankingScanlinesEnd = 260;
+
     // Palette from http://wiki.nesdev.com/w/index.php/File:Savtool-swatches.png
     const uint32_t kOutputPalette[64] = { 
         0x636363FF,

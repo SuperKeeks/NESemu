@@ -157,25 +157,25 @@ void PPU::Tick()
     if (_ticksUntilNextScanline <= 0)
     {
         ++_currentScanline;
-        if (_currentScanline > 260 && !_waitingToShowFrameBuffer)
+        if (_currentScanline > kVerticalBlankingScanlinesEnd && !_waitingToShowFrameBuffer)
         {
-            _currentScanline = -1;
+            _currentScanline = kPreRenderScanline;
         }
 
-        if (_currentScanline == -1)
+        if (_currentScanline == kPreRenderScanline)
         {
             BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::SpriteOverflow, false);
             BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, false);
             BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
         }
-        else if (_currentScanline >= 0 && _currentScanline <= 239)
+        else if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
         {
             RenderScanline(_currentScanline);
         }
-        else if (_currentScanline == 240)
+        else if (_currentScanline == kPostRenderScanline)
         {
         }
-        else if (_currentScanline == 241)
+        else if (_currentScanline == kVerticalBlankingScanlinesStart)
         {
             if (_waitToShowFrameBuffer)
             {
@@ -193,7 +193,7 @@ void PPU::Tick()
         {
         }
 
-        _ticksUntilNextScanline = 341 - 1;
+        _ticksUntilNextScanline = kCyclesPerScanline - 1;
     }
 }
 
