@@ -116,10 +116,10 @@ void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event even
         case SDLK_x:
             controllerState.A = keyState;
             break;
-        case SDLK_n:
+        case SDLK_RSHIFT:
             controllerState.Select = keyState;
             break;
-        case SDLK_m:
+        case SDLK_RETURN:
             controllerState.Start = keyState;
             break;
     }
