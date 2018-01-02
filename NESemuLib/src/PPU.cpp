@@ -164,6 +164,8 @@ void PPU::Tick()
 
         if (_currentScanline == -1)
         {
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::SpriteOverflow, false);
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, false);
             BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
         }
         else if (_currentScanline >= 0 && _currentScanline <= 239)
