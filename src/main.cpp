@@ -39,20 +39,20 @@ int main(int argc, char* args[])
             SDL_Event e;
 
             NESemu emu;
-            emu.Load("demo1.nes");
+            emu.Load("demo4.nes");
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
-            Uint64 now = SDL_GetPerformanceCounter();
-            Uint64 last = 0;
+            Uint32 now = SDL_GetTicks();
+            Uint32 last = 0;
             double deltaTime = 0; // In seconds
             Input::ControllerState controller1State;
 
             while (!quit)
             {
                 last = now;
-                now = SDL_GetPerformanceCounter();
-                deltaTime = ((now - last) * 1000/(double)SDL_GetPerformanceFrequency()) * 0.001;
+                now = SDL_GetTicks();
+                deltaTime = (float)(now - last) / 1000;
 
                 while (SDL_PollEvent(&e) != 0)
                 {
