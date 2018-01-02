@@ -380,18 +380,14 @@ void PPU::RenderScanline(int index)
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
     {
         const uint8_t bkgPaletteIndex = ReadPPUMem(kBkgColourAddress);
-        
-        if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping))
+
+        const bool isBkgClippingFlagSet = BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping);
+        for (int i = 0; i < kHorizontalResolution; ++i)
         {
-            for (int i = 0; i < kLeftClippingPixelCount; ++i)
+            if (i >= kLeftClippingPixelCount || isBkgClippingFlagSet)
             {
                 RenderPixel(i, index, bkgPaletteIndex);
             }
-        }
-
-        for (int i = kLeftClippingPixelCount; i < kHorizontalResolution; ++i)
-        {
-            RenderPixel(i, index, bkgPaletteIndex);
         }
     }
 }
