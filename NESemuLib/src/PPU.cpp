@@ -4,6 +4,7 @@
 #include "BitwiseUtils.h"
 #include "CHRROM.h"
 #include "CPU.h"
+#include "LogUtils.h"
 #include "SizeOfArray.h"
 
 PPU::PPU()
@@ -376,17 +377,46 @@ void PPU::WriteToggleableRegister(uint16_t& reg, uint8_t value)
 void PPU::RenderScanline(int index)
 {
     OMBAssert(index >= 0 && index < kHorizontalResolution, "Scanline index out of bounds!");
+    OMBAssert(!BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize), "8x16 Sprite size not supported yet!");
 
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
     {
-        const uint8_t bkgPaletteIndex = ReadPPUMem(kBkgColourAddress);
+        const uint8_t xScroll = _ppuScroll >> 8;
+        const uint8_t yScroll = (uint8_t)_ppuScroll;
+        const uint16_t nametableBaseAddress = GetNametableBaseAddress();
+        const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
+        const uint16_t attributeTableBaseAddress = nametableBaseAddress + kAttributeTableStartOffset;
+        const int absoluteY = yScroll + index;
 
         const bool isBkgClippingFlagSet = BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping);
         for (int i = 0; i < kHorizontalResolution; ++i)
         {
             if (i >= kLeftClippingPixelCount || isBkgClippingFlagSet)
             {
-                RenderPixel(i, index, bkgPaletteIndex);
+                const int absoluteX = xScroll + i;
+
+                const uint8_t nametableX = absoluteX / kTileWidth;
+                const uint8_t nametableY = absoluteY / kTileHeight;
+                const uint16_t nametableIndex = nametableY * kTilesPerNametableRow + nametableX;
+                
+                const uint8_t patternPixelX = absoluteX % kTileWidth;
+                const uint8_t patternPixelY = absoluteY % kTileHeight;
+                const uint8_t patternIndex = ReadPPUMem(nametableBaseAddress + nametableIndex);
+                const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
+                const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
+                const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
+                const uint8_t paletteColour = ((int)colourBit1 << 1) | (int)colourBit0;
+                
+                // Each attribute element contains 4x4 tiles, and each subarea is made of 2x2 tiles
+                const uint8_t attributeIndex = (nametableY / 4) * 8 + (nametableX / 4);
+                const uint8_t attributeArea = (nametableY % 4) / 2 << 1 | ((nametableX % 4) / 2); // 0:Top-Left, 1:Top-Right, 2:Bottom-Left, 3:Bottom-Right
+                const uint8_t attributeValue = ReadPPUMem(attributeTableBaseAddress + attributeIndex);
+                const uint8_t paletteNumber = (attributeValue >> (attributeArea * 2)) & 0x3;
+
+                const uint8_t paletteIndex = paletteNumber << 2 | paletteColour;
+                const uint8_t colourIndex = ReadPPUMem(kPaletteStartAddress + paletteIndex);
+
+                RenderPixel(i, index, colourIndex);
             }
         }
     }
@@ -397,4 +427,36 @@ void PPU::RenderPixel(int x, int y, uint8_t paletteIndex)
     OMBAssert(paletteIndex < sizeofarray(kOutputPalette), "Palette index is out of bounds!");
     const int pixelIndex = y * kHorizontalResolution + x;
     _frameBuffer[pixelIndex] = kOutputPalette[paletteIndex];
+}
+
+uint16_t PPU::GetNametableBaseAddress() const
+{
+    const uint8_t baseNametableValue = _ppuCtrl & 0x3; // Get lower 2 bytes
+    switch (baseNametableValue)
+    {
+        case 0:
+            return kNametable0StartAddress;
+            break;
+        case 1:
+            return kNametable1StartAddress;
+            break;
+        case 2:
+            return kNametable2StartAddress;
+            break;
+        default:
+            return kNametable3StartAddress;
+            break;
+    }
+}
+
+uint16_t PPU::GetBkgPatternTableBaseAddress() const
+{
+    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::BkgPatternTableAddress))
+    {
+        return kPatternTable1Address;
+    }
+    else
+    {
+        return kPatternTable0Address;
+    }
 }
