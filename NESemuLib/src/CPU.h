@@ -83,6 +83,7 @@ private:
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
     void Push(uint8_t value);
     uint8_t Pop();
+    void PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode);
 
     uint8_t GetLowByte(uint16_t value) const;
     uint8_t GetHighByte(uint16_t value) const;

@@ -5,6 +5,8 @@
 #include "LogUtils.h"
 #include "MemoryHandler.h"
 
+#include <map>
+
 void CPU::PowerOn()
 {
     _programCounter = 0xFFFF;
@@ -39,194 +41,193 @@ int CPU::ExecuteNextInstruction()
 {
     // Fetch next opcode
     const uint8_t opcode = _memoryHandler->ReadMem(++_programCounter);
-    //Log::Debug("Executing opcode: $%02X", opcode);
 
     switch (opcode)
     {
         // LDA
-        case 0xA9: return LDA(AddressingMode::Immediate);
-        case 0xA5: return LDA(AddressingMode::ZeroPage);
-        case 0xB5: return LDA(AddressingMode::ZeroPageX);
-        case 0xAD: return LDA(AddressingMode::Absolute);
-        case 0xBD: return LDA(AddressingMode::AbsoluteX);
-        case 0xB9: return LDA(AddressingMode::AbsoluteY);
-        case 0xA1: return LDA(AddressingMode::IndirectX);
-        case 0xB1: return LDA(AddressingMode::IndirectY);
+        case 0xA9: PrintOpcodeInfo(opcode, "LDA", AddressingMode::Immediate); return LDA(AddressingMode::Immediate);
+        case 0xA5: PrintOpcodeInfo(opcode, "LDA", AddressingMode::ZeroPage); return LDA(AddressingMode::ZeroPage);
+        case 0xB5: PrintOpcodeInfo(opcode, "LDA", AddressingMode::ZeroPageX); return LDA(AddressingMode::ZeroPageX);
+        case 0xAD: PrintOpcodeInfo(opcode, "LDA", AddressingMode::Absolute); return LDA(AddressingMode::Absolute);
+        case 0xBD: PrintOpcodeInfo(opcode, "LDA", AddressingMode::AbsoluteX); return LDA(AddressingMode::AbsoluteX);
+        case 0xB9: PrintOpcodeInfo(opcode, "LDA", AddressingMode::AbsoluteY); return LDA(AddressingMode::AbsoluteY);
+        case 0xA1: PrintOpcodeInfo(opcode, "LDA", AddressingMode::IndirectX); return LDA(AddressingMode::IndirectX);
+        case 0xB1: PrintOpcodeInfo(opcode, "LDA", AddressingMode::IndirectY); return LDA(AddressingMode::IndirectY);
 
         // LDX
-        case 0xA2: return LDX(AddressingMode::Immediate);
-        case 0xA6: return LDX(AddressingMode::ZeroPage);
-        case 0xB6: return LDX(AddressingMode::ZeroPageY);
-        case 0xAE: return LDX(AddressingMode::Absolute);
-        case 0xBE: return LDX(AddressingMode::AbsoluteY);
+        case 0xA2: PrintOpcodeInfo(opcode, "LDX", AddressingMode::Immediate); return LDX(AddressingMode::Immediate);
+        case 0xA6: PrintOpcodeInfo(opcode, "LDX", AddressingMode::ZeroPage); return LDX(AddressingMode::ZeroPage);
+        case 0xB6: PrintOpcodeInfo(opcode, "LDX", AddressingMode::ZeroPageY); return LDX(AddressingMode::ZeroPageY);
+        case 0xAE: PrintOpcodeInfo(opcode, "LDX", AddressingMode::Absolute); return LDX(AddressingMode::Absolute);
+        case 0xBE: PrintOpcodeInfo(opcode, "LDX", AddressingMode::AbsoluteY); return LDX(AddressingMode::AbsoluteY);
 
         // LDY
-        case 0xA0: return LDY(AddressingMode::Immediate);
-        case 0xA4: return LDY(AddressingMode::ZeroPage);
-        case 0xB4: return LDY(AddressingMode::ZeroPageX);
-        case 0xAC: return LDY(AddressingMode::Absolute);
-        case 0xBC: return LDY(AddressingMode::AbsoluteX);
+        case 0xA0: PrintOpcodeInfo(opcode, "LDY", AddressingMode::Immediate); return LDY(AddressingMode::Immediate);
+        case 0xA4: PrintOpcodeInfo(opcode, "LDY", AddressingMode::ZeroPage); return LDY(AddressingMode::ZeroPage);
+        case 0xB4: PrintOpcodeInfo(opcode, "LDY", AddressingMode::ZeroPageX); return LDY(AddressingMode::ZeroPageX);
+        case 0xAC: PrintOpcodeInfo(opcode, "LDY", AddressingMode::Absolute); return LDY(AddressingMode::Absolute);
+        case 0xBC: PrintOpcodeInfo(opcode, "LDY", AddressingMode::AbsoluteX); return LDY(AddressingMode::AbsoluteX);
 
         // STA
-        case 0x85: return STA(AddressingMode::ZeroPage);
-        case 0x95: return STA(AddressingMode::ZeroPageX);
-        case 0x8D: return STA(AddressingMode::Absolute);
-        case 0x9D: return STA(AddressingMode::AbsoluteX);
-        case 0x99: return STA(AddressingMode::AbsoluteY);
-        case 0x81: return STA(AddressingMode::IndirectX);
-        case 0x91: return STA(AddressingMode::IndirectY);
+        case 0x85: PrintOpcodeInfo(opcode, "STA", AddressingMode::ZeroPage); return STA(AddressingMode::ZeroPage);
+        case 0x95: PrintOpcodeInfo(opcode, "STA", AddressingMode::ZeroPageX); return STA(AddressingMode::ZeroPageX);
+        case 0x8D: PrintOpcodeInfo(opcode, "STA", AddressingMode::Absolute); return STA(AddressingMode::Absolute);
+        case 0x9D: PrintOpcodeInfo(opcode, "STA", AddressingMode::AbsoluteX); return STA(AddressingMode::AbsoluteX);
+        case 0x99: PrintOpcodeInfo(opcode, "STA", AddressingMode::AbsoluteY); return STA(AddressingMode::AbsoluteY);
+        case 0x81: PrintOpcodeInfo(opcode, "STA", AddressingMode::IndirectX); return STA(AddressingMode::IndirectX);
+        case 0x91: PrintOpcodeInfo(opcode, "STA", AddressingMode::IndirectY); return STA(AddressingMode::IndirectY);
 
         // STX
-        case 0x86: return STX(AddressingMode::ZeroPage);
-        case 0x96: return STX(AddressingMode::ZeroPageY);
-        case 0x8E: return STX(AddressingMode::Absolute);
+        case 0x86: PrintOpcodeInfo(opcode, "STX", AddressingMode::ZeroPage); return STX(AddressingMode::ZeroPage);
+        case 0x96: PrintOpcodeInfo(opcode, "STX", AddressingMode::ZeroPageY); return STX(AddressingMode::ZeroPageY);
+        case 0x8E: PrintOpcodeInfo(opcode, "STX", AddressingMode::Absolute); return STX(AddressingMode::Absolute);
 
         // STY
-        case 0x84: return STY(AddressingMode::ZeroPage);
-        case 0x94: return STY(AddressingMode::ZeroPageX);
-        case 0x8C: return STY(AddressingMode::Absolute);
+        case 0x84: PrintOpcodeInfo(opcode, "STY", AddressingMode::ZeroPage); return STY(AddressingMode::ZeroPage);
+        case 0x94: PrintOpcodeInfo(opcode, "STY", AddressingMode::ZeroPageX); return STY(AddressingMode::ZeroPageX);
+        case 0x8C: PrintOpcodeInfo(opcode, "STY", AddressingMode::Absolute); return STY(AddressingMode::Absolute);
 
         // ADC
-        case 0x69: return ADC(AddressingMode::Immediate);
-        case 0x65: return ADC(AddressingMode::ZeroPage);
-        case 0x75: return ADC(AddressingMode::ZeroPageX);
-        case 0x6D: return ADC(AddressingMode::Absolute);
-        case 0x7D: return ADC(AddressingMode::AbsoluteX);
-        case 0x79: return ADC(AddressingMode::AbsoluteY);
-        case 0x61: return ADC(AddressingMode::IndirectX);
-        case 0x71: return ADC(AddressingMode::IndirectY);
+        case 0x69: PrintOpcodeInfo(opcode, "ADC", AddressingMode::Immediate); return ADC(AddressingMode::Immediate);
+        case 0x65: PrintOpcodeInfo(opcode, "ADC", AddressingMode::ZeroPage); return ADC(AddressingMode::ZeroPage);
+        case 0x75: PrintOpcodeInfo(opcode, "ADC", AddressingMode::ZeroPageX); return ADC(AddressingMode::ZeroPageX);
+        case 0x6D: PrintOpcodeInfo(opcode, "ADC", AddressingMode::Absolute); return ADC(AddressingMode::Absolute);
+        case 0x7D: PrintOpcodeInfo(opcode, "ADC", AddressingMode::AbsoluteX); return ADC(AddressingMode::AbsoluteX);
+        case 0x79: PrintOpcodeInfo(opcode, "ADC", AddressingMode::AbsoluteY); return ADC(AddressingMode::AbsoluteY);
+        case 0x61: PrintOpcodeInfo(opcode, "ADC", AddressingMode::IndirectX); return ADC(AddressingMode::IndirectX);
+        case 0x71: PrintOpcodeInfo(opcode, "ADC", AddressingMode::IndirectY); return ADC(AddressingMode::IndirectY);
 
         // SBC
-        case 0xE9: return SBC(AddressingMode::Immediate);
-        case 0xE5: return SBC(AddressingMode::ZeroPage);
-        case 0xF5: return SBC(AddressingMode::ZeroPageX);
-        case 0xED: return SBC(AddressingMode::Absolute);
-        case 0xFD: return SBC(AddressingMode::AbsoluteX);
-        case 0xF9: return SBC(AddressingMode::AbsoluteY);
-        case 0xE1: return SBC(AddressingMode::IndirectX);
-        case 0xF1: return SBC(AddressingMode::IndirectY);
+        case 0xE9: PrintOpcodeInfo(opcode, "SBC", AddressingMode::Immediate); return SBC(AddressingMode::Immediate);
+        case 0xE5: PrintOpcodeInfo(opcode, "SBC", AddressingMode::ZeroPage); return SBC(AddressingMode::ZeroPage);
+        case 0xF5: PrintOpcodeInfo(opcode, "SBC", AddressingMode::ZeroPageX); return SBC(AddressingMode::ZeroPageX);
+        case 0xED: PrintOpcodeInfo(opcode, "SBC", AddressingMode::Absolute); return SBC(AddressingMode::Absolute);
+        case 0xFD: PrintOpcodeInfo(opcode, "SBC", AddressingMode::AbsoluteX); return SBC(AddressingMode::AbsoluteX);
+        case 0xF9: PrintOpcodeInfo(opcode, "SBC", AddressingMode::AbsoluteY); return SBC(AddressingMode::AbsoluteY);
+        case 0xE1: PrintOpcodeInfo(opcode, "SBC", AddressingMode::IndirectX); return SBC(AddressingMode::IndirectX);
+        case 0xF1: PrintOpcodeInfo(opcode, "SBC", AddressingMode::IndirectY); return SBC(AddressingMode::IndirectY);
 
         // CPU Flags
-        case 0x18: return CLC(AddressingMode::Implied);
-        case 0x38: return SEC(AddressingMode::Implied);
-        case 0x58: return CLI(AddressingMode::Implied);
-        case 0x78: return SEI(AddressingMode::Implied);
-        case 0xB8: return CLV(AddressingMode::Implied);
-        case 0xD8: return CLD(AddressingMode::Implied);
-        case 0xF8: return SED(AddressingMode::Implied);
+        case 0x18: PrintOpcodeInfo(opcode, "CLC", AddressingMode::Implied); return CLC(AddressingMode::Implied);
+        case 0x38: PrintOpcodeInfo(opcode, "SEC", AddressingMode::Implied); return SEC(AddressingMode::Implied);
+        case 0x58: PrintOpcodeInfo(opcode, "CLI", AddressingMode::Implied); return CLI(AddressingMode::Implied);
+        case 0x78: PrintOpcodeInfo(opcode, "SEI", AddressingMode::Implied); return SEI(AddressingMode::Implied);
+        case 0xB8: PrintOpcodeInfo(opcode, "CLV", AddressingMode::Implied); return CLV(AddressingMode::Implied);
+        case 0xD8: PrintOpcodeInfo(opcode, "CLD", AddressingMode::Implied); return CLD(AddressingMode::Implied);
+        case 0xF8: PrintOpcodeInfo(opcode, "SED", AddressingMode::Implied); return SED(AddressingMode::Implied);
 
         // Increment/Decrement
-        case 0xCA: return DEX(AddressingMode::Implied);
-        case 0xE8: return INX(AddressingMode::Implied);
-        case 0x88: return DEY(AddressingMode::Implied);
-        case 0xC8: return INY(AddressingMode::Implied);
-        case 0xC6: return DECINC(AddressingMode::ZeroPage, -1);
-        case 0xD6: return DECINC(AddressingMode::ZeroPageX, -1);
-        case 0xCE: return DECINC(AddressingMode::Absolute, -1);
-        case 0xDE: return DECINC(AddressingMode::AbsoluteX, -1);
-        case 0xE6: return DECINC(AddressingMode::ZeroPage, +1);
-        case 0xF6: return DECINC(AddressingMode::ZeroPageX, +1);
-        case 0xEE: return DECINC(AddressingMode::Absolute, +1);
-        case 0xFE: return DECINC(AddressingMode::AbsoluteX, +1);
+        case 0xCA: PrintOpcodeInfo(opcode, "DEX", AddressingMode::Implied); return DEX(AddressingMode::Implied);
+        case 0xE8: PrintOpcodeInfo(opcode, "INX", AddressingMode::Implied); return INX(AddressingMode::Implied);
+        case 0x88: PrintOpcodeInfo(opcode, "DEY", AddressingMode::Implied); return DEY(AddressingMode::Implied);
+        case 0xC8: PrintOpcodeInfo(opcode, "INY", AddressingMode::Implied); return INY(AddressingMode::Implied);
+        case 0xC6: PrintOpcodeInfo(opcode, "DEC", AddressingMode::ZeroPage); return DECINC(AddressingMode::ZeroPage, -1);
+        case 0xD6: PrintOpcodeInfo(opcode, "DEC", AddressingMode::ZeroPageX); return DECINC(AddressingMode::ZeroPageX, -1);
+        case 0xCE: PrintOpcodeInfo(opcode, "DEC", AddressingMode::Absolute); return DECINC(AddressingMode::Absolute, -1);
+        case 0xDE: PrintOpcodeInfo(opcode, "DEC", AddressingMode::AbsoluteX); return DECINC(AddressingMode::AbsoluteX, -1);
+        case 0xE6: PrintOpcodeInfo(opcode, "INC", AddressingMode::ZeroPage); return DECINC(AddressingMode::ZeroPage, +1);
+        case 0xF6: PrintOpcodeInfo(opcode, "INC", AddressingMode::ZeroPageX); return DECINC(AddressingMode::ZeroPageX, +1);
+        case 0xEE: PrintOpcodeInfo(opcode, "INC", AddressingMode::Absolute); return DECINC(AddressingMode::Absolute, +1);
+        case 0xFE: PrintOpcodeInfo(opcode, "INC", AddressingMode::AbsoluteX); return DECINC(AddressingMode::AbsoluteX, +1);
 
         // Routine instructions
-        case 0x4C: return JMP(AddressingMode::Absolute);
-        case 0x6C: return JMP(AddressingMode::Indirect);
-        case 0x20: return JSR(AddressingMode::Absolute);
-        case 0x60: return RTS(AddressingMode::Implied);
-        case 0x40: return RTI(AddressingMode::Implied);
+        case 0x4C: PrintOpcodeInfo(opcode, "JMP", AddressingMode::Absolute); return JMP(AddressingMode::Absolute);
+        case 0x6C: PrintOpcodeInfo(opcode, "JMP", AddressingMode::Indirect); return JMP(AddressingMode::Indirect);
+        case 0x20: PrintOpcodeInfo(opcode, "JSR", AddressingMode::Absolute); return JSR(AddressingMode::Absolute);
+        case 0x60: PrintOpcodeInfo(opcode, "RTS", AddressingMode::Implied); return RTS(AddressingMode::Implied);
+        case 0x40: PrintOpcodeInfo(opcode, "RTI", AddressingMode::Implied); return RTI(AddressingMode::Implied);
 
         // Compare instructions
-        case 0xC9: return CMP(AddressingMode::Immediate, _accumulator); // CMP
-        case 0xC5: return CMP(AddressingMode::ZeroPage, _accumulator);  // CMP
-        case 0xD5: return CMP(AddressingMode::ZeroPageX, _accumulator); // CMP
-        case 0xCD: return CMP(AddressingMode::Absolute, _accumulator);  // CMP
-        case 0xDD: return CMP(AddressingMode::AbsoluteX, _accumulator); // CMP
-        case 0xD9: return CMP(AddressingMode::AbsoluteY, _accumulator); // CMP
-        case 0xC1: return CMP(AddressingMode::IndirectX, _accumulator); // CMP
-        case 0xD1: return CMP(AddressingMode::IndirectY, _accumulator); // CMP
-        case 0xE0: return CMP(AddressingMode::Immediate, _x);           // CPX
-        case 0xE4: return CMP(AddressingMode::ZeroPage, _x);            // CPX
-        case 0xEC: return CMP(AddressingMode::Absolute, _x);            // CPX
-        case 0xC0: return CMP(AddressingMode::Immediate, _y);           // CPY
-        case 0xC4: return CMP(AddressingMode::ZeroPage, _y);            // CPY
-        case 0xCC: return CMP(AddressingMode::Absolute, _y);            // CPY
+        case 0xC9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _accumulator);
+        case 0xC5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _accumulator);
+        case 0xD5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPageX); return CMP(AddressingMode::ZeroPageX, _accumulator);
+        case 0xCD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _accumulator);
+        case 0xDD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteX); return CMP(AddressingMode::AbsoluteX, _accumulator);
+        case 0xD9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteY); return CMP(AddressingMode::AbsoluteY, _accumulator);
+        case 0xC1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectX); return CMP(AddressingMode::IndirectX, _accumulator);
+        case 0xD1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectY); return CMP(AddressingMode::IndirectY, _accumulator);
+        case 0xE0: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _x);
+        case 0xE4: PrintOpcodeInfo(opcode, "CPX", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _x);
+        case 0xEC: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _x);
+        case 0xC0: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _y);
+        case 0xC4: PrintOpcodeInfo(opcode, "CPY", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _y);
+        case 0xCC: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _y);
 
         // Logic instructions
-        case 0x24: return BIT(AddressingMode::ZeroPage);
-        case 0x2C: return BIT(AddressingMode::Absolute);
-        case 0x29: return AND(AddressingMode::Immediate);
-        case 0x25: return AND(AddressingMode::ZeroPage);
-        case 0x35: return AND(AddressingMode::ZeroPageX);
-        case 0x2D: return AND(AddressingMode::Absolute);
-        case 0x3D: return AND(AddressingMode::AbsoluteX);
-        case 0x39: return AND(AddressingMode::AbsoluteY);
-        case 0x21: return AND(AddressingMode::IndirectX);
-        case 0x31: return AND(AddressingMode::IndirectX);
-        case 0x09: return ORA(AddressingMode::Immediate);
-        case 0x05: return ORA(AddressingMode::ZeroPage);
-        case 0x15: return ORA(AddressingMode::ZeroPageX);
-        case 0x0D: return ORA(AddressingMode::Absolute);
-        case 0x1D: return ORA(AddressingMode::AbsoluteX);
-        case 0x19: return ORA(AddressingMode::AbsoluteY);
-        case 0x01: return ORA(AddressingMode::IndirectX);
-        case 0x11: return ORA(AddressingMode::IndirectX);
-        case 0x49: return EOR(AddressingMode::Immediate);
-        case 0x45: return EOR(AddressingMode::ZeroPage);
-        case 0x55: return EOR(AddressingMode::ZeroPageX);
-        case 0x4D: return EOR(AddressingMode::Absolute);
-        case 0x5D: return EOR(AddressingMode::AbsoluteX);
-        case 0x59: return EOR(AddressingMode::AbsoluteY);
-        case 0x41: return EOR(AddressingMode::IndirectX);
-        case 0x51: return EOR(AddressingMode::IndirectX);
+        case 0x24: PrintOpcodeInfo(opcode, "BIT", AddressingMode::ZeroPage); return BIT(AddressingMode::ZeroPage);
+        case 0x2C: PrintOpcodeInfo(opcode, "BIT", AddressingMode::Absolute); return BIT(AddressingMode::Absolute);
+        case 0x29: PrintOpcodeInfo(opcode, "AND", AddressingMode::Immediate); return AND(AddressingMode::Immediate);
+        case 0x25: PrintOpcodeInfo(opcode, "AND", AddressingMode::ZeroPage); return AND(AddressingMode::ZeroPage);
+        case 0x35: PrintOpcodeInfo(opcode, "AND", AddressingMode::ZeroPageX); return AND(AddressingMode::ZeroPageX);
+        case 0x2D: PrintOpcodeInfo(opcode, "AND", AddressingMode::Absolute); return AND(AddressingMode::Absolute);
+        case 0x3D: PrintOpcodeInfo(opcode, "AND", AddressingMode::AbsoluteX); return AND(AddressingMode::AbsoluteX);
+        case 0x39: PrintOpcodeInfo(opcode, "AND", AddressingMode::AbsoluteY); return AND(AddressingMode::AbsoluteY);
+        case 0x21: PrintOpcodeInfo(opcode, "AND", AddressingMode::IndirectX); return AND(AddressingMode::IndirectX);
+        case 0x31: PrintOpcodeInfo(opcode, "AND", AddressingMode::IndirectX); return AND(AddressingMode::IndirectX);
+        case 0x09: PrintOpcodeInfo(opcode, "ORA", AddressingMode::Immediate); return ORA(AddressingMode::Immediate);
+        case 0x05: PrintOpcodeInfo(opcode, "ORA", AddressingMode::ZeroPage); return ORA(AddressingMode::ZeroPage);
+        case 0x15: PrintOpcodeInfo(opcode, "ORA", AddressingMode::ZeroPageX); return ORA(AddressingMode::ZeroPageX);
+        case 0x0D: PrintOpcodeInfo(opcode, "ORA", AddressingMode::Absolute); return ORA(AddressingMode::Absolute);
+        case 0x1D: PrintOpcodeInfo(opcode, "ORA", AddressingMode::AbsoluteX); return ORA(AddressingMode::AbsoluteX);
+        case 0x19: PrintOpcodeInfo(opcode, "ORA", AddressingMode::AbsoluteY); return ORA(AddressingMode::AbsoluteY);
+        case 0x01: PrintOpcodeInfo(opcode, "ORA", AddressingMode::IndirectX); return ORA(AddressingMode::IndirectX);
+        case 0x11: PrintOpcodeInfo(opcode, "ORA", AddressingMode::IndirectX); return ORA(AddressingMode::IndirectX);
+        case 0x49: PrintOpcodeInfo(opcode, "EOR", AddressingMode::Immediate); return EOR(AddressingMode::Immediate);
+        case 0x45: PrintOpcodeInfo(opcode, "EOR", AddressingMode::ZeroPage); return EOR(AddressingMode::ZeroPage);
+        case 0x55: PrintOpcodeInfo(opcode, "EOR", AddressingMode::ZeroPageX); return EOR(AddressingMode::ZeroPageX);
+        case 0x4D: PrintOpcodeInfo(opcode, "EOR", AddressingMode::Absolute); return EOR(AddressingMode::Absolute);
+        case 0x5D: PrintOpcodeInfo(opcode, "EOR", AddressingMode::AbsoluteX); return EOR(AddressingMode::AbsoluteX);
+        case 0x59: PrintOpcodeInfo(opcode, "EOR", AddressingMode::AbsoluteY); return EOR(AddressingMode::AbsoluteY);
+        case 0x41: PrintOpcodeInfo(opcode, "EOR", AddressingMode::IndirectX); return EOR(AddressingMode::IndirectX);
+        case 0x51: PrintOpcodeInfo(opcode, "EOR", AddressingMode::IndirectX); return EOR(AddressingMode::IndirectX);
 
         // Shift instructions
-        case 0x0A: return ASL(AddressingMode::Accumulator);
-        case 0x06: return ASL(AddressingMode::ZeroPage);
-        case 0x16: return ASL(AddressingMode::ZeroPageX);
-        case 0x0E: return ASL(AddressingMode::Absolute);
-        case 0x1E: return ASL(AddressingMode::AbsoluteX);
-        case 0x4A: return LSR(AddressingMode::Accumulator);
-        case 0x46: return LSR(AddressingMode::ZeroPage);
-        case 0x56: return LSR(AddressingMode::ZeroPageX);
-        case 0x4E: return LSR(AddressingMode::Absolute);
-        case 0x5E: return LSR(AddressingMode::AbsoluteX);
-        case 0x2A: return ROL(AddressingMode::Accumulator);
-        case 0x26: return ROL(AddressingMode::ZeroPage);
-        case 0x36: return ROL(AddressingMode::ZeroPageX);
-        case 0x2E: return ROL(AddressingMode::Absolute);
-        case 0x3E: return ROL(AddressingMode::AbsoluteX);
-        case 0x6A: return ROR(AddressingMode::Accumulator);
-        case 0x66: return ROR(AddressingMode::ZeroPage);
-        case 0x76: return ROR(AddressingMode::ZeroPageX);
-        case 0x6E: return ROR(AddressingMode::Absolute);
-        case 0x7E: return ROR(AddressingMode::AbsoluteX);
+        case 0x0A: PrintOpcodeInfo(opcode, "ASL", AddressingMode::Accumulator); return ASL(AddressingMode::Accumulator);
+        case 0x06: PrintOpcodeInfo(opcode, "ASL", AddressingMode::ZeroPage); return ASL(AddressingMode::ZeroPage);
+        case 0x16: PrintOpcodeInfo(opcode, "ASL", AddressingMode::ZeroPageX); return ASL(AddressingMode::ZeroPageX);
+        case 0x0E: PrintOpcodeInfo(opcode, "ASL", AddressingMode::Absolute); return ASL(AddressingMode::Absolute);
+        case 0x1E: PrintOpcodeInfo(opcode, "ASL", AddressingMode::AbsoluteX); return ASL(AddressingMode::AbsoluteX);
+        case 0x4A: PrintOpcodeInfo(opcode, "LSR", AddressingMode::Accumulator); return LSR(AddressingMode::Accumulator);
+        case 0x46: PrintOpcodeInfo(opcode, "LSR", AddressingMode::ZeroPage); return LSR(AddressingMode::ZeroPage);
+        case 0x56: PrintOpcodeInfo(opcode, "LSR", AddressingMode::ZeroPageX); return LSR(AddressingMode::ZeroPageX);
+        case 0x4E: PrintOpcodeInfo(opcode, "LSR", AddressingMode::Absolute); return LSR(AddressingMode::Absolute);
+        case 0x5E: PrintOpcodeInfo(opcode, "LSR", AddressingMode::AbsoluteX); return LSR(AddressingMode::AbsoluteX);
+        case 0x2A: PrintOpcodeInfo(opcode, "ROL", AddressingMode::Accumulator); return ROL(AddressingMode::Accumulator);
+        case 0x26: PrintOpcodeInfo(opcode, "ROL", AddressingMode::ZeroPage); return ROL(AddressingMode::ZeroPage);
+        case 0x36: PrintOpcodeInfo(opcode, "ROL", AddressingMode::ZeroPageX); return ROL(AddressingMode::ZeroPageX);
+        case 0x2E: PrintOpcodeInfo(opcode, "ROL", AddressingMode::Absolute); return ROL(AddressingMode::Absolute);
+        case 0x3E: PrintOpcodeInfo(opcode, "ROL", AddressingMode::AbsoluteX); return ROL(AddressingMode::AbsoluteX);
+        case 0x6A: PrintOpcodeInfo(opcode, "ROR", AddressingMode::Accumulator); return ROR(AddressingMode::Accumulator);
+        case 0x66: PrintOpcodeInfo(opcode, "ROR", AddressingMode::ZeroPage); return ROR(AddressingMode::ZeroPage);
+        case 0x76: PrintOpcodeInfo(opcode, "ROR", AddressingMode::ZeroPageX); return ROR(AddressingMode::ZeroPageX);
+        case 0x6E: PrintOpcodeInfo(opcode, "ROR", AddressingMode::Absolute); return ROR(AddressingMode::Absolute);
+        case 0x7E: PrintOpcodeInfo(opcode, "ROR", AddressingMode::AbsoluteX); return ROR(AddressingMode::AbsoluteX);
 
         // Branch-on-condition instructions
-        case 0xF0: return BXX(AddressingMode::Relative, GetFlag(Flag::Zero));      // BEQ
-        case 0xD0: return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero));     // BNE
-        case 0xB0: return BXX(AddressingMode::Relative, GetFlag(Flag::Carry));     // BCS
-        case 0x90: return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry));    // BCC
-        case 0x70: return BXX(AddressingMode::Relative, GetFlag(Flag::Overflow));  // BVS
-        case 0x50: return BXX(AddressingMode::Relative, !GetFlag(Flag::Overflow)); // BVC
-        case 0x30: return BXX(AddressingMode::Relative, GetFlag(Flag::Sign));      // BMI
-        case 0x10: return BXX(AddressingMode::Relative, !GetFlag(Flag::Sign));     // BPL
+        case 0xF0: PrintOpcodeInfo(opcode, "BEQ", AddressingMode::Relative); return BXX(AddressingMode::Relative, GetFlag(Flag::Zero));
+        case 0xD0: PrintOpcodeInfo(opcode, "BNE", AddressingMode::Relative); return BXX(AddressingMode::Relative, !GetFlag(Flag::Zero));
+        case 0xB0: PrintOpcodeInfo(opcode, "BCS", AddressingMode::Relative); return BXX(AddressingMode::Relative, GetFlag(Flag::Carry));
+        case 0x90: PrintOpcodeInfo(opcode, "BCC", AddressingMode::Relative); return BXX(AddressingMode::Relative, !GetFlag(Flag::Carry));
+        case 0x70: PrintOpcodeInfo(opcode, "BVS", AddressingMode::Relative); return BXX(AddressingMode::Relative, GetFlag(Flag::Overflow));
+        case 0x50: PrintOpcodeInfo(opcode, "BVC", AddressingMode::Relative); return BXX(AddressingMode::Relative, !GetFlag(Flag::Overflow));
+        case 0x30: PrintOpcodeInfo(opcode, "BMI", AddressingMode::Relative); return BXX(AddressingMode::Relative, GetFlag(Flag::Sign));
+        case 0x10: PrintOpcodeInfo(opcode, "BPL", AddressingMode::Relative); return BXX(AddressingMode::Relative, !GetFlag(Flag::Sign));
 
         // Transfer instructions
-        case 0x9A: return TXX(AddressingMode::Implied, _x, _stackPointer); // TXS
-        case 0xBA: return TXX(AddressingMode::Implied, _stackPointer, _x); // TSX
-        case 0xAA: return TXX(AddressingMode::Implied, _accumulator, _x);  // TAX
-        case 0x8A: return TXX(AddressingMode::Implied, _x, _accumulator);  // TXA
-        case 0xA8: return TXX(AddressingMode::Implied, _accumulator, _y);  // TAY
-        case 0x98: return TXX(AddressingMode::Implied, _y, _accumulator);  // TYA
-        case 0x48: return PHA(AddressingMode::Implied);                    // PHA
-        case 0x68: return PLA(AddressingMode::Implied);                    // PLA
-        case 0x08: return PHP(AddressingMode::Implied);                    // PHP
-        case 0x28: return PLP(AddressingMode::Implied);                    // PLP
+        case 0x9A: PrintOpcodeInfo(opcode, "TXS", AddressingMode::Implied); return TXX(AddressingMode::Implied, _x, _stackPointer);
+        case 0xBA: PrintOpcodeInfo(opcode, "TSX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _stackPointer, _x);
+        case 0xAA: PrintOpcodeInfo(opcode, "TAX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _accumulator, _x);
+        case 0x8A: PrintOpcodeInfo(opcode, "TXA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _x, _accumulator);
+        case 0xA8: PrintOpcodeInfo(opcode, "TAY", AddressingMode::Implied); return TXX(AddressingMode::Implied, _accumulator, _y);
+        case 0x98: PrintOpcodeInfo(opcode, "TYA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _y, _accumulator);
+        case 0x48: PrintOpcodeInfo(opcode, "PHA", AddressingMode::Implied); return PHA(AddressingMode::Implied);
+        case 0x68: PrintOpcodeInfo(opcode, "PLA", AddressingMode::Implied); return PLA(AddressingMode::Implied);
+        case 0x08: PrintOpcodeInfo(opcode, "PHP", AddressingMode::Implied); return PHP(AddressingMode::Implied);
+        case 0x28: PrintOpcodeInfo(opcode, "PLP", AddressingMode::Implied); return PLP(AddressingMode::Implied);
 
         // Other
-        case 0x00: return BRK(AddressingMode::Implied);
-        case 0xEA: return NOP(AddressingMode::Implied);
+        case 0x00: PrintOpcodeInfo(opcode, "BRK", AddressingMode::Implied); return BRK(AddressingMode::Implied);
+        case 0xEA: PrintOpcodeInfo(opcode, "NOP", AddressingMode::Implied); return NOP(AddressingMode::Implied);
 
         default: Log::Debug("Unknown opcode: $%02X", opcode); return 0;
     };
@@ -465,4 +466,27 @@ uint8_t CPU::GetHighByte(uint16_t value) const
 bool CPU::IsValueNegative(uint8_t value) const
 {
     return (value >> 7) > 0;
+}
+
+void CPU::PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode)
+{
+    const std::map<AddressingMode, const char*> addressingModeStrs = {
+        { AddressingMode::Implied, "Implied" },
+        { AddressingMode::Accumulator, "Accumulator" },
+        { AddressingMode::Relative, "Relative" },
+        { AddressingMode::Immediate, "Immediate" },
+        { AddressingMode::ZeroPage, "ZeroPage" },
+        { AddressingMode::ZeroPageX, "ZeroPageX" },
+        { AddressingMode::ZeroPageY, "ZeroPageY" },
+        { AddressingMode::Absolute, "Absolute" },
+        { AddressingMode::AbsoluteX, "AbsoluteX" },
+        { AddressingMode::AbsoluteY, "AbsoluteY" },
+        { AddressingMode::Indirect, "Indirect" },
+        { AddressingMode::IndirectX, "IndirectX" },
+        { AddressingMode::IndirectY, "IndirectY" },
+    };
+
+#if _DEBUG
+    Log::Debug("Executing opcode: %s ($%02X, %s)", opcodeName, opcode, addressingModeStrs.find(addressingMode)->second);
+#endif
 }
