@@ -42,7 +42,7 @@ namespace NESemuLibTests
             Assert::AreEqual(false, cpu.GetFlag(CPU::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Carry));
-            Assert::AreEqual((uint8_t)0x40, cpu.GetAccumulator());
+            Assert::AreEqual((uint8_t)0x40, emu.ReadMem(0x33));
             Assert::AreEqual(5, cycles);
         }
 
