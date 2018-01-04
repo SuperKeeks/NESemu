@@ -487,21 +487,49 @@ bool CPU::IsValueNegative(uint8_t value) const
 void CPU::PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode)
 {
 #if _DEBUG
-    const std::map<AddressingMode, const char*> addressingModeStrs = {
-        { AddressingMode::Implied, "Implied" },
-        { AddressingMode::Accumulator, "Accumulator" },
-        { AddressingMode::Relative, "Relative" },
-        { AddressingMode::Immediate, "Immediate" },
-        { AddressingMode::ZeroPage, "ZeroPage" },
-        { AddressingMode::ZeroPageX, "ZeroPageX" },
-        { AddressingMode::ZeroPageY, "ZeroPageY" },
-        { AddressingMode::Absolute, "Absolute" },
-        { AddressingMode::AbsoluteX, "AbsoluteX" },
-        { AddressingMode::AbsoluteY, "AbsoluteY" },
-        { AddressingMode::Indirect, "Indirect" },
-        { AddressingMode::IndirectX, "IndirectX" },
-        { AddressingMode::IndirectY, "IndirectY" },
+    const char* addressingModeStr = nullptr;
+    switch (addressingMode)
+    {
+        case AddressingMode::Implied:
+            addressingModeStr = "Implied";
+            break;
+        case AddressingMode::Accumulator: 
+            addressingModeStr = "Accumulator"; 
+            break;
+        case AddressingMode::Relative: 
+            addressingModeStr = "Relative"; 
+            break;
+        case AddressingMode::Immediate: 
+            addressingModeStr = "Immediate"; 
+            break;
+        case AddressingMode::ZeroPage: 
+            addressingModeStr = "ZeroPage"; 
+            break;
+        case AddressingMode::ZeroPageX: 
+            addressingModeStr = "ZeroPageX"; 
+            break;
+        case AddressingMode::ZeroPageY: 
+            addressingModeStr = "ZeroPageY"; 
+            break;
+        case AddressingMode::Absolute: 
+            addressingModeStr = "Absolute"; 
+            break;
+        case AddressingMode::AbsoluteX: 
+            addressingModeStr = "AbsoluteX"; 
+            break;
+        case AddressingMode::AbsoluteY: 
+            addressingModeStr = "AbsoluteY"; 
+            break;
+        case AddressingMode::Indirect: 
+            addressingModeStr = "Indirect"; 
+            break;
+        case AddressingMode::IndirectX: 
+            addressingModeStr = "IndirectX"; 
+            break;
+        case AddressingMode::IndirectY: 
+            addressingModeStr = "IndirectY"; 
+            break;
     };
-    Log::Debug("Executing opcode: %s ($%02X, %s)", opcodeName, opcode, addressingModeStrs.find(addressingMode)->second);
+    Log::Debug("Executing opcode: %s ($%02X, %s)", opcodeName, opcode, addressingModeStr);
 #endif
 }
