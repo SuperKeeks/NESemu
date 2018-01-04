@@ -41,11 +41,14 @@ public:
     virtual void Reset();
 
     void SetControllerState(int controllerNumber, const ControllerState& state);
+    uint8_t ReadInput(bool* inputValues, uint8_t& currentIndex);
 
 private:
-    bool _4016[24];
-    bool _4017[24];
+    static const int kInputArraySize = 24;
+
+    bool _4016[kInputArraySize];
+    bool _4017[kInputArraySize];
     uint8_t _current4016Index;
     uint8_t _current4017Index;
-    uint8_t _lastWrittenValue;
+    uint8_t _strobe;
 };

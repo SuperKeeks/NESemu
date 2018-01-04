@@ -15,45 +15,32 @@ uint8_t Input::ReadMem(uint16_t address)
 {
     if (address == kController1Address)
     {
-        if (_current4016Index >= sizeofarray(_4016))
-        {
-            OMBAssert(false, "$4016 input read out of bounds!");
-            _current4016Index = 0;
-        }
-
-        uint8_t value = _4016[_current4016Index];
-        ++_current4016Index;
-        return value;
+        return ReadInput(_4016, _current4016Index);
     }
     else if (address == kController2Address)
     {
-        if (_current4017Index >= sizeofarray(_4017))
-        {
-            OMBAssert(false, "$4017 input read out of bounds!");
-            _current4017Index = 0;
-        }
-
-        uint8_t value = _4017[_current4017Index];
-        ++_current4017Index;
-        return value;
+        return ReadInput(_4017, _current4017Index);
     }
     else
     {
         OMBAssert(false, "Address %#06x is not part of Input!", address);
+        return 0;
     }
-
-    return 0;
 }
 
 void Input::WriteMem(uint16_t address, uint8_t value)
 {
-    OMBAssert(address == kController1Address, "Address %#06x is not part of Input!", address);
-    if (_lastWrittenValue == 0x1 && value == 0x0)
+    OMBAssert(address == kController1Address || address == kController2Address, "Address %#06x is not part of Input!", address);
+
+    if (address == kController1Address)
     {
-        _current4016Index = 0;
-        _current4017Index = 0;
+        if (_strobe == 0x1 && value == 0x0)
+        {
+            _current4016Index = 0;
+            _current4017Index = 0;
+        }
+        _strobe = value;
     }
-    _lastWrittenValue = value;
 }
 
 void Input::PowerOn()
@@ -75,7 +62,7 @@ void Input::Reset()
 
     _current4016Index = 0;
     _current4017Index = 0;
-    _lastWrittenValue = 0x0;
+    _strobe = 0x0;
 }
 
 void Input::SetControllerState(int controllerNumber, const ControllerState& state)
@@ -113,4 +100,30 @@ void Input::SetControllerState(int controllerNumber, const ControllerState& stat
     *curPos++ = state.Down;
     *curPos++ = state.Left;
     *curPos++ = state.Right;
+}
+
+uint8_t Input::ReadInput(bool* inputValues, uint8_t& currentIndex)
+{
+    // From http://wiki.nesdev.com/w/index.php/Standard_controller
+    //  In the NES and Famicom, the top three (or five) bits are not driven, and so retain the bits of the previous byte on the bus.
+    //  Usually this is the most significant byte of the address of the controller port—0x40. Paperboy relies on this behavior and 
+    //  requires that reads from the controller ports return exactly $40 or $41 as appropriate.
+    const uint8_t lastBusValue = 0x40;
+
+    // "While S (strobe) is high, the shift registers in the controllers are continuously reloaded from the button states, 
+    // and reading $4016/$4017 will keep returning the current state of the first button (A)"
+    if (_strobe == 0x1)
+    {
+        return (uint8_t)inputValues[0] | lastBusValue;
+    }
+
+    if (currentIndex >= kInputArraySize)
+    {
+        OMBAssert(false, "input read out of bounds!");
+        currentIndex = 0;
+    }
+
+    uint8_t value = inputValues[currentIndex];
+    ++currentIndex;
+    return value | lastBusValue;
 }
