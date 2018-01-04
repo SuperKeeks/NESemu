@@ -7,7 +7,8 @@ int CPU::ROR(AddressingMode mode)
     int cycles = 0;
     const uint8_t value = GetValueWithMode(mode, cycles);
     const uint8_t finalValue = value >> 1 | ((int)GetFlag(Flag::Carry) << 7);
-    SetAccumulator(finalValue);
+    SaveShiftOperationResult(mode, finalValue);
+
     SetFlag(Flag::Carry, (value & 1) != 0);
 
     // Can't find a way to make the cycles return by GetValueWithMode to work with this instruction

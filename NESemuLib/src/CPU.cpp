@@ -304,8 +304,8 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         }
         case AddressingMode::ZeroPage:
         {
-            const uint16_t address = _memoryHandler->ReadMem(++_programCounter);
-            value = _memoryHandler->ReadMem(address);
+            _lastReadAddress = _memoryHandler->ReadMem(++_programCounter);
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 2;
             break;
         }
@@ -313,15 +313,15 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         case AddressingMode::ZeroPageY:
         {
             const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
-            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + regValue;
-            value = _memoryHandler->ReadMem(address);
+            _lastReadAddress = _memoryHandler->ReadMem(++_programCounter) + regValue;
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 3;
             break;
         }
         case AddressingMode::Absolute:
         {
-            const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8);
-            value = _memoryHandler->ReadMem(address);
+            _lastReadAddress = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8);
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 3;
             break;
         }
@@ -332,8 +332,8 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
             const uint8_t loByte = _memoryHandler->ReadMem(++_programCounter);
             const uint16_t loBytePlusReg = loByte + regValue;
             const uint8_t hiByte = _memoryHandler->ReadMem(++_programCounter);
-            const uint16_t address = loBytePlusReg + (hiByte << 8);
-            value = _memoryHandler->ReadMem(address);
+            _lastReadAddress = loBytePlusReg + (hiByte << 8);
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 3;
             if (loBytePlusReg != (uint8_t)loBytePlusReg)
             {
@@ -345,8 +345,8 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         case AddressingMode::IndirectX:
         {
             const uint16_t address = _memoryHandler->ReadMem(++_programCounter) + _x;
-            const uint16_t finalAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
-            value = _memoryHandler->ReadMem(finalAddress);
+            _lastReadAddress = _memoryHandler->ReadMem(address) + (_memoryHandler->ReadMem(address + 1) << 8);
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 5;
             break;
         }
@@ -356,8 +356,8 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
             const uint8_t loByte = _memoryHandler->ReadMem(address);
             const uint16_t loBytePlusReg = loByte + _y;
             const uint8_t hiByte = _memoryHandler->ReadMem(address + 1);
-            const uint16_t finalAddress = loBytePlusReg + (hiByte << 8);
-            value = _memoryHandler->ReadMem(finalAddress);
+            _lastReadAddress = loBytePlusReg + (hiByte << 8);
+            value = _memoryHandler->ReadMem(_lastReadAddress);
             cycles += 4;
             if (loBytePlusReg != (uint8_t)loBytePlusReg)
             {
@@ -439,6 +439,22 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
     }
 }
 
+void CPU::SaveShiftOperationResult(AddressingMode mode, uint8_t result)
+{
+    if (mode == AddressingMode::Accumulator)
+    {
+        SetAccumulator(result);
+    }
+    else
+    {
+        // These 2 flags are set within SetAccumulator() too, so no need to do it within the previous condition
+        SetFlag(Flag::Sign, IsValueNegative(result));
+        SetFlag(Flag::Zero, result == 0);
+
+        _memoryHandler->WriteMem(_lastReadAddress, result);
+    }
+}
+
 void CPU::Push(uint8_t value)
 {
     _memoryHandler->WriteMem(kStackAddressStart + _stackPointer, value);
@@ -470,6 +486,7 @@ bool CPU::IsValueNegative(uint8_t value) const
 
 void CPU::PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode)
 {
+#if _DEBUG
     const std::map<AddressingMode, const char*> addressingModeStrs = {
         { AddressingMode::Implied, "Implied" },
         { AddressingMode::Accumulator, "Accumulator" },
@@ -485,8 +502,6 @@ void CPU::PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode
         { AddressingMode::IndirectX, "IndirectX" },
         { AddressingMode::IndirectY, "IndirectY" },
     };
-
-#if _DEBUG
     Log::Debug("Executing opcode: %s ($%02X, %s)", opcodeName, opcode, addressingModeStrs.find(addressingMode)->second);
 #endif
 }

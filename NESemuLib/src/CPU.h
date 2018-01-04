@@ -78,9 +78,11 @@ private:
 
     MemoryHandler* _memoryHandler = nullptr;
     int _ticksUntilNextInstruction = 0;
+    uint16_t _lastReadAddress;
 
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);
+    void SaveShiftOperationResult(AddressingMode mode, uint8_t result);
     void Push(uint8_t value);
     uint8_t Pop();
     void PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode);
