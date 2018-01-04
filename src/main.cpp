@@ -39,7 +39,14 @@ int main(int argc, char* args[])
             SDL_Event e;
 
             NESemu emu;
-            emu.Load("demo4.nes");
+            //emu.Load("color_test.nes");
+            //emu.Load("demo1.nes");
+            //emu.Load("smb.nes");
+            emu.Load("mariobros.nes");
+            //emu.Load("zelda_title.nes");
+            //emu.Load("popeye.nes");
+            //emu.Load("galaga.nes");
+            //emu.Load("pyramid.nes");
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
