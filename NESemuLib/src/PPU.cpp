@@ -508,6 +508,7 @@ void PPU::FindSpritesInScanline(int index)
 uint8_t PPU::CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
 {
     const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress();
+    const int spriteHeight = GetSpriteHeight();
 
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) &&
         (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteClipping)))
@@ -520,11 +521,32 @@ uint8_t PPU::CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSp
                 const uint8_t spriteY = _secondaryOAM[i + kSpriteYPosOffset] + 1;
                 const uint8_t patternIndex = _secondaryOAM[i + kSpriteTileIndexOffset];
                 const uint8_t attributes = _secondaryOAM[i + kSpriteAttributesOffset];
+                
                 const uint8_t paletteNumber = attributes & 0x3;
+                const bool flipHorizontally = (attributes & (1 << 6)) != 0;
+                const bool flipVertically = (attributes & (1 << 7)) != 0;
                 layer = (attributes & 0x10) == 0 ? SpriteLayer::Front : SpriteLayer::Behind;
 
-                const uint8_t patternPixelX = x - spriteX;
-                const uint8_t patternPixelY = y - spriteY;
+                uint8_t patternPixelX;
+                if (flipHorizontally)
+                {
+                    patternPixelX = (kTileWidth - 1) - (x - spriteX);
+                }
+                else
+                {
+                    patternPixelX = x - spriteX;
+                }
+
+                uint8_t patternPixelY;
+                if (flipVertically)
+                {
+                    patternPixelY = (spriteHeight - 1) - (y - spriteY);
+                }
+                else
+                {
+                    patternPixelY = y - spriteY;
+                }
+
                 const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
                 const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
                 const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
