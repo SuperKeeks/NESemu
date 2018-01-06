@@ -379,45 +379,36 @@ void PPU::RenderScanline(int index)
     OMBAssert(index >= 0 && index < kHorizontalResolution, "Scanline index out of bounds!");
     OMBAssert(!BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize), "8x16 Sprite size not supported yet!");
 
-    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility))
+    const uint8_t xScroll = _ppuScroll >> 8;
+    const uint8_t yScroll = (uint8_t)_ppuScroll;
+    const int bkgAbsoluteY = yScroll + index;
+    
+    FindSpritesInScanline(index);
+
+    for (int i = 0; i < kHorizontalResolution; ++i)
     {
-        const uint8_t xScroll = _ppuScroll >> 8;
-        const uint8_t yScroll = (uint8_t)_ppuScroll;
-        const uint16_t nametableBaseAddress = GetNametableBaseAddress();
-        const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
-        const uint16_t attributeTableBaseAddress = nametableBaseAddress + kAttributeTableStartOffset;
-        const int absoluteY = yScroll + index;
+        bool isSprite0;
+        SpriteLayer spriteLayer;
+        const uint8_t spritePixelColour = CalculateSpriteColorAt(i, index, spriteLayer, isSprite0);
+        const uint8_t bkgPixelColour = CalculateBkgColorAt(i, xScroll + i, bkgAbsoluteY);
 
-        const bool isBkgClippingFlagSet = BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping);
-        for (int i = 0; i < kHorizontalResolution; ++i)
+        // See "Sprite zero hits" section of http://wiki.nesdev.com/w/index.php/PPU_OAM
+        if (isSprite0 &&
+            i != 255 &&
+            spritePixelColour != kTransparentPixelColour &&
+            bkgPixelColour != kTransparentPixelColour)
         {
-            if (i >= kLeftClippingPixelCount || isBkgClippingFlagSet)
-            {
-                const int absoluteX = xScroll + i;
+            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, true);
+        }
 
-                const uint8_t nametableX = absoluteX / kTileWidth;
-                const uint8_t nametableY = absoluteY / kTileHeight;
-                const uint16_t nametableIndex = nametableY * kTilesPerNametableRow + nametableX;
-                
-                const uint8_t patternPixelX = absoluteX % kTileWidth;
-                const uint8_t patternPixelY = absoluteY % kTileHeight;
-                const uint8_t patternIndex = ReadPPUMem(nametableBaseAddress + nametableIndex);
-                const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
-                const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
-                const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
-                const uint8_t paletteColour = ((int)colourBit1 << 1) | (int)colourBit0;
-                
-                // Each attribute element contains 4x4 tiles, and each subarea is made of 2x2 tiles
-                const uint8_t attributeIndex = (nametableY / 4) * 8 + (nametableX / 4);
-                const uint8_t attributeArea = (nametableY % 4) / 2 << 1 | ((nametableX % 4) / 2); // 0:Top-Left, 1:Top-Right, 2:Bottom-Left, 3:Bottom-Right
-                const uint8_t attributeValue = ReadPPUMem(attributeTableBaseAddress + attributeIndex);
-                const uint8_t paletteNumber = (attributeValue >> (attributeArea * 2)) & 0x3;
-
-                const uint8_t paletteIndex = paletteNumber << 2 | paletteColour;
-                const uint8_t colourIndex = ReadPPUMem(kPaletteStartAddress + paletteIndex);
-
-                RenderPixel(i, index, colourIndex);
-            }
+        if (spritePixelColour != kTransparentPixelColour &&
+            (spriteLayer == SpriteLayer::Front || bkgPixelColour == kTransparentPixelColour))
+        {
+            RenderPixel(i, index, spritePixelColour);
+        }
+        else if (bkgPixelColour != kTransparentPixelColour)
+        {
+            RenderPixel(i, index, bkgPixelColour);
         }
     }
 }
@@ -459,4 +450,133 @@ uint16_t PPU::GetBkgPatternTableBaseAddress() const
     {
         return kPatternTable0Address;
     }
+}
+
+uint16_t PPU::GetSpritePatternTableBaseAddress() const
+{
+    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpritePatternTableAddress))
+    {
+        return kPatternTable1Address;
+    }
+    else
+    {
+        return kPatternTable0Address;
+    }
+}
+
+int PPU::GetSpriteHeight() const
+{
+    return BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize) ? 16 : 8;
+}
+
+void PPU::FindSpritesInScanline(int index)
+{
+    _secondaryOAMSpriteCount = 0;
+    _isSpriteZeroInSecondaryOAM = false;
+    
+    if (index == 0)
+    {
+        return; // No sprites allowed in the first scanline
+    }
+
+    const int spriteHeight = GetSpriteHeight();
+
+    for (int i = 0; i < kOAMSize && _secondaryOAMSpriteCount < kMaxSpritesInSecondaryOAM; i += kSpriteSize)
+    {
+        // Add +1 to spriteY because "Sprite data is delayed by one scanline; 
+        // you must subtract 1 from the sprite's Y coordinate before writing it here"
+        const uint8_t spriteY = _oam[i + kSpriteYPosOffset] + 1;
+        if (index >= spriteY && index < spriteY + spriteHeight)
+        {
+            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 0] = _oam[i + 0];
+            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 1] = _oam[i + 1];
+            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 2] = _oam[i + 2];
+            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 3] = _oam[i + 3];
+            ++_secondaryOAMSpriteCount;
+            if (i == 0)
+            {
+                _isSpriteZeroInSecondaryOAM = true;
+            }
+        }
+    }
+}
+
+uint8_t PPU::CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
+{
+    const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress();
+
+    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) &&
+        (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteClipping)))
+    {
+        for (int i = 0; i < _secondaryOAMSpriteCount * kSpriteSize; i += kSpriteSize)
+        {
+            const uint8_t spriteX = _secondaryOAM[i + kSpriteXPosOffset];
+            if (x >= spriteX && x < spriteX + kTileWidth)
+            {
+                const uint8_t spriteY = _secondaryOAM[i + kSpriteYPosOffset] + 1;
+                const uint8_t patternIndex = _secondaryOAM[i + kSpriteTileIndexOffset];
+                const uint8_t attributes = _secondaryOAM[i + kSpriteAttributesOffset];
+                const uint8_t paletteNumber = attributes & 0x3;
+                layer = (attributes & 0x10) == 0 ? SpriteLayer::Front : SpriteLayer::Behind;
+
+                const uint8_t patternPixelX = x - spriteX;
+                const uint8_t patternPixelY = y - spriteY;
+                const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
+                const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
+                const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
+                const uint8_t paletteColour = ((int)colourBit1 << 1) | (int)colourBit0;
+                if (paletteColour == 0x0)
+                {
+                    continue;
+                }
+
+                const uint8_t paletteIndex = (1 << 4) | paletteNumber << 2 | paletteColour;
+                const uint8_t colourIndex = ReadPPUMem(kPaletteStartAddress + paletteIndex);
+
+                isSprite0 = (i == 0) && _isSpriteZeroInSecondaryOAM;
+                return colourIndex;
+            }
+        }
+    }
+
+    // No opaque sprites found at this coordinate
+    isSprite0 = false;
+    return kTransparentPixelColour; // No opaque sprite pixel found at this position
+}
+
+uint8_t PPU::CalculateBkgColorAt(int screenX, int absoluteX, int absoluteY)
+{
+    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility) &&
+        (screenX >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping)))
+    {
+        const uint16_t nametableBaseAddress = GetNametableBaseAddress();
+        const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
+        const uint16_t attributeTableBaseAddress = nametableBaseAddress + kAttributeTableStartOffset;
+
+        const uint8_t nametableX = absoluteX / kTileWidth;
+        const uint8_t nametableY = absoluteY / kTileHeight;
+        const uint16_t nametableIndex = nametableY * kTilesPerNametableRow + nametableX;
+
+        const uint8_t patternPixelX = absoluteX % kTileWidth;
+        const uint8_t patternPixelY = absoluteY % kTileHeight;
+        const uint8_t patternIndex = ReadPPUMem(nametableBaseAddress + nametableIndex);
+        const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
+        const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
+        const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
+        const uint8_t paletteColour = ((int)colourBit1 << 1) | (int)colourBit0;
+        // TODO: Return kTransparentPixelColour if colour is 0?
+
+        // Each attribute element contains 4x4 tiles, and each subarea is made of 2x2 tiles
+        const uint8_t attributeIndex = (nametableY / 4) * 8 + (nametableX / 4);
+        const uint8_t attributeArea = (nametableY % 4) / 2 << 1 | ((nametableX % 4) / 2); // 0:Top-Left, 1:Top-Right, 2:Bottom-Left, 3:Bottom-Right
+        const uint8_t attributeValue = ReadPPUMem(attributeTableBaseAddress + attributeIndex);
+        const uint8_t paletteNumber = (attributeValue >> (attributeArea * 2)) & 0x3;
+
+        const uint8_t paletteIndex = paletteNumber << 2 | paletteColour;
+        const uint8_t colourIndex = ReadPPUMem(kPaletteStartAddress + paletteIndex);
+
+        return colourIndex;
+    }
+
+    return kTransparentPixelColour;
 }

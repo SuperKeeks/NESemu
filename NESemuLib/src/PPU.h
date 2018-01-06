@@ -73,8 +73,16 @@ private:
         VBlank = 7
     };
 
+    enum SpriteLayer
+    {
+        Front,
+        Behind
+    };
+
     static const int kVRAMSize = 2048;
     static const int kPaletteArraySize = 1 + 4*3 + 1*3 + 4*3; // 1 for Bkg colour + 4 Background palettes with extra data between them + 4 Sprite palettes
+    static const int kMaxSpritesInSecondaryOAM = 8;
+    static const int kSecondaryOAMSize = kMaxSpritesInSecondaryOAM * kSpriteSize;
     
     static const int kPatternTable0Address = 0x0000;
     static const int kPatternTable1Address = 0x1000;
@@ -98,7 +106,14 @@ private:
     static const int kTilesPerNametableRow = 32;
     static const int kElementsPerAttributeTableRow = 8;
     static const int kTileWidth = 8;
-    static const int kTileHeight = 8;
+    static const int kTileHeight = 8; // TODO: Temporary, use GetSpriteHeight() instead
+    static const uint8_t kTransparentPixelColour = 255;
+
+    // Each sprite is represented by 4 bytes. These are the offsets for each part of its info.
+    static const int kSpriteYPosOffset = 0;
+    static const int kSpriteTileIndexOffset = 1;
+    static const int kSpriteAttributesOffset = 2;
+    static const int kSpriteXPosOffset = 3;
 
     // Palette from http://wiki.nesdev.com/w/index.php/File:Savtool-swatches.png
     const uint32_t kOutputPalette[64] = {
@@ -188,7 +203,8 @@ private:
     bool _waitToShowFrameBuffer = false; // If true, the PPU won't start rendering the next frame until GetFrameBuffer() is called
 
     uint8_t _vram[kVRAMSize];
-    uint8_t _oam[kSpriteSize * kSpriteCount];
+    uint8_t _oam[kOAMSize];
+    uint8_t _secondaryOAM[kSecondaryOAMSize];
     uint8_t _palettes[kPaletteArraySize];
     uint32_t _frameBuffer[PPU::kHorizontalResolution * PPU::kVerticalResolution];
 
@@ -196,6 +212,8 @@ private:
     CHRROM* _chrRom;
     CPU* _cpu;
     MirroringMode _mirroringMode;
+    int _secondaryOAMSpriteCount;
+    bool _isSpriteZeroInSecondaryOAM;
 
     uint8_t* GetNametableMem(uint16_t address);
     uint8_t ReadPPUMem(uint16_t address);
@@ -208,4 +226,11 @@ private:
     void RenderPixel(int x, int y, uint8_t paletteIndex);
     uint16_t GetNametableBaseAddress() const;
     uint16_t GetBkgPatternTableBaseAddress() const;
+    uint16_t GetSpritePatternTableBaseAddress() const;
+    int GetSpriteHeight() const;
+    void FindSpritesInScanline(int index);
+
+    // These 2 functions return kTransparentPixelColour if no opaque pixel was found
+    uint8_t CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSprite0);
+    uint8_t CalculateBkgColorAt(int screenX, int absoluteX, int absoluteY);
 };
