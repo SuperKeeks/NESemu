@@ -93,6 +93,7 @@ private:
     static const int kAttributeTableStartOffset = 0x3C0; // Within each Nametable (i.e. Attribute table 0 starts at kNametable0StartAddress + kAttributeTableStart)
     static const int kMirrorStartAddress = 0x3000;
     static const int kPaletteStartAddress = 0x3F00;
+    static const int kUniversalBkgColourAddress = 0x3F00;
     static const int kShadowVRAMStartAddress = 0x4000;
 
     static const int kLeftClippingPixelCount = 8;

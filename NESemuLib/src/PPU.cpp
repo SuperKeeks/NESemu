@@ -410,6 +410,10 @@ void PPU::RenderScanline(int index)
         {
             RenderPixel(i, index, bkgPixelColour);
         }
+        else
+        {
+            RenderPixel(i, index, ReadPPUMem(kUniversalBkgColourAddress));
+        }
     }
 }
 
@@ -564,7 +568,10 @@ uint8_t PPU::CalculateBkgColorAt(int screenX, int absoluteX, int absoluteY)
         const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
         const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
         const uint8_t paletteColour = ((int)colourBit1 << 1) | (int)colourBit0;
-        // TODO: Return kTransparentPixelColour if colour is 0?
+        if (paletteColour == 0)
+        {
+            return kTransparentPixelColour;
+        }
 
         // Each attribute element contains 4x4 tiles, and each subarea is made of 2x2 tiles
         const uint8_t attributeIndex = (nametableY / 4) * 8 + (nametableX / 4);
