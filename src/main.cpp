@@ -92,6 +92,10 @@ int main(int argc, char* args[])
                     {
                         HandleGameControllerInput(controller2State, e);
                     }
+                    else if (e.type == SDL_CONTROLLER_BUTTON_A || e.type == SDL_CONTROLLERBUTTONUP)
+                    {
+                        HandleGameControllerInput(controller2State, e);
+                    }
                 }
 
                 emu.SetControllerState(1, controller1State);
@@ -172,28 +176,28 @@ void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Even
 
     switch (event.cbutton.button)
     {
-        case 0:
+        case SDL_CONTROLLER_BUTTON_A:
             controllerState.A = keyState;
             break;
-        case 2:
+        case SDL_CONTROLLER_BUTTON_X:
             controllerState.B = keyState;
             break;
-        case 4:
+        case SDL_CONTROLLER_BUTTON_BACK:
             controllerState.Select = keyState;
             break;
-        case 6:
+        case SDL_CONTROLLER_BUTTON_START:
             controllerState.Start = keyState;
             break;
-        case 11:
+        case SDL_CONTROLLER_BUTTON_DPAD_UP:
             controllerState.Up = keyState;
             break;
-        case 12:
+        case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
             controllerState.Down = keyState;
             break;
-        case 13:
+        case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
             controllerState.Left = keyState;
             break;
-        case 14:
+        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
             controllerState.Right = keyState;
             break;
     }
