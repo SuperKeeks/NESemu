@@ -1,4 +1,6 @@
+#include "LogUtils.h"
 #include "NESemu.h"
+#include "SizeOfArray.h"
 
 #include <SDL.h>
 #include <stdio.h>
@@ -6,16 +8,22 @@
 const int SCALE = 2;
 
 void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event);
+void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Event event);
 
 int main(int argc, char* args[])
 {
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_Texture* texture = NULL;
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    SDL_GameController* gameControllers[2];
+    for (int i = 0; i < sizeofarray(gameControllers); ++i)
     {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        gameControllers[i] = nullptr;
+    }
+
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+    {
+        Log::Error("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
     else
     {
@@ -28,10 +36,18 @@ int main(int argc, char* args[])
             SDL_WINDOW_SHOWN);
         if (window == NULL)
         {
-            printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+            Log::Error("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
         else
         {
+            // Initialise game controllers
+            const int numJoysticks = SDL_NumJoysticks();
+            Log::Info("%d joysticks were found.\n\n", numJoysticks);
+            for (int i = 0; i < numJoysticks && i < sizeofarray(gameControllers); i++)
+            {
+                gameControllers[i] = SDL_GameControllerOpen(i);
+            }
+
             renderer = SDL_CreateRenderer(window, -1, 0);
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
 
@@ -54,6 +70,7 @@ int main(int argc, char* args[])
             Uint32 last = 0;
             double deltaTime = 0; // In seconds
             Input::ControllerState controller1State;
+            Input::ControllerState controller2State;
 
             while (!quit)
             {
@@ -71,9 +88,14 @@ int main(int argc, char* args[])
                     {
                         HandleKeyboardInput(controller1State, e);
                     }
+                    else if (e.type == SDL_CONTROLLERBUTTONDOWN || e.type == SDL_CONTROLLERBUTTONUP)
+                    {
+                        HandleGameControllerInput(controller2State, e);
+                    }
                 }
 
                 emu.SetControllerState(1, controller1State);
+                emu.SetControllerState(2, controller2State);
                 emu.Update(deltaTime);
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
@@ -84,6 +106,14 @@ int main(int argc, char* args[])
                     SDL_RenderPresent(renderer);
                 }
             }
+        }
+    }
+
+    for (int i = 0; i < sizeofarray(gameControllers); ++i)
+    {
+        if (gameControllers[i] != nullptr)
+        {
+            SDL_GameControllerClose(gameControllers[i]);
         }
     }
 
@@ -128,6 +158,43 @@ void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event even
             break;
         case SDLK_RETURN:
             controllerState.Start = keyState;
+            break;
+    }
+}
+
+void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Event event)
+{
+    bool keyState = false;
+    if (event.type == SDL_CONTROLLERBUTTONDOWN)
+    {
+        keyState = true;
+    }
+
+    switch (event.cbutton.button)
+    {
+        case 0:
+            controllerState.A = keyState;
+            break;
+        case 2:
+            controllerState.B = keyState;
+            break;
+        case 4:
+            controllerState.Select = keyState;
+            break;
+        case 6:
+            controllerState.Start = keyState;
+            break;
+        case 11:
+            controllerState.Up = keyState;
+            break;
+        case 12:
+            controllerState.Down = keyState;
+            break;
+        case 13:
+            controllerState.Left = keyState;
+            break;
+        case 14:
+            controllerState.Right = keyState;
             break;
     }
 }
