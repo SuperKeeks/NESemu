@@ -92,10 +92,6 @@ int main(int argc, char* args[])
                     {
                         HandleGameControllerInput(controller2State, e);
                     }
-                    else if (e.type == SDL_CONTROLLER_BUTTON_A || e.type == SDL_CONTROLLERBUTTONUP)
-                    {
-                        HandleGameControllerInput(controller2State, e);
-                    }
                 }
 
                 emu.SetControllerState(1, controller1State);
