@@ -6,9 +6,11 @@
 #include <stdio.h>
 
 const int SCALE = 2;
+const int JOYSTICK_DEAD_ZONE = 8000;
 
-void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event);
-void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Event event);
+void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
+void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
+void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_Event event);
 
 int main(int argc, char* args[])
 {
@@ -86,11 +88,15 @@ int main(int argc, char* args[])
                     }
                     else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
                     {
-                        HandleKeyboardInput(controller1State, e);
+                        HandleKeyboardButtonEvent(controller1State, e);
                     }
                     else if (e.type == SDL_CONTROLLERBUTTONDOWN || e.type == SDL_CONTROLLERBUTTONUP)
                     {
-                        HandleGameControllerInput(controller2State, e);
+                        HandleGameControllerButtonEvent(controller2State, e);
+                    }
+                    else if (e.type == SDL_CONTROLLERAXISMOTION)
+                    {
+                        HandleGameControllerAxisEvent(controller2State, e);
                     }
                 }
 
@@ -125,7 +131,7 @@ int main(int argc, char* args[])
     return 0;
 }
 
-void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event event)
+void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event)
 {
     bool keyState = false;
     if (event.type == SDL_KEYDOWN)
@@ -162,7 +168,7 @@ void HandleKeyboardInput(Input::ControllerState& controllerState, SDL_Event even
     }
 }
 
-void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Event event)
+void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event)
 {
     bool keyState = false;
     if (event.type == SDL_CONTROLLERBUTTONDOWN)
@@ -196,5 +202,45 @@ void HandleGameControllerInput(Input::ControllerState& controllerState, SDL_Even
         case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
             controllerState.Right = keyState;
             break;
+    }
+}
+
+void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_Event event)
+{
+    if (event.jaxis.axis == 0)
+    {
+        if (event.jaxis.value < -JOYSTICK_DEAD_ZONE)
+        {
+            controllerState.Left = true;
+            controllerState.Right = false;
+        }
+        else if (event.jaxis.value > JOYSTICK_DEAD_ZONE)
+        {
+            controllerState.Left = false;
+            controllerState.Right = true;
+        }
+        else
+        {
+            controllerState.Left = false;
+            controllerState.Right = false;
+        }
+    }
+    else if (event.jaxis.axis == 1)
+    {
+        if (event.jaxis.value < -JOYSTICK_DEAD_ZONE)
+        {
+            controllerState.Up = false;
+            controllerState.Down = true;
+        }
+        else if (event.jaxis.value > JOYSTICK_DEAD_ZONE)
+        {
+            controllerState.Up = true;
+            controllerState.Down = false;
+        }
+        else
+        {
+            controllerState.Up = false;
+            controllerState.Down = false;
+        }
     }
 }
