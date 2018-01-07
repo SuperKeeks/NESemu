@@ -525,7 +525,7 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
                 const uint8_t paletteNumber = attributes & 0x3;
                 const bool flipHorizontally = (attributes & (1 << 6)) != 0;
                 const bool flipVertically = (attributes & (1 << 7)) != 0;
-                layer = (attributes & 0x10) == 0 ? SpriteLayer::Front : SpriteLayer::Behind;
+                layer = (attributes & (1 << 5)) == 0 ? SpriteLayer::Front : SpriteLayer::Behind;
 
                 uint8_t patternPixelX;
                 if (flipHorizontally)
