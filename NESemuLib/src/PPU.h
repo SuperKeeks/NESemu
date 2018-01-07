@@ -232,6 +232,6 @@ private:
     void FindSpritesInScanline(int index);
 
     // These 2 functions return kTransparentPixelColour if no opaque pixel was found
-    uint8_t CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSprite0);
-    uint8_t CalculateBkgColorAt(int screenX, int absoluteX, int absoluteY);
+    uint8_t CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0);
+    uint8_t CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY);
 };

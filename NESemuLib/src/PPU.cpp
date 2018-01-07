@@ -389,8 +389,8 @@ void PPU::RenderScanline(int index)
     {
         bool isSprite0;
         SpriteLayer spriteLayer;
-        const uint8_t spritePixelColour = CalculateSpriteColorAt(i, index, spriteLayer, isSprite0);
-        const uint8_t bkgPixelColour = CalculateBkgColorAt(i, xScroll + i, bkgAbsoluteY);
+        const uint8_t spritePixelColour = CalculateSpriteColourAt(i, index, spriteLayer, isSprite0);
+        const uint8_t bkgPixelColour = CalculateBkgColourAt(i, xScroll + i, bkgAbsoluteY);
 
         // See "Sprite zero hits" section of http://wiki.nesdev.com/w/index.php/PPU_OAM
         if (isSprite0 &&
@@ -505,7 +505,7 @@ void PPU::FindSpritesInScanline(int index)
     }
 }
 
-uint8_t PPU::CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
+uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
 {
     const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress();
     const int spriteHeight = GetSpriteHeight();
@@ -570,7 +570,7 @@ uint8_t PPU::CalculateSpriteColorAt(int x, int y, SpriteLayer& layer, bool& isSp
     return kTransparentPixelColour; // No opaque sprite pixel found at this position
 }
 
-uint8_t PPU::CalculateBkgColorAt(int screenX, int absoluteX, int absoluteY)
+uint8_t PPU::CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY)
 {
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility) &&
         (screenX >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping)))
