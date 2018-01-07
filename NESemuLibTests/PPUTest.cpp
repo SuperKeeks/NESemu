@@ -365,5 +365,140 @@ namespace NESemuLibTests
                 }
             }
         }
+
+        TEST_METHOD(PPUNametableScrolling)
+        {
+            NESemu emu;
+            PPU& ppu = *emu.GetPPU();
+            uint8_t rom[ROM::kMaxROMSize];
+
+            emu.Load(rom, ROM::kMaxROMSize);
+
+            const int tileHeight = ppu.GetSpriteHeight();
+
+            // Basenametable = 0
+            ppu.WriteMem(PPU::kPPUCtrlAddress, 0);
+            for (int y = 0; y < 480 / 8; ++y)
+            {
+                for (int x = 0; x < 512 / 8; ++x)
+                {
+                    if (y < 240 / tileHeight)
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable0StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable1StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                    else
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable2StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable3StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                }
+            }
+
+            // Basenametable = 1
+            ppu.WriteMem(PPU::kPPUCtrlAddress, 1);
+            for (int y = 0; y < 480 / 8; ++y)
+            {
+                for (int x = 0; x < 512 / 8; ++x)
+                {
+                    if (y < 240 / tileHeight)
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable1StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable0StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                    else
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable3StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable2StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                }
+            }
+
+            // Basenametable = 2
+            ppu.WriteMem(PPU::kPPUCtrlAddress, 2);
+            for (int y = 0; y < 480 / 8; ++y)
+            {
+                for (int x = 0; x < 512 / 8; ++x)
+                {
+                    if (y < 240 / tileHeight)
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable2StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable3StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                    else
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable0StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable1StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                }
+            }
+
+            // Basenametable = 3
+            ppu.WriteMem(PPU::kPPUCtrlAddress, 3);
+            for (int y = 0; y < 480 / 8; ++y)
+            {
+                for (int x = 0; x < 512 / 8; ++x)
+                {
+                    if (y < 240 / tileHeight)
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable3StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable2StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                    else
+                    {
+                        if (x < 256 / PPU::kTileWidth)
+                        {
+                            Assert::AreEqual(PPU::kNametable1StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                        else
+                        {
+                            Assert::AreEqual(PPU::kNametable0StartAddress, (int)ppu.GetNametableAddress(x, y));
+                        }
+                    }
+                }
+            }
+        }
     };
 }

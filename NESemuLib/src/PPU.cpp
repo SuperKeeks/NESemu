@@ -424,24 +424,38 @@ void PPU::RenderPixel(int x, int y, uint8_t paletteIndex)
     _frameBuffer[pixelIndex] = kOutputPalette[paletteIndex];
 }
 
-uint16_t PPU::GetNametableBaseAddress() const
+uint16_t PPU::GetNametableAddress(int globalTileX, int globalTileY) const
 {
-    const uint8_t baseNametableValue = _ppuCtrl & 0x3; // Get lower 2 bytes
-    switch (baseNametableValue)
+    // This function wraps around the nametables, so if for instance the base nametable is 0,
+    // and the tile's X coordinate is out of its bounds, it'll return nametable 1's address
+    // instead. If the tile's Y coordinate is out of tile 0's bounds, it'll return nametable
+    // 2's instead. If both coordinates are out of tile 0's bounds, it'll return nametable 3
+
+    // This array contains the indices of the nametable to use if wrapping happens
+    static const uint8_t kScrollTable[9] = { 
+        0, 1, 0,
+        2, 3, 2,
+        0, 1, 0
+    };
+
+    // First get the index of the base nametable in the kScrollTable array
+    const uint8_t baseNametableValue = _ppuCtrl & 0x3; // Get lower 2 bits    
+    uint8_t scrollTableIndex = baseNametableValue > 1 ? baseNametableValue + 1 : baseNametableValue;
+    
+    // Add 1 (i.e. a tile) if X is out of bounds
+    if (globalTileX >= kTilesPerNametableRow)
     {
-        case 0:
-            return kNametable0StartAddress;
-            break;
-        case 1:
-            return kNametable1StartAddress;
-            break;
-        case 2:
-            return kNametable2StartAddress;
-            break;
-        default:
-            return kNametable3StartAddress;
-            break;
+        scrollTableIndex += 1;
     }
+
+    // Add 3 (i.e. a row) if Y is out of bounds
+    const uint8_t tilesPerNametableColumn = kVerticalResolution / GetSpriteHeight();
+    if (globalTileY >= tilesPerNametableColumn)
+    {
+        scrollTableIndex += 3;
+    }
+    
+    return kNametable0StartAddress + kScrollTable[scrollTableIndex] * kNametableSize;
 }
 
 uint16_t PPU::GetBkgPatternTableBaseAddress() const
@@ -575,17 +589,18 @@ uint8_t PPU::CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY)
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility) &&
         (screenX >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping)))
     {
-        const uint16_t nametableBaseAddress = GetNametableBaseAddress();
-        const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
-        const uint16_t attributeTableBaseAddress = nametableBaseAddress + kAttributeTableStartOffset;
-
-        const uint8_t nametableX = absoluteX / kTileWidth;
-        const uint8_t nametableY = absoluteY / kTileHeight;
-        const uint16_t nametableIndex = nametableY * kTilesPerNametableRow + nametableX;
+        const uint8_t globalTileX = absoluteX / kTileWidth;
+        const uint8_t globalTileY = absoluteY / kTileHeight;
+        const uint16_t nametableAddress = GetNametableAddress(globalTileX, globalTileY);
+        const uint8_t tilesPerNametableColumn = kVerticalResolution / GetSpriteHeight();
+        const uint8_t nametableTileX = globalTileX % kTilesPerNametableRow;
+        const uint8_t nametableTileY = globalTileY % tilesPerNametableColumn;
+        const uint16_t nametableIndex = nametableTileY * kTilesPerNametableRow + nametableTileX;
 
         const uint8_t patternPixelX = absoluteX % kTileWidth;
         const uint8_t patternPixelY = absoluteY % kTileHeight;
-        const uint8_t patternIndex = ReadPPUMem(nametableBaseAddress + nametableIndex);
+        const uint8_t patternIndex = ReadPPUMem(nametableAddress + nametableIndex);
+        const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
         const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
         const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
         const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
@@ -596,8 +611,9 @@ uint8_t PPU::CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY)
         }
 
         // Each attribute element contains 4x4 tiles, and each subarea is made of 2x2 tiles
-        const uint8_t attributeIndex = (nametableY / 4) * 8 + (nametableX / 4);
-        const uint8_t attributeArea = (nametableY % 4) / 2 << 1 | ((nametableX % 4) / 2); // 0:Top-Left, 1:Top-Right, 2:Bottom-Left, 3:Bottom-Right
+        const uint16_t attributeTableBaseAddress = nametableAddress + kAttributeTableStartOffset;
+        const uint8_t attributeIndex = (nametableTileY / 4) * 8 + (nametableTileX / 4);
+        const uint8_t attributeArea = (nametableTileY % 4) / 2 << 1 | ((nametableTileX % 4) / 2); // 0:Top-Left, 1:Top-Right, 2:Bottom-Left, 3:Bottom-Right
         const uint8_t attributeValue = ReadPPUMem(attributeTableBaseAddress + attributeIndex);
         const uint8_t paletteNumber = (attributeValue >> (attributeArea * 2)) & 0x3;
 

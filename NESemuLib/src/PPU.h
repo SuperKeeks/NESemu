@@ -16,13 +16,20 @@ public:
     static const int kSpriteCount = 64;
     static const int kOAMSize = kSpriteCount * kSpriteSize;
     static const int kNametableSize = 0x400;
+    static const int kTileWidth = 8;
+    static const int kTileHeight = 8; // TODO: Temporary, use GetSpriteHeight() instead
 
     static const int kDMARegisterAddress = 0x4014;
+    static const int kPPUCtrlAddress = 0x2000;
     static const int kPPUStatusAddress = 0x2002;
     static const int kOAMAddress = 0x2003;
     static const int kOAMData = 0x2004;
     static const int kPPUAddrAddress = 0x2006;
     static const int kPPUDataAddress = 0x2007;
+    static const int kNametable0StartAddress = 0x2000;
+    static const int kNametable1StartAddress = 0x2400;
+    static const int kNametable2StartAddress = 0x2800;
+    static const int kNametable3StartAddress = 0x2C00;
 
     PPU();
     virtual ~PPU();
@@ -41,8 +48,10 @@ public:
     void SetWaitToShowFrameBuffer(bool value) { _waitToShowFrameBuffer = value; }
     bool IsWaitingToShowFrameBuffer() const { return _waitingToShowFrameBuffer; }
 
-    // For testing purposes
+    // Internal and for testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
+    uint16_t GetNametableAddress(int tileX, int tileY) const;
+    int GetSpriteHeight() const;
 
 private:
     enum PPUCtrlFlags
@@ -86,10 +95,6 @@ private:
     
     static const int kPatternTable0Address = 0x0000;
     static const int kPatternTable1Address = 0x1000;
-    static const int kNametable0StartAddress = 0x2000;
-    static const int kNametable1StartAddress = 0x2400;
-    static const int kNametable2StartAddress = 0x2800;
-    static const int kNametable3StartAddress = 0x2C00;
     static const int kAttributeTableStartOffset = 0x3C0; // Within each Nametable (i.e. Attribute table 0 starts at kNametable0StartAddress + kAttributeTableStart)
     static const int kMirrorStartAddress = 0x3000;
     static const int kPaletteStartAddress = 0x3F00;
@@ -106,8 +111,6 @@ private:
     static const int kVerticalBlankingScanlinesEnd = 260;
     static const int kTilesPerNametableRow = 32;
     static const int kElementsPerAttributeTableRow = 8;
-    static const int kTileWidth = 8;
-    static const int kTileHeight = 8; // TODO: Temporary, use GetSpriteHeight() instead
     static const uint8_t kTransparentPixelColour = 255;
 
     // Each sprite is represented by 4 bytes. These are the offsets for each part of its info.
@@ -225,10 +228,8 @@ private:
     void WriteToggleableRegister(uint16_t& reg, uint8_t value);
     void RenderScanline(int index);
     void RenderPixel(int x, int y, uint8_t paletteIndex);
-    uint16_t GetNametableBaseAddress() const;
     uint16_t GetBkgPatternTableBaseAddress() const;
     uint16_t GetSpritePatternTableBaseAddress() const;
-    int GetSpriteHeight() const;
     void FindSpritesInScanline(int index);
 
     // These 2 functions return kTransparentPixelColour if no opaque pixel was found
