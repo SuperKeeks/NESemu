@@ -17,7 +17,7 @@ public:
     static const int kOAMSize = kSpriteCount * kSpriteSize;
     static const int kNametableSize = 0x400;
     static const int kTileWidth = 8;
-    static const int kTileHeight = 8; // TODO: Temporary, use GetSpriteHeight() instead
+    static const int kTileHeight = 8;
 
     static const int kDMARegisterAddress = 0x4014;
     static const int kPPUCtrlAddress = 0x2000;
@@ -229,7 +229,7 @@ private:
     void RenderScanline(int index);
     void RenderPixel(int x, int y, uint8_t paletteIndex);
     uint16_t GetBkgPatternTableBaseAddress() const;
-    uint16_t GetSpritePatternTableBaseAddress() const;
+    uint16_t GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const;
     void FindSpritesInScanline(int index);
 
     // These 2 functions return kTransparentPixelColour if no opaque pixel was found

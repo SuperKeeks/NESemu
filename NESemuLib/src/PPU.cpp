@@ -377,7 +377,6 @@ void PPU::WriteToggleableRegister(uint16_t& reg, uint8_t value)
 void PPU::RenderScanline(int index)
 {
     OMBAssert(index >= 0 && index < kHorizontalResolution, "Scanline index out of bounds!");
-    OMBAssert(!BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize), "8x16 Sprite size not supported yet!");
 
     const uint8_t xScroll = _ppuScroll >> 8;
     const uint8_t yScroll = (uint8_t)_ppuScroll;
@@ -470,15 +469,31 @@ uint16_t PPU::GetBkgPatternTableBaseAddress() const
     }
 }
 
-uint16_t PPU::GetSpritePatternTableBaseAddress() const
+uint16_t PPU::GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const
 {
-    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpritePatternTableAddress))
+    // 8x16 sprite mode
+    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize))
     {
-        return kPatternTable1Address;
+        if ((spriteIndexNumber & 0x1) == 1)
+        {
+            spriteIndexNumber &= ~(0x1); // Set last bit to 0, as it represents the pattern table
+            return kPatternTable1Address;
+        }
+        else
+        {
+            return kPatternTable0Address;
+        }
     }
     else
     {
-        return kPatternTable0Address;
+        if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpritePatternTableAddress))
+        {
+            return kPatternTable1Address;
+        }
+        else
+        {
+            return kPatternTable0Address;
+        }
     }
 }
 
@@ -521,9 +536,6 @@ void PPU::FindSpritesInScanline(int index)
 
 uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
 {
-    const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress();
-    const int spriteHeight = GetSpriteHeight();
-
     if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) &&
         (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteClipping)))
     {
@@ -533,7 +545,8 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
             if (x >= spriteX && x < spriteX + kTileWidth)
             {
                 const uint8_t spriteY = _secondaryOAM[i + kSpriteYPosOffset] + 1;
-                const uint8_t patternIndex = _secondaryOAM[i + kSpriteTileIndexOffset];
+                uint8_t patternIndex = _secondaryOAM[i + kSpriteTileIndexOffset];
+                const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress(patternIndex);
                 const uint8_t attributes = _secondaryOAM[i + kSpriteAttributesOffset];
                 
                 const uint8_t paletteNumber = attributes & 0x3;
@@ -541,26 +554,32 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
                 const bool flipVertically = (attributes & (1 << 7)) != 0;
                 layer = (attributes & (1 << 5)) == 0 ? SpriteLayer::Front : SpriteLayer::Behind;
 
-                uint8_t patternPixelX;
+                uint8_t patternPixelX = x - spriteX;
                 if (flipHorizontally)
                 {
-                    patternPixelX = (kTileWidth - 1) - (x - spriteX);
-                }
-                else
-                {
-                    patternPixelX = x - spriteX;
+                    patternPixelX = kTileWidth - 1 - patternPixelX;
                 }
 
-                uint8_t patternPixelY;
+                uint8_t patternPixelY = y - spriteY;
                 if (flipVertically)
                 {
-                    patternPixelY = (spriteHeight - 1) - (y - spriteY);
-                }
-                else
-                {
-                    patternPixelY = y - spriteY;
+                    patternPixelY = kTileHeight - 1 - patternPixelY;
                 }
 
+                if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize))
+                {
+                    // Normally the second half of the sprite is located 0x10 bytes later
+                    // than the first half. But when flipping verticallya 8x16 sprite
+                    // the are inverted
+                    if ((patternPixelY > 7 && !flipVertically) ||
+                        (patternPixelY <= 7 && flipVertically))
+                    {
+                        patternIndex += 1;
+                    }
+                    
+                    patternPixelY %= 8;
+                }
+                
                 const uint16_t patternBaseAddress = patternTableBaseAddress + (patternIndex << 4) + patternPixelY;
                 const bool colourBit0 = (ReadPPUMem(patternBaseAddress) & (0x80 >> patternPixelX)) != 0;
                 const bool colourBit1 = (ReadPPUMem(patternBaseAddress + 8) & (0x80 >> patternPixelX)) != 0;
