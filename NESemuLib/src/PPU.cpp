@@ -448,7 +448,7 @@ uint16_t PPU::GetNametableAddress(int globalTileX, int globalTileY) const
     }
 
     // Add 3 (i.e. a row) if Y is out of bounds
-    const uint8_t tilesPerNametableColumn = kVerticalResolution / GetSpriteHeight();
+    const uint8_t tilesPerNametableColumn = kVerticalResolution / kTileHeight;
     if (globalTileY >= tilesPerNametableColumn)
     {
         scrollTableIndex += 3;
@@ -611,7 +611,7 @@ uint8_t PPU::CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY)
         const uint8_t globalTileX = absoluteX / kTileWidth;
         const uint8_t globalTileY = absoluteY / kTileHeight;
         const uint16_t nametableAddress = GetNametableAddress(globalTileX, globalTileY);
-        const uint8_t tilesPerNametableColumn = kVerticalResolution / GetSpriteHeight();
+        const uint8_t tilesPerNametableColumn = kVerticalResolution / kTileHeight;
         const uint8_t nametableTileX = globalTileX % kTilesPerNametableRow;
         const uint8_t nametableTileY = globalTileY % tilesPerNametableColumn;
         const uint16_t nametableIndex = nametableTileY * kTilesPerNametableRow + nametableTileX;
