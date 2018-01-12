@@ -86,6 +86,10 @@ int main(int argc, char* args[])
                     {
                         quit = true;
                     }
+                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_r))
+                    {
+                        emu.Reset();
+                    }
                     else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
                     {
                         HandleKeyboardButtonEvent(controller1State, e);
