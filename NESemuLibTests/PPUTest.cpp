@@ -16,8 +16,8 @@ namespace NESemuLibTests
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
             uint8_t rom[ROM::kMaxROMSize];
-            uint8_t chrRom[CHRROM::kMaxCHRROMSize];
-            for (int i = 0; i < sizeofarray(chrRom); ++i)
+            uint8_t chrRom[CHRROM::kPageCHRROMSize];
+            for (int i = 0; i < CHRROM::kPageCHRROMSize; ++i)
             {
                 chrRom[i] = i % 256;
             }
@@ -38,7 +38,7 @@ namespace NESemuLibTests
                 emu.ReadMem(PPU::kPPUDataAddress);
 
                 // Verify all values
-                for (int i = 0; i < sizeofarray(chrRom); ++i)
+                for (int i = 0; i < CHRROM::kPageCHRROMSize; ++i)
                 {
                     Assert::AreEqual(i % 256, (int)emu.ReadMem(PPU::kPPUDataAddress));
                 }

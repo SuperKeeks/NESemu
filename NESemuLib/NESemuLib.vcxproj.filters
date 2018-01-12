@@ -137,6 +137,13 @@
     </ClCompile>
     <ClCompile Include="src\CHRROM.cpp" />
     <ClCompile Include="src\BitwiseUtils.cpp" />
+    <ClCompile Include="src\mappers\IM000_NROM.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mappers\IM003_CNROM.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MemoryMapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -157,6 +164,14 @@
     <ClInclude Include="src\CHRROM.h" />
     <ClInclude Include="src\MirroringMode.h" />
     <ClInclude Include="src\BitwiseUtils.h" />
+    <ClInclude Include="src\MemoryMapper.h" />
+    <ClInclude Include="src\mappers\IM000_NROM.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hardware.h" />
+    <ClInclude Include="src\mappers\IM003_CNROM.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -164,6 +179,9 @@
     </Filter>
     <Filter Include="opcodes">
       <UniqueIdentifier>{f1cceb9e-82fc-455b-90fa-c3adb410ec77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mappers">
+      <UniqueIdentifier>{65d5cfba-5121-44ea-bdee-674462aecee4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

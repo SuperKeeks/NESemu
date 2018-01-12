@@ -13,7 +13,7 @@ CHRROM::~CHRROM()
 uint8_t CHRROM::ReadMem(uint16_t address)
 {
     OMBAssert(address < sizeofarray(_chrRom), "Address is out of bounds");
-    return _chrRom[address];
+    return _chrRom[(_pageIndex * kPageCHRROMSize) + address];
 }
 
 void CHRROM::WriteMem(uint16_t address, uint8_t value)
@@ -24,6 +24,7 @@ void CHRROM::WriteMem(uint16_t address, uint8_t value)
 
 void CHRROM::PowerOn()
 {
+    _pageIndex = 0;
     for (int i = 0; i < sizeofarray(_chrRom); ++i)
     {
         _chrRom[i] = 0;
@@ -32,5 +33,10 @@ void CHRROM::PowerOn()
 
 void CHRROM::Reset()
 {
-    // Do nothing
+    _pageIndex = 0;
+}
+
+void CHRROM::SelectPage(int pageIndex)
+{
+    _pageIndex = pageIndex;
 }

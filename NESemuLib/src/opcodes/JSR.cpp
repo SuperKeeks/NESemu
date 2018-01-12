@@ -1,7 +1,7 @@
 #include "CPU.h"
 
 #include "Assert.h"
-#include "MemoryHandler.h"
+#include "MemoryMapper.h"
 
 int CPU::JSR(AddressingMode mode)
 {
@@ -11,6 +11,6 @@ int CPU::JSR(AddressingMode mode)
     Push(GetHighByte(nextOpAddress));
     Push(GetLowByte(nextOpAddress));
     // NOTE: Subtract 1 so next time PC is incremented it fetches the right opcode
-    _programCounter = _memoryHandler->ReadMem(++_programCounter) + (_memoryHandler->ReadMem(++_programCounter) << 8) - 1;
+    _programCounter = _memoryMapper->ReadMem(++_programCounter) + (_memoryMapper->ReadMem(++_programCounter) << 8) - 1;
     return 6;
 }

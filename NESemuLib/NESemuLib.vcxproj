@@ -156,10 +156,14 @@
     <ClInclude Include="src\BitwiseUtils.h" />
     <ClInclude Include="src\CHRROM.h" />
     <ClInclude Include="src\CPU.h" />
+    <ClInclude Include="src\Hardware.h" />
     <ClInclude Include="src\INESParser.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\LogUtils.h" />
+    <ClInclude Include="src\mappers\IM000_NROM.h" />
+    <ClInclude Include="src\mappers\IM003_CNROM.h" />
     <ClInclude Include="src\MemoryHandler.h" />
+    <ClInclude Include="src\MemoryMapper.h" />
     <ClInclude Include="src\MirroringMode.h" />
     <ClInclude Include="src\MM5.h" />
     <ClInclude Include="src\NESemu.h" />
@@ -178,6 +182,9 @@
     <ClCompile Include="src\INESParser.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\LogUtils.cpp" />
+    <ClCompile Include="src\mappers\IM000_NROM.cpp" />
+    <ClCompile Include="src\mappers\IM003_CNROM.cpp" />
+    <ClCompile Include="src\MemoryMapper.cpp" />
     <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\opcodes\ADC.cpp" />

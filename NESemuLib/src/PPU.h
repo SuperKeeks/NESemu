@@ -5,6 +5,7 @@
 
 class CHRROM;
 class CPU;
+class MemoryMapper;
 
 class PPU : public MemoryHandler
 {
@@ -40,7 +41,7 @@ public:
     virtual void WriteMem(uint16_t address, uint8_t value);
 
     virtual void PowerOn();
-    virtual void Reset(MemoryHandler* memoryHandler, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode);
+    virtual void Reset(MemoryMapper* memoryMapper, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode);
 
     void Tick();
 
@@ -212,7 +213,7 @@ private:
     uint8_t _palettes[kPaletteArraySize];
     uint32_t _frameBuffer[PPU::kHorizontalResolution * PPU::kVerticalResolution];
 
-    MemoryHandler* _memoryHandler;
+    MemoryMapper* _memoryMapper;
     CHRROM* _chrRom;
     CPU* _cpu;
     MirroringMode _mirroringMode;

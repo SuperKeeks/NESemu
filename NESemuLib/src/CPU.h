@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-class MemoryHandler;
+class MemoryMapper;
 
 class CPU
 {
@@ -46,7 +46,7 @@ public:
     };
 
     void PowerOn();
-    void Reset(MemoryHandler* memoryHandler);
+    void Reset(MemoryMapper* memoryMapper);
 
     void Tick();
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
@@ -76,7 +76,7 @@ private:
     uint8_t _x;
     uint8_t _y;
 
-    MemoryHandler* _memoryHandler = nullptr;
+    MemoryMapper* _memoryMapper = nullptr;
     int _ticksUntilNextInstruction = 0;
     uint16_t _lastReadAddress;
 

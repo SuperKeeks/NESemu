@@ -5,6 +5,7 @@
 #include "CHRROM.h"
 #include "CPU.h"
 #include "LogUtils.h"
+#include "MemoryMapper.h"
 #include "SizeOfArray.h"
 
 PPU::PPU()
@@ -114,7 +115,7 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     {
         for (int i = 0; i < sizeofarray(_oam); ++i)
         {
-            _oam[i] = _memoryHandler->ReadMem((value << 8) + i);
+            _oam[i] = _memoryMapper->ReadMem((value << 8) + i);
         }
     }
     else
@@ -143,9 +144,9 @@ void PPU::PowerOn()
     }
 }
 
-void PPU::Reset(MemoryHandler* memoryHandler, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode)
+void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode)
 {
-    _memoryHandler = memoryHandler;
+    _memoryMapper = memoryMapper;
     _cpu = cpu;
     _chrRom = chrRom;
     _mirroringMode = mirroringMode;

@@ -1,6 +1,6 @@
 #include "CPU.h"
 
-#include "MemoryHandler.h"
+#include "MemoryMapper.h"
 
 int CPU::BRK(AddressingMode mode)
 {
@@ -10,8 +10,8 @@ int CPU::BRK(AddressingMode mode)
     Push(GetLowByte(pcPlus1));
     Push(statusPlusBFlag);
     SetFlag(Flag::InterruptDisable, true);
-    _programCounter = _memoryHandler->ReadMem(kInterruptBreakVectorAddressL) +
-        (_memoryHandler->ReadMem(kInterruptBreakVectorAddressH) << 8) - 1;
+    _programCounter = _memoryMapper->ReadMem(kInterruptBreakVectorAddressL) +
+        (_memoryMapper->ReadMem(kInterruptBreakVectorAddressH) << 8) - 1;
 
     return 7;
 }

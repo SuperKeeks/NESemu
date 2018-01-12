@@ -1,11 +1,11 @@
 #include "CPU.h"
 
-#include "MemoryHandler.h"
+#include "MemoryMapper.h"
 
 int CPU::BXX(AddressingMode mode, bool condition)
 {
     OMBAssert(mode == AddressingMode::Relative, "Only Relative addressing mode is supported on branch instructions!");
-    const uint8_t relativeAddress = _memoryHandler->ReadMem(++_programCounter);
+    const uint8_t relativeAddress = _memoryMapper->ReadMem(++_programCounter);
 
     int cycles = 2;
     if (condition)
