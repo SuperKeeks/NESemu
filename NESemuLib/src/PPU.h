@@ -220,6 +220,7 @@ private:
     int _secondaryOAMSpriteCount;
     bool _isSpriteZeroInSecondaryOAM;
 
+    void ResetInternal(bool fullReset);
     uint8_t* GetNametableMem(uint16_t address);
     uint8_t ReadPPUMem(uint16_t address);
     void WritePPUMem(uint16_t address, uint8_t value);

@@ -9,9 +9,10 @@
 
 void CPU::PowerOn()
 {
+    // http://wiki.nesdev.com/w/index.php/CPU_power_up_state
     _programCounter = 0xFFFF;
-    _stackPointer = 0xFF;
-    _status = 0;
+    _stackPointer = 0;
+    _status = 0x34;
     _accumulator = 0;
     _x = 0;
     _y = 0;
@@ -23,6 +24,10 @@ void CPU::Reset(MemoryMapper* memoryMapper)
 
     // Load program start address in program counter
     _programCounter = _memoryMapper->ReadMem(kResetVectorAddressL) + (_memoryMapper->ReadMem(kResetVectorAddressH) << 8) - 1;
+    _ticksUntilNextInstruction = 0;
+    
+    // "After reset S was decremented by 3 (but nothing was written to the stack)" from http://wiki.nesdev.com/w/index.php/CPU_power_up_state
+    _stackPointer -= 0x3;
     
     // https://stackoverflow.com/questions/16913423/why-is-the-initial-state-of-the-interrupt-flag-of-the-6502-a-1
     SetFlag(Flag::InterruptDisable, true);

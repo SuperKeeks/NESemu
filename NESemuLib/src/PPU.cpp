@@ -126,22 +126,7 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
 
 void PPU::PowerOn()
 {
-    _ppuCtrl = 0;
-    _ppuMask = 0;
-    _ppuStatus = 0;
-    _oamAddr = 0;
-    _ppuScroll = 0;
-    _ppuAddr = 0;
-
-    for (int i = 0; i < sizeofarray(_vram); ++i)
-    {
-        _vram[i] = 0;
-    }
-
-    for (int i = 0; i < sizeofarray(_oam); ++i)
-    {
-        _oam[i] = 0;
-    }
+    ResetInternal(true);
 }
 
 void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode)
@@ -150,6 +135,40 @@ void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, CHRROM* chrRom, MirroringM
     _cpu = cpu;
     _chrRom = chrRom;
     _mirroringMode = mirroringMode;
+
+    ResetInternal(false);
+}
+
+void PPU::ResetInternal(bool fullReset)
+{
+    // See http://wiki.nesdev.com/w/index.php/PPU_power_up_state
+    _ppuCtrl = 0;
+    _ppuMask = 0;
+    _ppuScroll = 0;
+    _writeToggle = false;
+    _readBuffer = 0;
+
+    _currentScanline = -1;
+    _ticksUntilNextScanline = 0;
+    _waitingToShowFrameBuffer = false;
+
+    if (fullReset)
+    {
+        _ppuStatus = 0;
+        _oamAddr = 0;
+        _ppuAddr = 0;
+        _waitToShowFrameBuffer = false;
+
+        for (int i = 0; i < sizeofarray(_vram); ++i)
+        {
+            _vram[i] = 0;
+        }
+
+        for (int i = 0; i < sizeofarray(_oam); ++i)
+        {
+            _oam[i] = 0;
+        }
+    }
 }
 
 void PPU::Tick()
