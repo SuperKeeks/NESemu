@@ -2,6 +2,7 @@
 
 #include "Assert.h"
 #include "CHRROM.h"
+#include "LogUtils.h"
 #include "ROM.h"
 #include "SizeOfArray.h"
 
@@ -47,15 +48,15 @@ void INESParser::Parse(const char* path, ROM& rom, CHRROM& chrRom)
 
 void INESParser::PrintInfo() const
 {
-    printf("iNES ROM Info:\n");
-    printf("==============\n");
-    printf("PRG-ROM 16 KB page count: %d\n", GetPRGROMPageCount());
-    printf("CHR-ROM 8 KB page count: %d\n", GetCHRROMPageCount());
-    printf("Mirroring: %s\n", GetMirroringMode() == MirroringMode::Horizontal ? "Horizontal" : "Vertical");
-    printf("SRAM: %s\n", IsSRAMEnabled() ? "Enabled" : "Disabled");
-    printf("Trainer present: %s\n", IsTrainerPresent() ? "Yes" : "No");
-    printf("Four-screen mirroring: %s\n", IsFourScreenMirroringEnabled() ? "Enabled" : "Disabled");
-    printf("Mapper number: #%03d", GetMapperNumber());
+    Log::Info("iNES ROM Info:");
+    Log::Info("==============");
+    Log::Info("PRG-ROM 16 KB page count: %d", GetPRGROMPageCount());
+    Log::Info("CHR-ROM 8 KB page count: %d", GetCHRROMPageCount());
+    Log::Info("Mirroring: %s", GetMirroringMode() == MirroringMode::Horizontal ? "Horizontal" : "Vertical");
+    Log::Info("SRAM: %s", IsSRAMEnabled() ? "Enabled" : "Disabled");
+    Log::Info("Trainer present: %s", IsTrainerPresent() ? "Yes" : "No");
+    Log::Info("Four-screen mirroring: %s", IsFourScreenMirroringEnabled() ? "Enabled" : "Disabled");
+    Log::Info("Mapper number: #%03d\n", GetMapperNumber());
 }
 
 uint8_t INESParser::GetPRGROMPageCount() const
