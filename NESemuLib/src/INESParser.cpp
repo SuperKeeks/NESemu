@@ -55,7 +55,7 @@ void INESParser::PrintInfo() const
     printf("SRAM: %s\n", IsSRAMEnabled() ? "Enabled" : "Disabled");
     printf("Trainer present: %s\n", IsTrainerPresent() ? "Yes" : "No");
     printf("Four-screen mirroring: %s\n", IsFourScreenMirroringEnabled() ? "Enabled" : "Disabled");
-    printf("Mapper number: #%d", GetMapperNumber());
+    printf("Mapper number: #%03d", GetMapperNumber());
 }
 
 uint8_t INESParser::GetPRGROMPageCount() const
