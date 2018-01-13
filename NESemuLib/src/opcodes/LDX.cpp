@@ -6,7 +6,7 @@ int CPU::LDX(AddressingMode mode)
     const uint8_t value = GetValueWithMode(mode, cycles);
     _x = value;
 
-    SetFlag(Flag::Sign, IsValueNegative(_x) != 0);
+    SetFlag(Flag::Sign, IsValueNegative(_x));
     SetFlag(Flag::Zero, _x == 0);
 
     return cycles;
