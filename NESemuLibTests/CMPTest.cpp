@@ -45,7 +45,7 @@ namespace NESemuLibTests
             // Compared value is greater than A (and A is positive)
             cpu.SetAccumulator(0x44);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
+            Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Carry));
             Assert::AreEqual(2, cycles);
@@ -53,7 +53,7 @@ namespace NESemuLibTests
             // Compared value is lower than A (and A is negative)
             cpu.SetAccumulator(0x90);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
+            Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Carry));
             Assert::AreEqual(2, cycles);

@@ -30,7 +30,7 @@ namespace NESemuLibTests
 
             // Compared value is lower than A (and A is negative)
             rom[codeIndex++] = 0xC0; // CPY Immediate
-            rom[codeIndex++] = 0x44; // Value to compare with
+            rom[codeIndex++] = 0x05; // Value to compare with
 
             emu.Load(rom, ROM::kMaxROMSize);
 
@@ -42,15 +42,15 @@ namespace NESemuLibTests
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Carry));
             Assert::AreEqual(2, cycles);
 
-            // Compared value is greater than A (and A is positive)
+            // Compared value is greater than Y (and Y is positive)
             cpu.SetY(0x44);
             cycles = cpu.ExecuteNextInstruction();
-            Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Sign));
+            Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Zero));
             Assert::AreEqual(false, cpu.GetFlag(CPU::Flag::Carry));
             Assert::AreEqual(2, cycles);
 
-            // Compared value is lower than A (and A is negative)
+            // Compared value is lower than Y (and Y is negative)
             cpu.SetY(0x90);
             cycles = cpu.ExecuteNextInstruction();
             Assert::AreEqual(true, cpu.GetFlag(CPU::Flag::Sign));
