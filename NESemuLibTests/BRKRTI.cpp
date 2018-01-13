@@ -40,7 +40,10 @@ namespace NESemuLibTests
             // RTI
             cycles = cpu.ExecuteNextInstruction();
             Assert::AreEqual(6, cycles);
-            Assert::AreEqual(statusBeforeBreak, cpu.GetStatus());
+
+            // The status register is 0x34 at power on, which means both the Break and Unused flags are set
+            // However the RTI function sets both of them off
+            Assert::AreEqual(statusBeforeBreak & ~(1 << CPU::Flag::Break) & ~(1 << CPU::Flag::Unused), (int)cpu.GetStatus());
             Assert::AreEqual((int)pcBeforeBreak + 2, (int)cpu.GetProgramCounter());
         }
 
