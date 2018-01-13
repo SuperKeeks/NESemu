@@ -529,7 +529,7 @@ void PPU::FindSpritesInScanline(int index)
     
     if (index == 0)
     {
-        return; // No sprites allowed in the first scanline
+        return; // Early exit: no sprites are allowed in the first scanline
     }
 
     const int spriteHeight = GetSpriteHeight();
@@ -539,7 +539,7 @@ void PPU::FindSpritesInScanline(int index)
         // Add +1 to spriteY because "Sprite data is delayed by one scanline; 
         // you must subtract 1 from the sprite's Y coordinate before writing it here"
         const uint8_t spriteY = _oam[i + kSpriteYPosOffset] + 1;
-        if (index >= spriteY && index < spriteY + spriteHeight)
+        if (spriteY > 0 && index >= spriteY && index < spriteY + spriteHeight)
         {
             _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 0] = _oam[i + 0];
             _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 1] = _oam[i + 1];
