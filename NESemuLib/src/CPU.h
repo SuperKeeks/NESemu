@@ -67,6 +67,7 @@ public:
     uint8_t PeekStack(int index);
     uint8_t GetStackPointer() const { return _stackPointer; }
     void SetStackPointer(uint8_t value) { _stackPointer = value; }
+    void EnableOpcodeInfoPrinting(bool value) { _enableOpcodeInfoPrinting = value; }
 
 private:
     uint16_t _programCounter;
@@ -79,6 +80,8 @@ private:
     MemoryMapper* _memoryMapper = nullptr;
     int _ticksUntilNextInstruction = 0;
     uint16_t _lastReadAddress;
+
+    bool _enableOpcodeInfoPrinting = false;
 
     uint8_t GetValueWithMode(AddressingMode mode, int& cycles);
     void SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles);

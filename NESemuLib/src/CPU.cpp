@@ -492,6 +492,11 @@ bool CPU::IsValueNegative(uint8_t value) const
 void CPU::PrintOpcodeInfo(uint8_t opcode, const char* opcodeName, AddressingMode addressingMode)
 {
 #if _DEBUG
+    if (!_enableOpcodeInfoPrinting)
+    {
+        return;
+    }
+
     const char* addressingModeStr = nullptr;
     switch (addressingMode)
     {

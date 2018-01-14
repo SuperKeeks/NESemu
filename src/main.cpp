@@ -44,7 +44,7 @@ int main(int argc, char* args[])
         {
             // Initialise game controllers
             const int numJoysticks = SDL_NumJoysticks();
-            Log::Info("%d joysticks were found.\n\n", numJoysticks);
+            Log::Info("%d joysticks were found.\n", numJoysticks);
             for (int i = 0; i < numJoysticks && i < sizeofarray(gameControllers); i++)
             {
                 gameControllers[i] = SDL_GameControllerOpen(i);
@@ -59,12 +59,14 @@ int main(int argc, char* args[])
             NESemu emu;
             //emu.Load("color_test.nes");
             //emu.Load("demo1.nes");
-            //emu.Load("smb.nes");
-            emu.Load("mariobros.nes");
+            emu.Load("smb.nes");
+            //emu.Load("mariobros.nes");
             //emu.Load("zelda_title.nes");
             //emu.Load("popeye.nes");
             //emu.Load("galaga.nes");
             //emu.Load("pyramid.nes");
+            //emu.Load("donkey.nes");
+            //emu.Load("tetris.nes");
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
@@ -73,6 +75,7 @@ int main(int argc, char* args[])
             double deltaTime = 0; // In seconds
             Input::ControllerState controller1State;
             Input::ControllerState controller2State;
+            bool enableOpcodeInfoPrinting = false;
 
             while (!quit)
             {
@@ -89,6 +92,11 @@ int main(int argc, char* args[])
                     else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_r))
                     {
                         emu.Reset();
+                    }
+                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_d))
+                    {
+                        enableOpcodeInfoPrinting = !enableOpcodeInfoPrinting;
+                        emu.GetCPU()->EnableOpcodeInfoPrinting(enableOpcodeInfoPrinting);
                     }
                     else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
                     {
