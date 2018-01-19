@@ -196,14 +196,17 @@ private:
     uint8_t _ppuMask;
     uint8_t _ppuStatus;
     uint8_t _oamAddr;
-    uint16_t _ppuScroll;
-    uint16_t _ppuAddr;
 
-    bool _writeToggle; // false: Next write to 0x2005 and 0x2006 sets upper byte, true: Next write sets lower byte
+    // http://wiki.nesdev.com/w/index.php/PPU_scrolling
+    uint16_t _v;
+    uint16_t _t;
+    uint8_t _x;
+    bool _w; // false: Next write to 0x2005 and 0x2006 sets upper byte, true: Next write sets lower byte
 
     uint8_t _readBuffer;
     int _currentScanline = -1;
-    int _ticksUntilNextScanline = 0;
+    int _scanlineCycleIndex;
+    bool _isOddFrame;
     bool _waitingToShowFrameBuffer = false;
     bool _waitToShowFrameBuffer = false; // If true, the PPU won't start rendering the next frame until GetFrameBuffer() is called
 
@@ -227,14 +230,14 @@ private:
     uint16_t ConvertToRealVRAMAddress(uint16_t address) const;
     uint8_t GetAddressIncrement() const;
     uint8_t ConvertAddressToPaletteIndex(uint16_t address) const;
-    void WriteToggleableRegister(uint16_t& reg, uint8_t value);
-    void RenderScanline(int index);
-    void RenderPixel(int x, int y, uint8_t paletteIndex);
+    void RenderPixel(int x, int y);
+    void SetPixelInFrameBuffer(int x, int y, uint8_t paletteIndex);
     uint16_t GetBkgPatternTableBaseAddress() const;
     uint16_t GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const;
+    void ClearSecondaryOAM();
     void FindSpritesInScanline(int index);
 
     // These 2 functions return kTransparentPixelColour if no opaque pixel was found
     uint8_t CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0);
-    uint8_t CalculateBkgColourAt(int screenX, int absoluteX, int absoluteY);
+    uint8_t CalculateBkgColourAt(int x, int y);
 };
