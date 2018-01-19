@@ -441,40 +441,6 @@ void PPU::SetPixelInFrameBuffer(int x, int y, uint8_t paletteIndex)
     _frameBuffer[pixelIndex] = kOutputPalette[paletteIndex];
 }
 
-uint16_t PPU::GetNametableAddress(int globalTileX, int globalTileY) const
-{
-    // This function wraps around the nametables, so if for instance the base nametable is 0,
-    // and the tile's X coordinate is out of its bounds, it'll return nametable 1's address
-    // instead. If the tile's Y coordinate is out of tile 0's bounds, it'll return nametable
-    // 2's instead. If both coordinates are out of tile 0's bounds, it'll return nametable 3
-
-    // This array contains the indices of the nametable to use if wrapping happens
-    static const uint8_t kScrollTable[9] = { 
-        0, 1, 0,
-        2, 3, 2,
-        0, 1, 0
-    };
-
-    // First get the index of the base nametable in the kScrollTable array
-    const uint8_t baseNametableValue = _ppuCtrl & 0x3; // Get lower 2 bits    
-    uint8_t scrollTableIndex = baseNametableValue > 1 ? baseNametableValue + 1 : baseNametableValue;
-    
-    // Add 1 (i.e. a tile) if X is out of bounds
-    if (globalTileX >= kTilesPerNametableRow)
-    {
-        scrollTableIndex += 1;
-    }
-
-    // Add 3 (i.e. a row) if Y is out of bounds
-    const uint8_t tilesPerNametableColumn = kVerticalResolution / kTileHeight;
-    if (globalTileY >= tilesPerNametableColumn)
-    {
-        scrollTableIndex += 3;
-    }
-    
-    return kNametable0StartAddress + kScrollTable[scrollTableIndex] * kNametableSize;
-}
-
 uint16_t PPU::GetBkgPatternTableBaseAddress() const
 {
     if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::BkgPatternTableAddress))
@@ -703,13 +669,13 @@ void PPU::VisibleScanlineTick()
         BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
         BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
 
-    if (_scanlineCycleIndex >= 1 && _scanlineCycleIndex <= 256)
+    if (_scanlineCycleIndex >= 1 && _scanlineCycleIndex <= kHorizontalResolution)
     {
         if (isRenderingEnabled)
         {
             const int xPlusScroll = _scanlineCycleIndex - 1 + _x;
             const bool gotToNextTile = (xPlusScroll >= 8) && (xPlusScroll % 8 == 0);
-            if (gotToNextTile && _scanlineCycleIndex < 256)
+            if (gotToNextTile && _scanlineCycleIndex < kHorizontalResolution)
             {
                 // "Coarse X increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
                 if ((_v & 0x001F) == 31)    // if coarse X == 31
@@ -722,7 +688,7 @@ void PPU::VisibleScanlineTick()
                     _v += 1;                // increment coarse X
                 }
             }
-            else if (_scanlineCycleIndex == 256)
+            else if (_scanlineCycleIndex == kHorizontalResolution)
             {
                 // If rendering is enabled, the PPU increments the vertical position in v.
                 // The effective Y scroll coordinate is incremented, which is a complex operation 

@@ -51,7 +51,6 @@ public:
 
     // Internal and for testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
-    uint16_t GetNametableAddress(int tileX, int tileY) const;
     int GetSpriteHeight() const;
 
 private:
@@ -96,7 +95,6 @@ private:
     
     static const int kPatternTable0Address = 0x0000;
     static const int kPatternTable1Address = 0x1000;
-    static const int kAttributeTableStartOffset = 0x3C0; // Within each Nametable (i.e. Attribute table 0 starts at kNametable0StartAddress + kAttributeTableStart)
     static const int kMirrorStartAddress = 0x3000;
     static const int kPaletteStartAddress = 0x3F00;
     static const int kUniversalBkgColourAddress = 0x3F00;
@@ -107,11 +105,8 @@ private:
     static const int kPreRenderScanline = -1;
     static const int kVisibleScanlinesStart = 0;
     static const int kVisibleScanlinesEnd = 239;
-    static const int kPostRenderScanline = 240;
     static const int kVerticalBlankingScanlinesStart = 241;
     static const int kVerticalBlankingScanlinesEnd = 260;
-    static const int kTilesPerNametableRow = 32;
-    static const int kElementsPerAttributeTableRow = 8;
     static const uint8_t kTransparentPixelColour = 255;
 
     // Each sprite is represented by 4 bytes. These are the offsets for each part of its info.
