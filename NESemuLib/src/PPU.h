@@ -197,7 +197,17 @@ private:
     uint8_t _ppuStatus;
     uint8_t _oamAddr;
 
-    // http://wiki.nesdev.com/w/index.php/PPU_scrolling
+    /*
+        http://wiki.nesdev.com/w/index.php/PPU_scrolling
+
+        The 15 bit registers t and v are composed this way during rendering:
+
+        yyy NN YYYYY XXXXX
+        ||| || ||||| +++++-- coarse X scroll
+        ||| || +++++-------- coarse Y scroll
+        ||| ++-------------- nametable select
+        +++----------------- fine Y scroll
+    */
     uint16_t _v;
     uint16_t _t;
     uint8_t _x;
@@ -240,4 +250,8 @@ private:
     // These 2 functions return kTransparentPixelColour if no opaque pixel was found
     uint8_t CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0);
     uint8_t CalculateBkgColourAt(int x, int y);
+
+    void PreRenderScanlineTick();
+    void VisibleScanlineTick();
+    void VerticalBlankingStartScanlineTick();
 };

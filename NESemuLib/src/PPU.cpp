@@ -202,17 +202,7 @@ void PPU::ResetInternal(bool fullReset)
 
 void PPU::Tick()
 {
-    /* 
-        Main reference for this function implementation: http://wiki.nesdev.com/w/index.php/PPU_rendering
-        
-        The 15 bit registers t and v are composed this way during rendering:
-
-        yyy NN YYYYY XXXXX
-        ||| || ||||| +++++-- coarse X scroll
-        ||| || +++++-------- coarse Y scroll
-        ||| ++-------------- nametable select
-        +++----------------- fine Y scroll
-    */
+    // Main reference for this function implementation: http://wiki.nesdev.com/w/index.php/PPU_rendering
 
     // Exit early if the last finished frame hasn't been shown yet to avoid tearing
     if (_waitingToShowFrameBuffer)
@@ -233,124 +223,18 @@ void PPU::Tick()
         }
     }
 
-    const bool isRenderingEnabled =
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
-
-    if (_currentScanline == -1)
+    // NOTE: Scanlines not handled here are just idle
+    if (_currentScanline == kPreRenderScanline)
     {
-        if (_scanlineCycleIndex == 1)
-        {
-            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::SpriteOverflow, false);
-            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, false);
-            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
-            ClearSecondaryOAM();
-        }
-        else if (isRenderingEnabled && _scanlineCycleIndex == 257)
-        {
-            // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v
-            _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
-        }
-        else if (isRenderingEnabled && _scanlineCycleIndex >= 280 && _scanlineCycleIndex <= 304)
-        {
-            // "If rendering is enabled, at the end of vblank, shortly after the horizontal bits are copied from 
-            // t to v at dot 257, the PPU will repeatedly copy the vertical bits from t to v from dots 280 to 304, 
-            // completing the full initialization of v from t
-            _v = (_v & 0x841F) | (_t & ~0x841F);
-        }
-        else if (_isOddFrame && _scanlineCycleIndex + 2 == kCyclesPerScanline)
-        {
-            // "For odd frames, the cycle at the end of the scanline is skipped"
-            ++_scanlineCycleIndex;
-        }
+        PreRenderScanlineTick();
     }
-    else if (_currentScanline >= 0 && _currentScanline <= 239)
+    else if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
     {
-        if (_scanlineCycleIndex >= 1 && _scanlineCycleIndex <= 256)
-        {
-            if (isRenderingEnabled)
-            {
-                const int xPlusScroll = _scanlineCycleIndex - 1 + _x;
-                const bool gotToNextTile = (xPlusScroll >= 8) && (xPlusScroll % 8 == 0);
-                if (gotToNextTile && _scanlineCycleIndex < 256)
-                {
-                    // "Coarse X increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
-                    if ((_v & 0x001F) == 31)    // if coarse X == 31
-                    {
-                        _v &= ~0x001F;          // coarse X = 0
-                        _v ^= 0x0400;           // switch horizontal nametable
-                    }
-                    else
-                    {
-                        _v += 1;                // increment coarse X
-                    }
-                }
-                else if (_scanlineCycleIndex == 256)
-                {
-                    // If rendering is enabled, the PPU increments the vertical position in v.
-                    // The effective Y scroll coordinate is incremented, which is a complex operation 
-                    // that will correctly skip the attribute table memory regions, and wrap to the next nametable appropriately
-                    // See "Y increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
-                    if ((_v & 0x7000) != 0x7000)            // if fine Y < 7
-                    {
-                        _v += 0x1000;                       // increment fine Y
-                    }
-                    else
-                    {
-                        _v &= ~0x7000;                      // fine Y = 0
-                        uint16_t y = (_v & 0x03E0) >> 5;    // let y = coarse Y
-                        if (y == 29)
-                        {
-                            y = 0;                          // coarse Y = 0
-                            _v ^= 0x0800;                   // switch vertical nametable
-                        }
-                        else if (y == 31)
-                        {
-                            y = 0;                          // coarse Y = 0, nametable not switched
-                        }
-                        else
-                        {
-                            y += 1;                         // increment coarse Y
-                        }
-                        _v = (_v & ~0x03E0) | (y << 5);     // put coarse Y back into v
-                    }
-                }
-            }
-            
-            RenderPixel(_scanlineCycleIndex - 1, _currentScanline);
-        }
-        else if (_scanlineCycleIndex >= 257 && _scanlineCycleIndex <= 320)
-        {
-            if (isRenderingEnabled && _scanlineCycleIndex == 257)
-            {
-                // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-                _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
-            }
-            else if (isRenderingEnabled && _scanlineCycleIndex == 320)
-            {
-                // "The tile data for the sprites on the next scanline are fetched here."
-                FindSpritesInScanline(_currentScanline + 1);
-            }
-        }
+        VisibleScanlineTick();
     }
-    else if (_currentScanline == 241)
+    else if (_currentScanline == kVerticalBlankingScanlinesStart)
     {
-        if (_scanlineCycleIndex == 1)
-        {
-            // "The VBlank flag of the PPU is set at tick 1 (the second tick) of scanline 241..."
-            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, true);
-
-            // "...where the VBlank NMI also occurs"
-            if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
-            {
-                _cpu->ExecuteNMI();
-            }
-
-            if (_waitToShowFrameBuffer)
-            {
-                _waitingToShowFrameBuffer = true;
-            }
-        }
+        VerticalBlankingStartScanlineTick();
     }
 }
 
@@ -779,4 +663,130 @@ uint8_t PPU::CalculateBkgColourAt(int x, int y)
     }
 
     return kTransparentPixelColour;
+}
+
+void PPU::PreRenderScanlineTick()
+{
+    const bool isRenderingEnabled =
+        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
+        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
+
+    if (_scanlineCycleIndex == 1)
+    {
+        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::SpriteOverflow, false);
+        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, false);
+        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
+        ClearSecondaryOAM();
+    }
+    else if (isRenderingEnabled && _scanlineCycleIndex == 257)
+    {
+        // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v
+        _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
+    }
+    else if (isRenderingEnabled && _scanlineCycleIndex >= 280 && _scanlineCycleIndex <= 304)
+    {
+        // "If rendering is enabled, at the end of vblank, shortly after the horizontal bits are copied from 
+        // t to v at dot 257, the PPU will repeatedly copy the vertical bits from t to v from dots 280 to 304, 
+        // completing the full initialization of v from t
+        _v = (_v & 0x841F) | (_t & ~0x841F);
+    }
+    else if (_isOddFrame && _scanlineCycleIndex + 2 == kCyclesPerScanline)
+    {
+        // "For odd frames, the cycle at the end of the scanline is skipped"
+        ++_scanlineCycleIndex;
+    }
+}
+
+void PPU::VisibleScanlineTick()
+{
+    const bool isRenderingEnabled =
+        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
+        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
+
+    if (_scanlineCycleIndex >= 1 && _scanlineCycleIndex <= 256)
+    {
+        if (isRenderingEnabled)
+        {
+            const int xPlusScroll = _scanlineCycleIndex - 1 + _x;
+            const bool gotToNextTile = (xPlusScroll >= 8) && (xPlusScroll % 8 == 0);
+            if (gotToNextTile && _scanlineCycleIndex < 256)
+            {
+                // "Coarse X increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
+                if ((_v & 0x001F) == 31)    // if coarse X == 31
+                {
+                    _v &= ~0x001F;          // coarse X = 0
+                    _v ^= 0x0400;           // switch horizontal nametable
+                }
+                else
+                {
+                    _v += 1;                // increment coarse X
+                }
+            }
+            else if (_scanlineCycleIndex == 256)
+            {
+                // If rendering is enabled, the PPU increments the vertical position in v.
+                // The effective Y scroll coordinate is incremented, which is a complex operation 
+                // that will correctly skip the attribute table memory regions, and wrap to the next nametable appropriately
+                // See "Y increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
+                if ((_v & 0x7000) != 0x7000)            // if fine Y < 7
+                {
+                    _v += 0x1000;                       // increment fine Y
+                }
+                else
+                {
+                    _v &= ~0x7000;                      // fine Y = 0
+                    uint16_t y = (_v & 0x03E0) >> 5;    // let y = coarse Y
+                    if (y == 29)
+                    {
+                        y = 0;                          // coarse Y = 0
+                        _v ^= 0x0800;                   // switch vertical nametable
+                    }
+                    else if (y == 31)
+                    {
+                        y = 0;                          // coarse Y = 0, nametable not switched
+                    }
+                    else
+                    {
+                        y += 1;                         // increment coarse Y
+                    }
+                    _v = (_v & ~0x03E0) | (y << 5);     // put coarse Y back into v
+                }
+            }
+        }
+
+        RenderPixel(_scanlineCycleIndex - 1, _currentScanline);
+    }
+    else if (_scanlineCycleIndex >= 257 && _scanlineCycleIndex <= 320)
+    {
+        if (isRenderingEnabled && _scanlineCycleIndex == 257)
+        {
+            // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
+            _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
+        }
+        else if (isRenderingEnabled && _scanlineCycleIndex == 320)
+        {
+            // "The tile data for the sprites on the next scanline are fetched here."
+            FindSpritesInScanline(_currentScanline + 1);
+        }
+    }
+}
+
+void PPU::VerticalBlankingStartScanlineTick()
+{
+    if (_scanlineCycleIndex == 1)
+    {
+        // "The VBlank flag of the PPU is set at tick 1 (the second tick) of scanline 241..."
+        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, true);
+
+        // "...where the VBlank NMI also occurs"
+        if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
+        {
+            _cpu->ExecuteNMI();
+        }
+
+        if (_waitToShowFrameBuffer)
+        {
+            _waitingToShowFrameBuffer = true;
+        }
+    }
 }
