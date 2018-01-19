@@ -29,6 +29,9 @@ int main(int argc, char* args[])
     }
     else
     {
+        // Download latest DB from https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
+        SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+
         window = SDL_CreateWindow(
             "NESemu",
             SDL_WINDOWPOS_UNDEFINED,
@@ -48,6 +51,10 @@ int main(int argc, char* args[])
             for (int i = 0; i < numJoysticks && i < sizeofarray(gameControllers); i++)
             {
                 gameControllers[i] = SDL_GameControllerOpen(i);
+                if (gameControllers[i] == nullptr)
+                {
+                    Log::Error("Can't open game controller %d: %s", i, SDL_GetError());
+                }
             }
 
             renderer = SDL_CreateRenderer(window, -1, 0);
