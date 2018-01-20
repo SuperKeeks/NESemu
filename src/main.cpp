@@ -107,6 +107,18 @@ int main(int argc, char* args[])
                         enableOpcodeInfoPrinting = !enableOpcodeInfoPrinting;
                         emu.GetCPU()->EnableOpcodeInfoPrinting(enableOpcodeInfoPrinting);
                     }
+                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_i))
+                    {
+                        invertAB = !invertAB;
+                        if (invertAB)
+                        {
+                            Log::Info("Inverted A and B buttons mappings");
+                        }
+                        else
+                        {
+                            Log::Info("Restored A and B buttons mappings");
+                        }
+                    }
                     else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
                     {
                         HandleKeyboardButtonEvent(SelectControllerState(e, controller1State, controller2State), e);
