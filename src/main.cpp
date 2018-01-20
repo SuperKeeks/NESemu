@@ -8,8 +8,9 @@
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
 
+Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
-void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
+void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event, bool invertAB);
 void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_Event event);
 
 int main(int argc, char* args[])
@@ -22,6 +23,7 @@ int main(int argc, char* args[])
     {
         gameControllers[i] = nullptr;
     }
+    bool invertAB = true; // Used for NES Mini controllers
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
     {
@@ -46,9 +48,9 @@ int main(int argc, char* args[])
         else
         {
             // Initialise game controllers
-            const int numJoysticks = SDL_NumJoysticks();
-            Log::Info("%d joysticks were found.\n", numJoysticks);
-            for (int i = 0; i < numJoysticks && i < sizeofarray(gameControllers); i++)
+            const int gameControllerCount = SDL_NumJoysticks();
+            Log::Info("%d joysticks were found.\n", gameControllerCount);
+            for (int i = 0; i < gameControllerCount && i < sizeofarray(gameControllers); i++)
             {
                 gameControllers[i] = SDL_GameControllerOpen(i);
                 if (gameControllers[i] == nullptr)
@@ -107,15 +109,15 @@ int main(int argc, char* args[])
                     }
                     else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
                     {
-                        HandleKeyboardButtonEvent(controller1State, e);
+                        HandleKeyboardButtonEvent(SelectControllerState(e, controller1State, controller2State), e);
                     }
                     else if (e.type == SDL_CONTROLLERBUTTONDOWN || e.type == SDL_CONTROLLERBUTTONUP)
                     {
-                        HandleGameControllerButtonEvent(controller2State, e);
+                        HandleGameControllerButtonEvent(SelectControllerState(e, controller1State, controller2State), e, invertAB);
                     }
                     else if (e.type == SDL_CONTROLLERAXISMOTION)
                     {
-                        HandleGameControllerAxisEvent(controller2State, e);
+                        HandleGameControllerAxisEvent(SelectControllerState(e, controller1State, controller2State), e);
                     }
                 }
 
@@ -148,6 +150,31 @@ int main(int argc, char* args[])
     SDL_Quit();
 
     return 0;
+}
+
+Input::ControllerState& SelectControllerState(
+    SDL_Event event,
+    Input::ControllerState& controllerState1, 
+    Input::ControllerState& controllerState2)
+{
+    if (event.type == SDL_CONTROLLERBUTTONDOWN || 
+        event.type == SDL_CONTROLLERBUTTONUP || 
+        event.type == SDL_CONTROLLERAXISMOTION)
+    {
+        if (event.cdevice.which == 0)
+        {
+            return controllerState1;
+        }
+        else
+        {
+            return controllerState2;
+        }
+    }
+    else
+    {
+        // The keyboard always maps to player 1
+        return controllerState1;
+    }
 }
 
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event)
@@ -187,7 +214,7 @@ void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Even
     }
 }
 
-void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event)
+void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event, bool invertAB)
 {
     bool keyState = false;
     if (event.type == SDL_CONTROLLERBUTTONDOWN)
@@ -198,10 +225,25 @@ void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SD
     switch (event.cbutton.button)
     {
         case SDL_CONTROLLER_BUTTON_A:
-            controllerState.A = keyState;
+            if (invertAB)
+            {
+                controllerState.B = keyState;
+            }
+            else
+            {
+                controllerState.A = keyState;
+            }
             break;
+        case SDL_CONTROLLER_BUTTON_B:
         case SDL_CONTROLLER_BUTTON_X:
-            controllerState.B = keyState;
+            if (invertAB)
+            {
+                controllerState.A = keyState;
+            }
+            else
+            {
+                controllerState.B = keyState;
+            }
             break;
         case SDL_CONTROLLER_BUTTON_BACK:
             controllerState.Select = keyState;
