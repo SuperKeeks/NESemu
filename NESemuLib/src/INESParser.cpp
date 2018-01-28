@@ -31,7 +31,7 @@ void INESParser::Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom)
     }
 
     // PRG-ROM
-    const size_t prgROMSize = 16384 * GetPRGROMPageCount();
+    const size_t prgROMSize = PRGROM::kPRGROMPageSize * GetPRGROMPageCount();
     OMBAssert(prgROMSize <= PRGROM::kMaxPRGROMSize, "Trying to load PRG-ROM bigger than it is supported");
     const size_t readPRGROMSize = fread_s(prgRom.GetROMPtr(), PRGROM::kMaxPRGROMSize, sizeof(uint8_t), prgROMSize, file);
     OMBAssert(readPRGROMSize == prgROMSize, "Unexpected PRG-ROM size");

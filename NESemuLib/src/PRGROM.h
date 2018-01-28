@@ -5,7 +5,8 @@
 class PRGROM : public MemoryHandler
 {
 public:
-    static const uint16_t kMaxPRGROMSize = 32768;
+    static const uint16_t kPRGROMPageSize = 16384;
+    static const uint16_t kMaxPRGROMSize = 2 * kPRGROMPageSize;
     static const uint16_t kStartAddress = 0x8000;
 
     PRGROM();
