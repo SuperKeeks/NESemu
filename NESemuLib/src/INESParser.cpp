@@ -3,7 +3,7 @@
 #include "Assert.h"
 #include "CHRROM.h"
 #include "LogUtils.h"
-#include "ROM.h"
+#include "PRGROM.h"
 #include "SizeOfArray.h"
 
 #include <cstdlib>
@@ -13,7 +13,7 @@ INESParser::~INESParser()
 {
 }
 
-void INESParser::Parse(const char* path, ROM& rom, CHRROM& chrRom)
+void INESParser::Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom)
 {
     FILE* file;
     fopen_s(&file, path, "rb");
@@ -32,10 +32,10 @@ void INESParser::Parse(const char* path, ROM& rom, CHRROM& chrRom)
 
     // PRG-ROM
     const size_t prgROMSize = 16384 * GetPRGROMPageCount();
-    OMBAssert(prgROMSize <= ROM::kMaxROMSize, "Trying to load PRG-ROM bigger than it is supported");
-    const size_t readPRGROMSize = fread_s(rom.GetROMPtr(), ROM::kMaxROMSize, sizeof(uint8_t), prgROMSize, file);
+    OMBAssert(prgROMSize <= PRGROM::kMaxPRGROMSize, "Trying to load PRG-ROM bigger than it is supported");
+    const size_t readPRGROMSize = fread_s(prgRom.GetROMPtr(), PRGROM::kMaxPRGROMSize, sizeof(uint8_t), prgROMSize, file);
     OMBAssert(readPRGROMSize == prgROMSize, "Unexpected PRG-ROM size");
-    rom.SetIs16KBROM(GetPRGROMPageCount() == 1);
+    prgRom.SetIs16KBROM(GetPRGROMPageCount() == 1);
 
     // CHR-ROM
     const size_t chrROMSize = CHRROM::kPageCHRROMSize * GetCHRROMPageCount();

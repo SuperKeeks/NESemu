@@ -16,7 +16,7 @@ NESemu::~NESemu()
 
 void NESemu::Load(const char* path)
 {
-    _parser.Parse(path, _hw.rom, _hw.chrRom);
+    _parser.Parse(path, _hw.prgRom, _hw.chrRom);
     _parser.PrintInfo();
     _hw.sram.SetEnabled(_parser.IsSRAMEnabled());
 
@@ -43,13 +43,13 @@ void NESemu::Load(const char* path)
 
 void NESemu::Load(const uint8_t rom[], uint16_t romSize)
 {
-    OMBAssert(romSize == ROM::kMaxROMSize || romSize == ROM::kMaxROMSize / 2, "Unsupported ROM size");
+    OMBAssert(romSize == PRGROM::kMaxPRGROMSize || romSize == PRGROM::kMaxPRGROMSize / 2, "Unsupported ROM size");
     _mapper = new IM000_NROM(_hw);
     for (int i = 0; i < romSize; ++i)
     {
-        _hw.rom.GetROMPtr()[i] = rom[i];
+        _hw.prgRom.GetROMPtr()[i] = rom[i];
     }
-    _hw.rom.SetIs16KBROM(romSize == ROM::kMaxROMSize / 2);
+    _hw.prgRom.SetIs16KBROM(romSize == PRGROM::kMaxPRGROMSize / 2);
 
     Reset();
 }

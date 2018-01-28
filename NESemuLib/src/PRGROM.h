@@ -2,14 +2,14 @@
 
 #include "MemoryHandler.h"
 
-class ROM : public MemoryHandler
+class PRGROM : public MemoryHandler
 {
 public:
-    static const uint16_t kMaxROMSize = 32768;
+    static const uint16_t kMaxPRGROMSize = 32768;
     static const uint16_t kStartAddress = 0x8000;
 
-    ROM();
-    virtual ~ROM();
+    PRGROM();
+    virtual ~PRGROM();
 
     virtual uint8_t ReadMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
@@ -17,11 +17,11 @@ public:
     virtual void Reset();
 
     // For ROM parsing only
-    uint8_t* GetROMPtr() { return _rom; }
+    uint8_t* GetROMPtr() { return _prgRom; }
     void SetIs16KBROM(bool is16KROM) { _is16KBROM = is16KROM; }
 
 private:
-    uint8_t _rom[kMaxROMSize];
+    uint8_t _prgRom[kMaxPRGROMSize];
     bool _is16KBROM;
 
     uint16_t ConvertToIndex(uint16_t address) const;

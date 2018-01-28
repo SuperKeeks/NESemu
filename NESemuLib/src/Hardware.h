@@ -5,8 +5,8 @@
 #include "CPU.h"
 #include "Input.h"
 #include "PPU.h"
+#include "PRGROM.h"
 #include "RAM.h"
-#include "ROM.h"
 #include "SRAM.h"
 
 struct Hardware
@@ -17,7 +17,7 @@ struct Hardware
     APU apu;
     Input input;
     SRAM sram;
-    ROM rom;
+    PRGROM prgRom;
     CHRROM chrRom;
 
     void PowerOn()
@@ -28,7 +28,7 @@ struct Hardware
         apu.PowerOn();
         input.PowerOn();
         sram.PowerOn();
-        rom.PowerOn();
+        prgRom.PowerOn();
         chrRom.PowerOn();
     }
     
@@ -40,7 +40,7 @@ struct Hardware
         apu.Reset();
         input.Reset();
         sram.Reset();
-        rom.Reset();
+        prgRom.Reset();
         chrRom.Reset();
     }
 };

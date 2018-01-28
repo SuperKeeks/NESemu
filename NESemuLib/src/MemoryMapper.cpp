@@ -28,7 +28,7 @@ MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address)
     }
     else if (address >= 0x8000 && address <= 0xFFFF)
     {
-        return _hw.rom;
+        return _hw.prgRom;
     }
     else
     {

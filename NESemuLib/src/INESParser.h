@@ -5,13 +5,13 @@
 #include <stdint.h>
 
 class CHRROM;
-class ROM;
+class PRGROM;
 
 class INESParser
 {
 public:
     ~INESParser();
-    void Parse(const char* path, ROM& rom, CHRROM& chrRom);
+    void Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom);
 
     void PrintInfo() const;
     uint8_t GetPRGROMPageCount() const;

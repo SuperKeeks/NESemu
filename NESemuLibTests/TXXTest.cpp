@@ -14,9 +14,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[ROM::kMaxROMSize];
-            rom[CPU::kResetVectorAddressL - ROM::kStartAddress] = 0;
-            rom[CPU::kResetVectorAddressH - ROM::kStartAddress] = ROM::kStartAddress >> 8;
+            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            rom[CPU::kResetVectorAddressL - PRGROM::kStartAddress] = 0;
+            rom[CPU::kResetVectorAddressH - PRGROM::kStartAddress] = PRGROM::kStartAddress >> 8;
             int cycles;
             int codeIndex = 0;
 
@@ -27,7 +27,7 @@ namespace NESemuLibTests
             rom[codeIndex++] = 0xA8; // TAY
             rom[codeIndex++] = 0x98; // TYA
 
-            emu.Load(rom, ROM::kMaxROMSize);
+            emu.Load(rom, PRGROM::kMaxPRGROMSize);
 
             // TXS
             cpu.SetX(0x66);
