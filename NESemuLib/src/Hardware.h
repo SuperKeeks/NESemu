@@ -4,7 +4,6 @@
 #include "CHRROM.h"
 #include "CPU.h"
 #include "Input.h"
-#include "MM5.h"
 #include "PPU.h"
 #include "RAM.h"
 #include "ROM.h"
@@ -17,7 +16,6 @@ struct Hardware
     PPU ppu;
     APU apu;
     Input input;
-    MM5 mm5;
     SRAM sram;
     ROM rom;
     CHRROM chrRom;
@@ -29,7 +27,6 @@ struct Hardware
         ppu.PowerOn();
         apu.PowerOn();
         input.PowerOn();
-        mm5.PowerOn();
         sram.PowerOn();
         rom.PowerOn();
         chrRom.PowerOn();
@@ -42,7 +39,6 @@ struct Hardware
         ppu.Reset(memoryMapper, &cpu, &chrRom, mirroringMode);
         apu.Reset();
         input.Reset();
-        mm5.Reset();
         sram.Reset();
         rom.Reset();
         chrRom.Reset();

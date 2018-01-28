@@ -22,10 +22,6 @@ MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address)
     {
         return _hw.input;
     }
-    else if (address >= 0x5000 && address < 0x6000)
-    {
-        return _hw.mm5;
-    }
     else if (address >= 0x6000 && address < 0x8000)
     {
         return _hw.sram;

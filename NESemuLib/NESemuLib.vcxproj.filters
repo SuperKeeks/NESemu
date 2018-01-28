@@ -5,7 +5,6 @@
     <ClCompile Include="src\CPU.cpp" />
     <ClCompile Include="src\INESParser.cpp" />
     <ClCompile Include="src\Input.cpp" />
-    <ClCompile Include="src\MM5.cpp" />
     <ClCompile Include="src\NESemu.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
@@ -152,7 +151,6 @@
     <ClInclude Include="src\INESParser.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\MemoryHandler.h" />
-    <ClInclude Include="src\MM5.h" />
     <ClInclude Include="src\NESemu.h" />
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\RAM.h" />
