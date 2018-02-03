@@ -8,6 +8,12 @@
 class MemoryMapper
 {
 public:
+    enum AccessMode
+    {
+        Read,
+        Write
+    };
+
     MemoryMapper(Hardware& hw);
     virtual ~MemoryMapper() {}
     virtual uint8_t ReadMem(uint16_t address) = 0;
@@ -16,5 +22,5 @@ public:
 protected:
     Hardware& _hw;
 
-    MemoryHandler& GetMemoryHandlerForAddress(uint16_t address);
+    MemoryHandler& GetMemoryHandlerForAddress(uint16_t address, AccessMode mode);
 };

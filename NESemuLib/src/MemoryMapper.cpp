@@ -4,7 +4,7 @@ MemoryMapper::MemoryMapper(Hardware& hw) : _hw(hw)
 {
 }
 
-MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address)
+MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address, AccessMode mode)
 {
     if (address >= 0x0 && address < 0x2000)
     {
@@ -14,11 +14,11 @@ MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address)
     {
         return _hw.ppu;
     }
-    else if ((address >= 0x4000 && address < 0x4014) || address == 0x4015)
+    else if ((address >= 0x4000 && address < 0x4014) || address == 0x4015 || (address == 0x4017 && mode == AccessMode::Write))
     {
         return _hw.apu;
     }
-    else if (address == 0x4016 || address == 0x4017)
+    else if (address == 0x4016 || (address == 0x4017 && mode == AccessMode::Read))
     {
         return _hw.input;
     }

@@ -30,17 +30,14 @@ uint8_t Input::ReadMem(uint16_t address)
 
 void Input::WriteMem(uint16_t address, uint8_t value)
 {
-    OMBAssert(address == kController1Address || address == kController2Address, "Address %#06x is not part of Input!", address);
+    OMBAssert(address == kController1Address, "Address %#06x is not part of Input!", address);
 
-    if (address == kController1Address)
+    if (_strobe == 0x1 && value == 0x0)
     {
-        if (_strobe == 0x1 && value == 0x0)
-        {
-            _current4016Index = 0;
-            _current4017Index = 0;
-        }
-        _strobe = value;
+        _current4016Index = 0;
+        _current4017Index = 0;
     }
+    _strobe = value;
 }
 
 void Input::PowerOn()
