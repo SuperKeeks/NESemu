@@ -51,6 +51,7 @@ public:
     void Tick();
     int ExecuteNextInstruction(); // Returns number of CPU cycles taken
     void ExecuteNMI();
+    void ExecuteIRQ();
 
     // Internal or for testing purposes (hence the publicness) Don't use these without a good reason
     uint16_t GetProgramCounter() const { return _programCounter; }
@@ -93,6 +94,8 @@ private:
     uint8_t GetLowByte(uint16_t value) const;
     uint8_t GetHighByte(uint16_t value) const;
     bool IsValueNegative(uint8_t value) const;
+
+    void Interrupt(bool breakFlagValue, uint16_t jumpAddressL);
 
     int LDA(AddressingMode mode);
     int LDX(AddressingMode mode);

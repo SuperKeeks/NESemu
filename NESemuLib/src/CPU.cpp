@@ -238,15 +238,30 @@ int CPU::ExecuteNextInstruction()
     };
 }
 
-void CPU::ExecuteNMI()
+void CPU::Interrupt(bool breakFlagValue, uint16_t jumpAddressL)
 {
-    const uint8_t statusPlusBFlag = _status | (1 << Flag::Break) | (1 << Flag::Unused);
+    uint8_t newStatus = _status | (1 << Flag::Unused);
+    BitwiseUtils::SetFlag(newStatus, Flag::Break, breakFlagValue);
     Push(GetHighByte(_programCounter));
     Push(GetLowByte(_programCounter));
-    Push(statusPlusBFlag);
+    Push(newStatus);
     SetFlag(Flag::InterruptDisable, true);
-    _programCounter = _memoryMapper->ReadMem(kNMIVectorAddressL) +
-        (_memoryMapper->ReadMem(kNMIVectorAddressH) << 8) - 1;
+    _programCounter = _memoryMapper->ReadMem(jumpAddressL) +
+        (_memoryMapper->ReadMem(jumpAddressL + 1) << 8) - 1;
+}
+
+void CPU::ExecuteNMI()
+{
+    Interrupt(false, kNMIVectorAddressL);
+}
+
+void CPU::ExecuteIRQ()
+{
+    if (!GetFlag(Flag::InterruptDisable))
+    {
+        OMBAssert(false, "Untested, verify!");
+        Interrupt(false, kInterruptBreakVectorAddressL);
+    }
 }
 
 void CPU::SetAccumulator(uint8_t value)
