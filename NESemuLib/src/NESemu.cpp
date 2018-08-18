@@ -76,9 +76,9 @@ void NESemu::Update(double delta)
     }
 #endif
 
+    // PPU and CPU update
     const double masterDelta = kMasterClockSpeed * delta;
     const uint64_t ppuDelta = (uint64_t)std::round(masterDelta / 4); // The PPU runs 4x slower than the master clock
-
     for (int i = 0; i < ppuDelta; ++i)
     {
         if (i % 3 == 0)
@@ -87,6 +87,13 @@ void NESemu::Update(double delta)
         }
 
         _hw.ppu.Tick();
+    }
+
+    // APU update
+    const double apuDelta = APU::kFrameCounterFrequency * delta;
+    for (int i = 0; i < apuDelta; ++i)
+    {
+        _hw.apu.Tick();
     }
 }
 
