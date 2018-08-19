@@ -25,7 +25,7 @@ int main(int argc, char* args[])
     }
     bool invertAB = true; // Used for NES Mini controllers
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0)
     {
         Log::Error("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
@@ -59,8 +59,41 @@ int main(int argc, char* args[])
                 }
             }
 
+            // Rendering initialisation
             renderer = SDL_CreateRenderer(window, -1, 0);
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
+
+            // Audio initialisation
+            int samplesPerSecond = 48000;
+            int channelCount = 1;
+            int fps = 60;
+            int bytesPerSample = sizeof(int16_t) * channelCount;
+
+            SDL_AudioSpec audioSettings = { 0 };
+            audioSettings.freq = samplesPerSecond;
+            audioSettings.format = AUDIO_S16LSB;
+            audioSettings.channels = channelCount;
+            audioSettings.samples = (samplesPerSecond * bytesPerSample / fps) / 2;
+            //audioSettings.callback = &SDLAudioCallback;
+
+            int toneHz = 256;
+            int16_t toneVolume = 500;
+            uint32_t runningSampleIndex = 0;
+            int bytesToWrite = (samplesPerSecond / fps) * bytesPerSample;
+            int sampleCount = bytesToWrite / bytesPerSample;
+            int squareWavePeriod = samplesPerSecond / toneHz;
+            int halfSquareWavePeriod = squareWavePeriod / 2;
+
+            SDL_OpenAudio(&audioSettings, 0);
+
+            Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
+            if (audioSettings.format != AUDIO_S16LSB)
+            {
+                Log::Error("Got an unexpected audio format");
+                SDL_CloseAudio();
+            }
+
+            SDL_PauseAudio(0);
 
             bool quit = false;
             SDL_Event e;
@@ -143,6 +176,47 @@ int main(int argc, char* args[])
                     SDL_RenderCopy(renderer, texture, NULL, NULL);
                     SDL_RenderPresent(renderer);
                 }
+
+                // Audio test
+                APU* apu = emu.GetAPU();
+                //const double apuOutput = apu->GenerateOutput();
+                
+                /*void* soundBuffer = malloc(bytesToWrite);
+                int16_t* sampleOut = (int16_t*)soundBuffer;
+
+                for (int sampleIndex = 0;
+                    sampleIndex < sampleCount;
+                    ++sampleIndex)
+                {
+                    int16_t sampleValue = ((runningSampleIndex++ / halfSquareWavePeriod) % 2) ? toneVolume : -toneVolume;
+
+                    for (int channelIndex = 0; channelIndex < channelCount; ++channelIndex)
+                    {
+                        *sampleOut++ = sampleValue;
+                        //*sampleOut++ = (int16_t)(apuOutput * toneVolume);
+                    }
+                }
+                
+                SDL_QueueAudio(1, soundBuffer, bytesToWrite);*/
+
+                const int bufferFilledLength = apu->GetBufferFilledLength();
+                double* buffer = apu->GetBuffer();
+                void* soundBuffer = malloc(bufferFilledLength * bytesPerSample);
+                int16_t* sampleOut = (int16_t*)soundBuffer;
+                for (int i = 0; i < bufferFilledLength; ++i)
+                {
+                    *sampleOut++ = (int16_t)(buffer[i] * toneVolume);
+                }
+                apu->ClearBuffer();
+
+                //Log::Info("Queued audio size: %d", SDL_GetQueuedAudioSize(1));
+                
+                if (bufferFilledLength > 0)
+                {
+                    SDL_QueueAudio(1, soundBuffer, bufferFilledLength);
+                }
+
+                free(soundBuffer);
             }
         }
     }
@@ -155,6 +229,7 @@ int main(int argc, char* args[])
         }
     }
 
+    SDL_CloseAudio();
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

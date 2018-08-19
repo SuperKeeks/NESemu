@@ -152,6 +152,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
+    <ClInclude Include="src\apu\AudioChannel.h" />
+    <ClInclude Include="src\apu\Divider.h" />
+    <ClInclude Include="src\apu\Envelope.h" />
+    <ClInclude Include="src\apu\SquareChannel.h" />
     <ClInclude Include="src\Assert.h" />
     <ClInclude Include="src\BitwiseUtils.h" />
     <ClInclude Include="src\CHRROM.h" />
@@ -175,6 +179,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\APU.cpp" />
+    <ClCompile Include="src\apu\Divider.cpp" />
+    <ClCompile Include="src\apu\Envelope.cpp" />
+    <ClCompile Include="src\apu\SquareChannel.cpp" />
     <ClCompile Include="src\BitwiseUtils.cpp" />
     <ClCompile Include="src\CHRROM.cpp" />
     <ClCompile Include="src\CPU.cpp" />

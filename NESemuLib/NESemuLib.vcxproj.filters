@@ -143,6 +143,15 @@
     </ClCompile>
     <ClCompile Include="src\MemoryMapper.cpp" />
     <ClCompile Include="src\PRGROM.cpp" />
+    <ClCompile Include="src\apu\SquareChannel.cpp">
+      <Filter>apu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\apu\Envelope.cpp">
+      <Filter>apu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\apu\Divider.cpp">
+      <Filter>apu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -170,6 +179,18 @@
       <Filter>mappers</Filter>
     </ClInclude>
     <ClInclude Include="src\PRGROM.h" />
+    <ClInclude Include="src\apu\AudioChannel.h">
+      <Filter>apu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\apu\SquareChannel.h">
+      <Filter>apu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\apu\Envelope.h">
+      <Filter>apu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\apu\Divider.h">
+      <Filter>apu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -177,6 +198,9 @@
     </Filter>
     <Filter Include="opcodes">
       <UniqueIdentifier>{f1cceb9e-82fc-455b-90fa-c3adb410ec77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="apu">
+      <UniqueIdentifier>{770ed666-7638-4785-83b3-63dbeabae332}</UniqueIdentifier>
     </Filter>
     <Filter Include="mappers">
       <UniqueIdentifier>{65d5cfba-5121-44ea-bdee-674462aecee4}</UniqueIdentifier>

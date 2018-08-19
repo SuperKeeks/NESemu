@@ -2,13 +2,13 @@
 
 #include "MemoryHandler.h"
 
+#include "apu\SquareChannel.h"
+
 class CPU;
 
 class APU : public MemoryHandler
 {
 public:
-    static const int kFrameCounterFrequency = 240; // Hz
-
     APU();
     virtual ~APU();
 
@@ -18,6 +18,9 @@ public:
     virtual void Reset(CPU* cpu);
 
     void Tick();
+    double* GetBuffer();
+    int GetBufferFilledLength() const;
+    void ClearBuffer();
 
 private:
     enum StatusFlags
@@ -41,8 +44,22 @@ private:
         FiveStep
     };
 
-    CPU* m_cpu;
-    FrameCounterMode m_frameCounterMode;
-    bool m_irqEnabled;
-    uint8_t m_frameCounter;
+    CPU* _cpu;
+    FrameCounterMode _frameCounterMode;
+    bool _irqEnabled;
+    int _cpuCycles;
+    bool _isEvenCPUCycle;
+    double _outputBuffer[4096];
+    int _nextBufferIndex;
+    int _cyclesSinceLastSample;
+
+    // Channels
+    SquareChannel _squareChannel1;
+    SquareChannel _squareChannel2;
+
+    void ResetCPUCycles();
+    void TrySetInterruptFlag();
+    void QuarterFrameTick();
+    void HalfFrameTick();
+    double GenerateSample();
 };

@@ -83,17 +83,12 @@ void NESemu::Update(double delta)
     {
         if (i % 3 == 0)
         {
-            _hw.cpu.Tick(); // For every 3 PPU cycles, the CPU runs one
+            // For every 3 PPU cycles, the CPU and APU run one
+            _hw.cpu.Tick();
+            _hw.apu.Tick();
         }
 
         _hw.ppu.Tick();
-    }
-
-    // APU update
-    const double apuDelta = APU::kFrameCounterFrequency * delta;
-    for (int i = 0; i < apuDelta; ++i)
-    {
-        _hw.apu.Tick();
     }
 }
 

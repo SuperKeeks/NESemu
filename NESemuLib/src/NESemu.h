@@ -22,6 +22,7 @@ public:
 
     CPU* GetCPU() { return &_hw.cpu; }
     PPU* GetPPU() { return &_hw.ppu; }
+    APU* GetAPU() { return &_hw.apu; }
 
     uint8_t ReadMem(uint16_t address);
     void WriteMem(uint16_t address, uint8_t value);
