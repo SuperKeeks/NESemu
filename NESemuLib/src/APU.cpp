@@ -6,7 +6,9 @@
 #include "LogUtils.h"
 #include "SizeOfArray.h"
 
-APU::APU()
+APU::APU() : 
+    _squareChannel1(1),
+    _squareChannel2(2)
 {
 }
 

@@ -20,7 +20,7 @@ void Divider::SetPeriod(int period)
     _period = period;
 }
 
-void Divider::ReloadCounter()
+void Divider::Reset()
 {
     _counter = _period;
 }
@@ -29,7 +29,7 @@ bool Divider::Tick()
 {
     if (_counter == 0)
     {
-        ReloadCounter();
+        Reset();
         return true;
     }
     else
@@ -37,4 +37,9 @@ bool Divider::Tick()
         --_counter;
         return false;
     }
+}
+
+int Divider::GetValue() const
+{
+    return _counter;
 }

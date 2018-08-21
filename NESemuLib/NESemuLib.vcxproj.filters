@@ -152,6 +152,9 @@
     <ClCompile Include="src\apu\Divider.cpp">
       <Filter>apu</Filter>
     </ClCompile>
+    <ClCompile Include="src\apu\Sweep.cpp">
+      <Filter>apu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -189,6 +192,9 @@
       <Filter>apu</Filter>
     </ClInclude>
     <ClInclude Include="src\apu\Divider.h">
+      <Filter>apu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\apu\Sweep.h">
       <Filter>apu</Filter>
     </ClInclude>
   </ItemGroup>

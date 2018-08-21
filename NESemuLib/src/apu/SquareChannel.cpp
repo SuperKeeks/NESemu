@@ -3,6 +3,10 @@
 #include "BitwiseUtils.h"
 #include "LogUtils.h"
 
+SquareChannel::SquareChannel(int channelNumber) : _channelNumber(channelNumber)
+{
+}
+
 void SquareChannel::WriteMem(uint16_t address, uint8_t value)
 {
     if (address == 0x4000 || address == 0x4004)
@@ -15,7 +19,11 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x4001 || address == 0x4005)
     {
-        // TODO
+        const bool enabled = BitwiseUtils::GetBitRange(value, 7, 1) == 1;
+        const int sweepPeriod = BitwiseUtils::GetBitRange(value, 6, 3);
+        const bool negateFlag = BitwiseUtils::GetBitRange(value, 3, 1) == 1;
+        const int shiftCount = BitwiseUtils::GetBitRange(value, 2, 3);
+        _sweep.SetParameters(_channelNumber, enabled, sweepPeriod, negateFlag, shiftCount);
     }
     else if (address == 0x4002 || address == 0x4006)
     {
@@ -73,7 +81,8 @@ void SquareChannel::QuarterFrameTick()
 
 void SquareChannel::HalfFrameTick()
 {
-    // TODO: Length counter Tick() and sweep Tick()    
+    // TODO: Length counter Tick()
+    _sweep.Tick(_timer);
 }
 
 int SquareChannel::GetOutput() const
@@ -81,6 +90,28 @@ int SquareChannel::GetOutput() const
     const int envelopeOutput = _envelope.GetOutput();
 
     // TODO: Sweep and length counter
-    int output = envelopeOutput * dutyValues[_duty][_sequencerStep];
-    return output;
+
+    // From http://wiki.nesdev.com/w/index.php/APU_Pulse:
+    // The mixer receives the current envelope volume except when:
+    // The sequencer output is zero, or
+    // overflow from the sweep unit's adder is silencing the channel, or
+    // the length counter is zero, or
+    // the timer has a value less than eight.
+    if (_sweep.HasOverflowed())
+    {
+        return 0;
+    }
+    else if (_timer.GetValue() < 8)
+    {
+        return 0;
+    }
+    else if (false)
+    {
+        // TODO: Check if length counter is zero
+        return 0;
+    }
+    else
+    {
+        return envelopeOutput * dutyValues[_duty][_sequencerStep];
+    }
 }

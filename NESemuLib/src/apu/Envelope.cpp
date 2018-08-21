@@ -34,7 +34,7 @@ void Envelope::Tick()
     {
         _startFlag = false;
         _decayLevelCounter = kDecayLevelCounterReloadValue;
-        _divider.ReloadCounter();
+        _divider.Reset();
     }
     else
     {
