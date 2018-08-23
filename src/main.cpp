@@ -7,6 +7,7 @@
 
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
+const int AUDIO_FREQUENCY = 48000;
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
@@ -64,30 +65,25 @@ int main(int argc, char* args[])
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
 
             // Audio initialisation
-            int samplesPerSecond = 48000;
-            int channelCount = 1;
-            int bytesPerSample = sizeof(int16_t) * channelCount;
-
+            const int bytesPerSample = sizeof(int16_t);
             SDL_AudioSpec audioSettings;
             SDL_zero(audioSettings);
-            audioSettings.freq = samplesPerSecond;
+            audioSettings.freq = AUDIO_FREQUENCY;
             audioSettings.format = AUDIO_S16LSB;
-            audioSettings.channels = channelCount;
+            audioSettings.channels = 1;
             audioSettings.samples = 1024;
-            //audioSettings.callback = &SDLAudioCallback;
             SDL_OpenAudio(&audioSettings, 0);
 
-            Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
             if (audioSettings.format != AUDIO_S16LSB)
             {
                 Log::Error("Got an unexpected audio format");
                 SDL_CloseAudio();
             }
-
-            SDL_PauseAudio(0);
-
-            bool quit = false;
-            SDL_Event e;
+            else
+            {
+                Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
+                SDL_PauseAudio(0);
+            }
 
             NESemu emu;
             //emu.Load("arkanoid.nes");
@@ -100,7 +96,7 @@ int main(int argc, char* args[])
             //emu.Load("zelda_title.nes");            
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
-            emu.GetAPU()->SetOutputFrequency(samplesPerSecond);
+            emu.GetAPU()->SetOutputFrequency(AUDIO_FREQUENCY);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint32 now = SDL_GetTicks();
@@ -110,28 +106,30 @@ int main(int argc, char* args[])
             Input::ControllerState controller2State;
             bool enableOpcodeInfoPrinting = false;
 
+            bool quit = false;
+            SDL_Event inputEvent;
             while (!quit)
             {
                 last = now;
                 now = SDL_GetTicks();
                 deltaTime = (float)(now - last) / 1000;
 
-                while (SDL_PollEvent(&e) != 0)
+                while (SDL_PollEvent(&inputEvent) != 0)
                 {
-                    if (e.type == SDL_QUIT || (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE))
+                    if (inputEvent.type == SDL_QUIT || (inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_ESCAPE))
                     {
                         quit = true;
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_r))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_r))
                     {
                         emu.Reset();
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_d))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_d))
                     {
                         enableOpcodeInfoPrinting = !enableOpcodeInfoPrinting;
                         emu.GetCPU()->EnableOpcodeInfoPrinting(enableOpcodeInfoPrinting);
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_i))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_i))
                     {
                         invertAB = !invertAB;
                         if (invertAB)
@@ -143,17 +141,17 @@ int main(int argc, char* args[])
                             Log::Info("Restored A and B buttons mappings");
                         }
                     }
-                    else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+                    else if (inputEvent.type == SDL_KEYDOWN || inputEvent.type == SDL_KEYUP)
                     {
-                        HandleKeyboardButtonEvent(SelectControllerState(e, controller1State, controller2State), e);
+                        HandleKeyboardButtonEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent);
                     }
-                    else if (e.type == SDL_CONTROLLERBUTTONDOWN || e.type == SDL_CONTROLLERBUTTONUP)
+                    else if (inputEvent.type == SDL_CONTROLLERBUTTONDOWN || inputEvent.type == SDL_CONTROLLERBUTTONUP)
                     {
-                        HandleGameControllerButtonEvent(SelectControllerState(e, controller1State, controller2State), e, invertAB);
+                        HandleGameControllerButtonEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent, invertAB);
                     }
-                    else if (e.type == SDL_CONTROLLERAXISMOTION)
+                    else if (inputEvent.type == SDL_CONTROLLERAXISMOTION)
                     {
-                        HandleGameControllerAxisEvent(SelectControllerState(e, controller1State, controller2State), e);
+                        HandleGameControllerAxisEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent);
                     }
                 }
 
@@ -177,7 +175,7 @@ int main(int argc, char* args[])
                 int16_t* sampleOut = (int16_t*)soundBuffer;
                 for (int i = 0; i < bufferFilledLength; ++i)
                 {
-                    OMBAssert(buffer[i] >= 0 && buffer[i] <= 1.0, "");
+                    OMBAssert(buffer[i] >= 0 && buffer[i] <= 1.0, "Wrong output value");
                     *sampleOut++ = (int16_t)(buffer[i] * std::numeric_limits<int16_t>::max());
                 }
                 apu->ClearBuffer();

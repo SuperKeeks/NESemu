@@ -106,14 +106,16 @@ int SquareChannel::GetOutput() const
 
     const int envelopeOutput = _envelope.GetOutput();
 
-    // TODO: Sweep and length counter
-
     // From http://wiki.nesdev.com/w/index.php/APU_Pulse:
     // The mixer receives the current envelope volume except when:
     // The sequencer output is zero, or
     // overflow from the sweep unit's adder is silencing the channel, or
     // the length counter is zero, or
     // the timer has a value less than eight.
+    if (dutyValues[_duty][_sequencerStep] == 0)
+    {
+        return 0;
+    }
     if (_sweep.HasOverflowed())
     {
         return 0;
@@ -128,6 +130,6 @@ int SquareChannel::GetOutput() const
     }
     else
     {
-        return envelopeOutput * dutyValues[_duty][_sequencerStep];
+        return envelopeOutput;
     }
 }
