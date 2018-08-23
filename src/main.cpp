@@ -8,6 +8,7 @@
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
 const int AUDIO_FREQUENCY = 48000;
+const int AUDIO_BUFFER_SIZE = 1024;
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
@@ -66,12 +67,13 @@ int main(int argc, char* args[])
 
             // Audio initialisation
             const int bytesPerSample = sizeof(int16_t);
+            int16_t audioOutputBuffer[AUDIO_BUFFER_SIZE];
             SDL_AudioSpec audioSettings;
             SDL_zero(audioSettings);
             audioSettings.freq = AUDIO_FREQUENCY;
             audioSettings.format = AUDIO_S16LSB;
             audioSettings.channels = 1;
-            audioSettings.samples = 1024;
+            audioSettings.samples = AUDIO_BUFFER_SIZE;
             SDL_OpenAudio(&audioSettings, 0);
 
             if (audioSettings.format != AUDIO_S16LSB)
@@ -170,22 +172,19 @@ int main(int argc, char* args[])
                 // Audio test
                 APU* apu = emu.GetAPU();
                 const int bufferFilledLength = apu->GetBufferFilledLength();
-                double* buffer = apu->GetBuffer();
-                void* soundBuffer = malloc(bufferFilledLength * bytesPerSample);
-                int16_t* sampleOut = (int16_t*)soundBuffer;
+                double* emulatorBuffer = apu->GetBuffer();
+                OMBAssert(sizeofarray(audioOutputBuffer) >= bufferFilledLength, "Emulator buffer too big for current SDL output buffer");
                 for (int i = 0; i < bufferFilledLength; ++i)
                 {
-                    OMBAssert(buffer[i] >= 0 && buffer[i] <= 1.0, "Wrong output value");
-                    *sampleOut++ = (int16_t)(buffer[i] * std::numeric_limits<int16_t>::max());
+                    OMBAssert(emulatorBuffer[i] >= 0 && emulatorBuffer[i] <= 1.0, "Wrong output value");
+                    audioOutputBuffer[i] = (int16_t)(emulatorBuffer[i] * std::numeric_limits<int16_t>::max());
                 }
                 apu->ClearBuffer();
                 
                 if (bufferFilledLength > 0)
                 {
-                    SDL_QueueAudio(1, soundBuffer, bufferFilledLength * bytesPerSample);
+                    SDL_QueueAudio(1, audioOutputBuffer, bufferFilledLength * bytesPerSample);
                 }
-
-                free(soundBuffer);
             }
         }
     }

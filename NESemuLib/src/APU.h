@@ -50,7 +50,7 @@ private:
     bool _irqEnabled;
     int _cpuCycles;
     bool _isEvenCPUCycle;
-    double _outputBuffer[4096];
+    double _outputBuffer[2048];
     int _nextBufferIndex;
     double _cyclesPerSample;
     double _cyclesSinceLastSample;
