@@ -41,6 +41,12 @@ void APU::WriteMem(uint16_t address, uint8_t value)
         _frameCounterMode = BitwiseUtils::IsFlagSet(value, FrameCounterFlags::Mode) ? FrameCounterMode::FiveStep : FrameCounterMode::FourStep;
         _irqEnabled = BitwiseUtils::IsFlagSet(value, FrameCounterFlags::IRQInhibit) ? false : true;
         ResetCPUCycles();
+
+        if (_frameCounterMode == FrameCounterMode::FiveStep)
+        {
+            QuarterFrameTick();
+            HalfFrameTick();
+        }
     }
     else if (address >= 0x4000 && address <= 0x4003)
     {
@@ -92,6 +98,8 @@ void APU::Reset(CPU* cpu)
     // TODO: Triangle
     // TODO: Noise
     // TODO: DMC
+
+    WriteMem(0x4015, 0); // "Power-up and reset have the effect of writing $00, silencing all channels."
 }
 
 void APU::SetOutputFrequency(int frequency)
