@@ -66,24 +66,15 @@ int main(int argc, char* args[])
             // Audio initialisation
             int samplesPerSecond = 48000;
             int channelCount = 1;
-            int fps = 60;
             int bytesPerSample = sizeof(int16_t) * channelCount;
 
-            SDL_AudioSpec audioSettings = { 0 };
+            SDL_AudioSpec audioSettings;
+            SDL_zero(audioSettings);
             audioSettings.freq = samplesPerSecond;
             audioSettings.format = AUDIO_S16LSB;
             audioSettings.channels = channelCount;
-            audioSettings.samples = (samplesPerSecond * bytesPerSample / fps) / 2;
+            audioSettings.samples = 1024;
             //audioSettings.callback = &SDLAudioCallback;
-
-            int toneHz = 256;
-            int16_t toneVolume = 500;
-            uint32_t runningSampleIndex = 0;
-            int bytesToWrite = (samplesPerSecond / fps) * bytesPerSample;
-            int sampleCount = bytesToWrite / bytesPerSample;
-            int squareWavePeriod = samplesPerSecond / toneHz;
-            int halfSquareWavePeriod = squareWavePeriod / 2;
-
             SDL_OpenAudio(&audioSettings, 0);
 
             Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
@@ -180,41 +171,20 @@ int main(int argc, char* args[])
 
                 // Audio test
                 APU* apu = emu.GetAPU();
-                //const double apuOutput = apu->GenerateOutput();
-                
-                /*void* soundBuffer = malloc(bytesToWrite);
-                int16_t* sampleOut = (int16_t*)soundBuffer;
-
-                for (int sampleIndex = 0;
-                    sampleIndex < sampleCount;
-                    ++sampleIndex)
-                {
-                    int16_t sampleValue = ((runningSampleIndex++ / halfSquareWavePeriod) % 2) ? toneVolume : -toneVolume;
-
-                    for (int channelIndex = 0; channelIndex < channelCount; ++channelIndex)
-                    {
-                        *sampleOut++ = sampleValue;
-                        //*sampleOut++ = (int16_t)(apuOutput * toneVolume);
-                    }
-                }
-                
-                SDL_QueueAudio(1, soundBuffer, bytesToWrite);*/
-
                 const int bufferFilledLength = apu->GetBufferFilledLength();
                 double* buffer = apu->GetBuffer();
                 void* soundBuffer = malloc(bufferFilledLength * bytesPerSample);
                 int16_t* sampleOut = (int16_t*)soundBuffer;
                 for (int i = 0; i < bufferFilledLength; ++i)
                 {
-                    *sampleOut++ = (int16_t)(buffer[i] * toneVolume);
+                    OMBAssert(buffer[i] >= 0 && buffer[i] <= 1.0, "");
+                    *sampleOut++ = (int16_t)(buffer[i] * std::numeric_limits<int16_t>::max());
                 }
                 apu->ClearBuffer();
-
-                //Log::Info("Queued audio size: %d", SDL_GetQueuedAudioSize(1));
                 
                 if (bufferFilledLength > 0)
                 {
-                    SDL_QueueAudio(1, soundBuffer, bufferFilledLength);
+                    SDL_QueueAudio(1, soundBuffer, bufferFilledLength * bytesPerSample);
                 }
 
                 free(soundBuffer);

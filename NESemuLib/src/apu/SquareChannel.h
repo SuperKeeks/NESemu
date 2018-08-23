@@ -22,14 +22,6 @@ public:
     int GetOutput() const;
 
 private:
-    // http://wiki.nesdev.com/w/index.php/APU_Pulse
-    const int dutyValues[4][8] = {
-        {0, 1, 0, 0, 0, 0, 0, 0},
-        {0, 1, 1, 0, 0, 0, 0, 0},
-        {0, 1, 1, 1, 1, 0, 0, 0},
-        {1, 0, 0, 1, 1, 1, 1, 1}
-    };
-
     int _channelNumber;
     Envelope _envelope;
     LengthCounter _lengthCounter;

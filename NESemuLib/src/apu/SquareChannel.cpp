@@ -75,10 +75,10 @@ void SquareChannel::Tick()
 {
     if (_timer.Tick())
     {
-        --_sequencerStep;
-        if (_sequencerStep < 0)
+        ++_sequencerStep;
+        if (_sequencerStep > 7)
         {
-            _sequencerStep = 7;
+            _sequencerStep = 0;
         }
     }
 }
@@ -96,6 +96,14 @@ void SquareChannel::HalfFrameTick()
 
 int SquareChannel::GetOutput() const
 {
+    // http://wiki.nesdev.com/w/index.php/APU_Pulse
+    static const int dutyValues[4][8] = {
+        { 0, 1, 0, 0, 0, 0, 0, 0 },
+        { 0, 1, 1, 0, 0, 0, 0, 0 },
+        { 0, 1, 1, 1, 1, 0, 0, 0 },
+        { 1, 0, 0, 1, 1, 1, 1, 1 }
+    };
+
     const int envelopeOutput = _envelope.GetOutput();
 
     // TODO: Sweep and length counter
