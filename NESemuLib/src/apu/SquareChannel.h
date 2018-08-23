@@ -3,6 +3,7 @@
 #include "AudioChannel.h"
 
 #include "Envelope.h"
+#include "LengthCounter.h"
 #include "Sweep.h"
 
 class SquareChannel : public AudioChannel
@@ -14,6 +15,7 @@ public:
     virtual void PowerOn();
     virtual void Reset();
 
+    void SetEnable(bool enable);
     virtual void Tick();
     virtual void QuarterFrameTick();
     virtual void HalfFrameTick();
@@ -30,6 +32,7 @@ private:
 
     int _channelNumber;
     Envelope _envelope;
+    LengthCounter _lengthCounter;
     Sweep _sweep;
     uint8_t _duty;
     int _sequencerStep;

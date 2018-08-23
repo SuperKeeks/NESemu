@@ -26,10 +26,12 @@ void APU::WriteMem(uint16_t address, uint8_t value)
 {
     if (address == 0x4015)
     {
-        // TODO
-        /*bool enablePulse1 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse1);
+        bool enablePulse1 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse1);
+        _squareChannel1.SetEnable(enablePulse1);
         bool enablePulse2 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse2);
-        bool enableTriangle = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableTriangle);
+        _squareChannel2.SetEnable(enablePulse2);
+        // TODO
+        /*bool enableTriangle = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableTriangle);
         bool enableNoise = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableNoise);
         bool enableDMC = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableDMC);*/
     }

@@ -25,7 +25,7 @@ public:
 private:
     enum StatusFlags
     {
-        EnablePulse1,
+        EnablePulse1 = 0,
         EnablePulse2,
         EnableTriangle,
         EnableNoise,

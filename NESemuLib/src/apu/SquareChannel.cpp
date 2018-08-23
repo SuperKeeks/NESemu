@@ -16,6 +16,7 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
         const bool envelopeLoopFlag = BitwiseUtils::GetBitRange(value, 5, 1) == 1;
         _duty = BitwiseUtils::GetBitRange(value, 7, 2);
         _envelope.SetParameters(envelopeLoopFlag, constantVolumeFlag, volume);
+        _lengthCounter.SetHalt(envelopeLoopFlag);
     }
     else if (address == 0x4001 || address == 0x4005)
     {
@@ -38,10 +39,14 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
         period = (period & 0xFF) | highTimerBits << 7; // Set the high 3 bits (keeping the low 8 bits)
         _timer.SetPeriod(period);
 
-        // TODO: 
+        int lenghtCounterLoad = BitwiseUtils::GetBitRange(value, 7, 5);
+        _lengthCounter.SetLoad(lenghtCounterLoad);
+
+        // From NESdev: 
         // The sequencer is immediately restarted at the first value of the current sequence. 
-        // (DONE)The envelope is also restarted. 
+        // The envelope is also restarted. 
         // The period divider is not reset.
+        _sequencerStep = 0;
         _envelope.SetStartFlag();
     }
     else
@@ -61,14 +66,19 @@ void SquareChannel::Reset()
     _sequencerStep = 0;
 }
 
+void SquareChannel::SetEnable(bool enable)
+{
+    _lengthCounter.SetEnabled(enable);
+}
+
 void SquareChannel::Tick()
 {
     if (_timer.Tick())
     {
-        ++_sequencerStep;
-        if (_sequencerStep >= 8)
+        --_sequencerStep;
+        if (_sequencerStep < 0)
         {
-            _sequencerStep = 0;
+            _sequencerStep = 7;
         }
     }
 }
@@ -76,12 +86,11 @@ void SquareChannel::Tick()
 void SquareChannel::QuarterFrameTick()
 {
     _envelope.Tick();
-    // TODO: Linear counter Tick()
 }
 
 void SquareChannel::HalfFrameTick()
 {
-    // TODO: Length counter Tick()
+    _lengthCounter.Tick();
     _sweep.Tick(_timer);
 }
 
@@ -101,13 +110,12 @@ int SquareChannel::GetOutput() const
     {
         return 0;
     }
-    else if (_timer.GetValue() < 8)
+    else if (_lengthCounter.IsZero())
     {
         return 0;
     }
-    else if (false)
+    else if (_timer.GetValue() < 8)
     {
-        // TODO: Check if length counter is zero
         return 0;
     }
     else
