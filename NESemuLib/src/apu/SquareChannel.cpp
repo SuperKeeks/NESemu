@@ -36,7 +36,7 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
     {
         int highTimerBits = BitwiseUtils::GetBitRange(value, 2, 3);
         int period = _timer.GetPeriod();
-        period = (period & 0xFF) | highTimerBits << 7; // Set the high 3 bits (keeping the low 8 bits)
+        period = (period & 0xFF) | highTimerBits << 8; // Set the high 3 bits (keeping the low 8 bits)
         _timer.SetPeriod(period);
 
         int lenghtCounterLoad = BitwiseUtils::GetBitRange(value, 7, 5);
