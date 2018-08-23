@@ -174,7 +174,7 @@ int main(int argc, char* args[])
                 const int bufferFilledLength = apu->GetBufferFilledLength();
                 double* emulatorBuffer = apu->GetBuffer();
                 OMBAssert(sizeofarray(audioOutputBuffer) >= bufferFilledLength, "Emulator buffer too big for current SDL output buffer");
-                for (int i = 0; i < bufferFilledLength; ++i)
+                for (int i = 0; i < bufferFilledLength && i < sizeofarray(audioOutputBuffer); ++i)
                 {
                     OMBAssert(emulatorBuffer[i] >= 0 && emulatorBuffer[i] <= 1.0, "Wrong output value");
                     audioOutputBuffer[i] = (int16_t)(emulatorBuffer[i] * std::numeric_limits<int16_t>::max());
