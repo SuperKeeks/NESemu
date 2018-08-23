@@ -109,6 +109,7 @@ int main(int argc, char* args[])
             //emu.Load("zelda_title.nes");            
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
+            emu.GetAPU()->SetOutputFrequency(samplesPerSecond);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint32 now = SDL_GetTicks();

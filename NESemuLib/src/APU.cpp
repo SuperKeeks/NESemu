@@ -8,7 +8,8 @@
 
 APU::APU() : 
     _squareChannel1(1),
-    _squareChannel2(2)
+    _squareChannel2(2),
+    _cyclesPerSample(0)
 {
 }
 
@@ -93,8 +94,15 @@ void APU::Reset(CPU* cpu)
     // TODO: DMC
 }
 
+void APU::SetOutputFrequency(int frequency)
+{
+    _cyclesPerSample = (21477272 / 12) / frequency; // CPU frequency divided by output frequency
+}
+
 void APU::Tick()
 {
+    OMBAssert(_cyclesPerSample > 0, "Output frequency hasn't been set");
+
     ++_cpuCycles;
     _isEvenCPUCycle = !_isEvenCPUCycle;
 
@@ -169,8 +177,7 @@ void APU::Tick()
     }
 
     ++_cyclesSinceLastSample;
-    static const int cyclesPerSample = (21477272 / 12) / 48000; // TODO: remove literals
-    if (_cyclesSinceLastSample >= cyclesPerSample)
+    if (_cyclesSinceLastSample >= _cyclesPerSample)
     {
         _cyclesSinceLastSample = 0;
         OMBAssert(_nextBufferIndex < sizeofarray(_outputBuffer), "Buffer is filled!");

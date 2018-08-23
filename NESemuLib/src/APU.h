@@ -17,6 +17,7 @@ public:
     virtual void PowerOn();
     virtual void Reset(CPU* cpu);
 
+    void SetOutputFrequency(int frequency);
     void Tick();
     double* GetBuffer();
     int GetBufferFilledLength() const;
@@ -51,7 +52,8 @@ private:
     bool _isEvenCPUCycle;
     double _outputBuffer[4096];
     int _nextBufferIndex;
-    int _cyclesSinceLastSample;
+    double _cyclesPerSample;
+    double _cyclesSinceLastSample;
 
     // Channels
     SquareChannel _squareChannel1;
