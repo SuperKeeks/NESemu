@@ -2,7 +2,8 @@
 
 #include "MemoryHandler.h"
 
-#include "apu\SquareChannel.h"
+#include "apu/SquareChannel.h"
+#include "apu/TriangleChannel.h"
 
 class CPU;
 
@@ -58,6 +59,7 @@ private:
     // Channels
     SquareChannel _squareChannel1;
     SquareChannel _squareChannel2;
+    TriangleChannel _triangleChannel;
 
     void ResetCPUCycles();
     void TrySetInterruptFlag();

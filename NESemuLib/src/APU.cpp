@@ -27,13 +27,14 @@ void APU::WriteMem(uint16_t address, uint8_t value)
 {
     if (address == 0x4015)
     {
-        bool enablePulse1 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse1);
+        const bool enablePulse1 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse1);
         _squareChannel1.SetEnable(enablePulse1);
-        bool enablePulse2 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse2);
+        const bool enablePulse2 = BitwiseUtils::IsFlagSet(value, StatusFlags::EnablePulse2);
         _squareChannel2.SetEnable(enablePulse2);
+        const bool enableTriangle = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableTriangle);
+        _triangleChannel.SetEnable(enableTriangle);
         // TODO
-        /*bool enableTriangle = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableTriangle);
-        bool enableNoise = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableNoise);
+        /*bool enableNoise = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableNoise);
         bool enableDMC = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableDMC);*/
     }
     else if (address == 0x4017)
@@ -58,7 +59,7 @@ void APU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address >= 0x4008 && address <= 0x400B)
     {
-        // TODO: Write to Triangle channel
+        _triangleChannel.WriteMem(address, value);
     }
     else if (address >= 0x400C && address <= 0x400F)
     {
@@ -78,7 +79,7 @@ void APU::PowerOn()
 {
     _squareChannel1.PowerOn();
     _squareChannel2.PowerOn();
-    // TODO: Triangle
+    _triangleChannel.PowerOn();
     // TODO: Noise
     // TODO: DMC
 }
@@ -95,7 +96,7 @@ void APU::Reset(CPU* cpu)
 
     _squareChannel1.Reset();
     _squareChannel2.Reset();
-    // TODO: Triangle
+    _triangleChannel.Reset();
     // TODO: Noise
     // TODO: DMC
 
@@ -115,7 +116,7 @@ void APU::Tick()
     _isEvenCPUCycle = !_isEvenCPUCycle;
 
     // Timer ticking
-    // TODO: Triangle Tick()
+    _triangleChannel.Tick();
     if (_isEvenCPUCycle)
     {
         _squareChannel1.Tick();
@@ -229,18 +230,17 @@ void APU::QuarterFrameTick()
 {
     _squareChannel1.QuarterFrameTick();
     _squareChannel2.QuarterFrameTick();
-    // TODO: Triangle
+    _triangleChannel.QuarterFrameTick();
     // TODO: Noise
     // TODO: DMC
 }
 
 void APU::HalfFrameTick()
 {
-    _squareChannel1.QuarterFrameTick();
+    QuarterFrameTick();
     _squareChannel1.HalfFrameTick();
-    _squareChannel2.QuarterFrameTick();
     _squareChannel2.HalfFrameTick();
-    // TODO: Triangle
+    _triangleChannel.HalfFrameTick();
     // TODO: Noise
     // TODO: DMC
 }
@@ -261,7 +261,7 @@ double APU::GenerateSample()
 
     // Triangle, Noise and DMC outputs
     double tndOutput = 0;
-    const double triangleOutput = 0; // TODO
+    const double triangleOutput = _triangleChannel.GetOutput();
     const double noiseOutput = 0; // TODO
     const double dmcOutput = 0; // TODO
     if (triangleOutput != 0 || noiseOutput != 0 || dmcOutput != 0)
