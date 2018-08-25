@@ -164,6 +164,9 @@
     <ClCompile Include="src\apu\LinearCounter.cpp">
       <Filter>apu</Filter>
     </ClCompile>
+    <ClCompile Include="src\apu\NoiseChannel.cpp">
+      <Filter>apu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -213,6 +216,9 @@
       <Filter>apu</Filter>
     </ClInclude>
     <ClInclude Include="src\apu\LinearCounter.h">
+      <Filter>apu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\apu\NoiseChannel.h">
       <Filter>apu</Filter>
     </ClInclude>
   </ItemGroup>

@@ -157,6 +157,7 @@
     <ClInclude Include="src\apu\Envelope.h" />
     <ClInclude Include="src\apu\LengthCounter.h" />
     <ClInclude Include="src\apu\LinearCounter.h" />
+    <ClInclude Include="src\apu\NoiseChannel.h" />
     <ClInclude Include="src\apu\SquareChannel.h" />
     <ClInclude Include="src\apu\Sweep.h" />
     <ClInclude Include="src\apu\TriangleChannel.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="src\apu\Envelope.cpp" />
     <ClCompile Include="src\apu\LengthCounter.cpp" />
     <ClCompile Include="src\apu\LinearCounter.cpp" />
+    <ClCompile Include="src\apu\NoiseChannel.cpp" />
     <ClCompile Include="src\apu\SquareChannel.cpp" />
     <ClCompile Include="src\apu\Sweep.cpp" />
     <ClCompile Include="src\apu\TriangleChannel.cpp" />

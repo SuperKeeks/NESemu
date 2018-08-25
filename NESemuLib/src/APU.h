@@ -2,6 +2,7 @@
 
 #include "MemoryHandler.h"
 
+#include "apu/NoiseChannel.h"
 #include "apu/SquareChannel.h"
 #include "apu/TriangleChannel.h"
 
@@ -60,6 +61,7 @@ private:
     SquareChannel _squareChannel1;
     SquareChannel _squareChannel2;
     TriangleChannel _triangleChannel;
+    NoiseChannel _noiseChannel;
 
     void ResetCPUCycles();
     void TrySetInterruptFlag();
