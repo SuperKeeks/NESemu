@@ -34,12 +34,12 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == 0x4003 || address == 0x4007)
     {
-        int highTimerBits = BitwiseUtils::GetBitRange(value, 2, 3);
+        const int highTimerBits = BitwiseUtils::GetBitRange(value, 2, 3);
         int period = _timer.GetPeriod();
         period = (period & 0xFF) | highTimerBits << 8; // Set the high 3 bits (keeping the low 8 bits)
         _timer.SetPeriod(period);
 
-        int lenghtCounterLoad = BitwiseUtils::GetBitRange(value, 7, 5);
+        const int lenghtCounterLoad = BitwiseUtils::GetBitRange(value, 7, 5);
         _lengthCounter.SetLoad(lenghtCounterLoad);
 
         // From NESdev: 
