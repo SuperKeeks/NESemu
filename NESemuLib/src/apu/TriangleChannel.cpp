@@ -36,10 +36,13 @@ void TriangleChannel::WriteMem(uint16_t address, uint8_t value)
 
 void TriangleChannel::PowerOn()
 {
+    Reset();
 }
 
 void TriangleChannel::Reset()
 {
+    _period = 0;
+    _sequencerStep = 0;
 }
 
 void TriangleChannel::SetEnable(bool enable)
