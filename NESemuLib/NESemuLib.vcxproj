@@ -154,6 +154,7 @@
     <ClInclude Include="src\APU.h" />
     <ClInclude Include="src\apu\AudioChannel.h" />
     <ClInclude Include="src\apu\Divider.h" />
+    <ClInclude Include="src\apu\DMCChannel.h" />
     <ClInclude Include="src\apu\Envelope.h" />
     <ClInclude Include="src\apu\LengthCounter.h" />
     <ClInclude Include="src\apu\LinearCounter.h" />
@@ -185,6 +186,7 @@
   <ItemGroup>
     <ClCompile Include="src\APU.cpp" />
     <ClCompile Include="src\apu\Divider.cpp" />
+    <ClCompile Include="src\apu\DMCChannel.cpp" />
     <ClCompile Include="src\apu\Envelope.cpp" />
     <ClCompile Include="src\apu\LengthCounter.cpp" />
     <ClCompile Include="src\apu\LinearCounter.cpp" />

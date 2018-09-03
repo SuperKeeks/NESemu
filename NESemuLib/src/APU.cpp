@@ -19,6 +19,7 @@ APU::~APU()
 
 uint8_t APU::ReadMem(uint16_t address)
 {
+    // TODO
     OMBAssert(false, "Unimplemented");
     return 0;
 }
@@ -35,8 +36,8 @@ void APU::WriteMem(uint16_t address, uint8_t value)
         _triangleChannel.SetEnable(enableTriangle);
         const bool enableNoise = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableNoise);
         _noiseChannel.SetEnable(enableNoise);
-        // TODO
-        /*const bool enableDMC = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableDMC);*/
+        const bool enableDMC = BitwiseUtils::IsFlagSet(value, StatusFlags::EnableDMC);
+        _dmcChannel.SetEnable(enableDMC);
     }
     else if (address == 0x4017)
     {
@@ -68,7 +69,7 @@ void APU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address >= 0x4010 && address <= 0x4013)
     {
-        // TODO: Write to DMC channel
+        _dmcChannel.WriteMem(address, value);
     }
     else
     {
@@ -82,7 +83,7 @@ void APU::PowerOn()
     _squareChannel2.PowerOn();
     _triangleChannel.PowerOn();
     _noiseChannel.PowerOn();
-    // TODO: DMC
+    _dmcChannel.PowerOn();
 }
 
 void APU::Reset(CPU* cpu)
@@ -99,7 +100,7 @@ void APU::Reset(CPU* cpu)
     _squareChannel2.Reset();
     _triangleChannel.Reset();
     _noiseChannel.Reset();
-    // TODO: DMC
+    _dmcChannel.Reset();
 
     WriteMem(0x4015, 0); // "Power-up and reset have the effect of writing $00, silencing all channels."
 }
@@ -123,7 +124,7 @@ void APU::Tick()
         _squareChannel1.Tick();
         _squareChannel2.Tick();
         _noiseChannel.Tick();
-        // TODO: DMC Tick()
+        _dmcChannel.Tick();
     }
 
     // Frame counter update
@@ -233,7 +234,7 @@ void APU::QuarterFrameTick()
     _squareChannel2.QuarterFrameTick();
     _triangleChannel.QuarterFrameTick();
     _noiseChannel.QuarterFrameTick();
-    // TODO: DMC
+    _dmcChannel.QuarterFrameTick();
 }
 
 void APU::HalfFrameTick()
@@ -243,7 +244,7 @@ void APU::HalfFrameTick()
     _squareChannel2.HalfFrameTick();
     _triangleChannel.HalfFrameTick();
     _noiseChannel.HalfFrameTick();
-    // TODO: DMC
+    _dmcChannel.HalfFrameTick();
 }
 
 double APU::GenerateSample()
@@ -264,7 +265,7 @@ double APU::GenerateSample()
     double tndOutput = 0;
     const double triangleOutput = _triangleChannel.GetOutput();
     const double noiseOutput = _noiseChannel.GetOutput();
-    const double dmcOutput = 0; // TODO
+    const double dmcOutput = _dmcChannel.GetOutput();
     if (triangleOutput != 0 || noiseOutput != 0 || dmcOutput != 0)
     {
         tndOutput = 159.79 / ((1.0 / (triangleOutput / 8227.0 + noiseOutput / 12241.0 + dmcOutput / 22638.0)) + 100);
