@@ -8,7 +8,7 @@
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
 const int AUDIO_FREQUENCY = 48000;
-const int AUDIO_BUFFER_SIZE = 1024;
+const int AUDIO_BUFFER_SIZE = 2048;
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
