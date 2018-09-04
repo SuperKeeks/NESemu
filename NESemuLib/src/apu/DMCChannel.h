@@ -2,6 +2,8 @@
 
 #include "AudioChannel.h"
 
+#include "Divider.h"
+
 class DMCChannel : public AudioChannel
 {
 public:
@@ -16,5 +18,6 @@ public:
     virtual int GetOutput() const;
 
 private:
+    Divider _timer;
     int _outputLevel;
 };
