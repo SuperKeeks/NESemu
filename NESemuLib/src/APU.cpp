@@ -86,7 +86,7 @@ void APU::PowerOn()
     _dmcChannel.PowerOn();
 }
 
-void APU::Reset(CPU* cpu)
+void APU::Reset(CPU* cpu, MemoryMapper* memoryMapper)
 {
     _cpu = cpu;
     _frameCounterMode = FrameCounterMode::FourStep;
@@ -100,7 +100,7 @@ void APU::Reset(CPU* cpu)
     _squareChannel2.Reset();
     _triangleChannel.Reset();
     _noiseChannel.Reset();
-    _dmcChannel.Reset();
+    _dmcChannel.Reset(memoryMapper);
 
     WriteMem(0x4015, 0); // "Power-up and reset have the effect of writing $00, silencing all channels."
 }
@@ -125,6 +125,12 @@ void APU::Tick()
         _squareChannel2.Tick();
         _noiseChannel.Tick();
         _dmcChannel.Tick();
+        if (_dmcChannel.IsInterruptFlagSet())
+        {
+            // "At any time, if the interrupt flag is set, the CPU's IRQ line is continuously asserted 
+            // until the interrupt flag is cleared. The processor will continue on from where it was stalled."
+            _cpu->ExecuteIRQ();
+        }
     }
 
     // Frame counter update

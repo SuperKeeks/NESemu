@@ -8,6 +8,7 @@
 #include "apu/TriangleChannel.h"
 
 class CPU;
+class MemoryMapper;
 
 class APU : public MemoryHandler
 {
@@ -18,7 +19,7 @@ public:
     virtual uint8_t ReadMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
     virtual void PowerOn();
-    virtual void Reset(CPU* cpu);
+    virtual void Reset(CPU* cpu, MemoryMapper* memoryMapper);
 
     void SetOutputFrequency(int frequency);
     void Tick();

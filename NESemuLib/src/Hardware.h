@@ -37,7 +37,7 @@ struct Hardware
         cpu.Reset(memoryMapper);
         ram.Reset();
         ppu.Reset(memoryMapper, &cpu, &chrRom, mirroringMode);
-        apu.Reset(&cpu);
+        apu.Reset(&cpu, memoryMapper);
         input.Reset();
         sram.Reset();
         prgRom.Reset();
