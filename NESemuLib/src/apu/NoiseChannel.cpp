@@ -13,6 +13,10 @@ void NoiseChannel::WriteMem(uint16_t address, uint8_t value)
         const int volumeEnvelopeDividerPeriod = BitwiseUtils::GetBitRange(value, 3, 4);
         _envelope.SetParameters(lengthCounterHaltEnvelopeLoopFlag, constantVolumeEnvelopeFlag, volumeEnvelopeDividerPeriod);
     }
+    else if (address == 0x400D)
+    {
+        // Unused
+    }
     else if (address == 0x400E)
     {
         _modeFlag = BitwiseUtils::GetBitRange(value, 7, 1);
