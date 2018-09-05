@@ -33,6 +33,10 @@ void DMCChannel::WriteMem(uint16_t address, uint8_t value)
 void DMCChannel::PowerOn()
 {
     _outputLevel = 0;
+    _remainingBits = 0;
+    _silenceFlag = true;
+    _rightShiftRegister = 0;
+    _sampleBuffer = 0;
 }
 
 void DMCChannel::Reset()
@@ -50,7 +54,50 @@ void DMCChannel::Tick()
 {
     if (_timer.Tick())
     {
+        // From: https://wiki.nesdev.com/w/index.php/APU_DMC
+        // When the timer outputs a clock, the following actions occur in order:
 
+        // 1. If the silence flag is clear, the output level changes based on bit 0 of the shift register. 
+        // If the bit is 1, add 2; otherwise, subtract 2. But if adding or subtracting 2 would cause the 
+        // output level to leave the 0-127 range, leave the output level unchanged. 
+        // This means subtract 2 only if the current level is at least 2, or add 2 only if the current level is at most 125.
+        if (!_silenceFlag)
+        {
+            if (BitwiseUtils::GetBitRange(_rightShiftRegister, 0, 1) == 1)
+            {
+                if (_outputLevel + 2 < 128)
+                {
+                    _outputLevel += 2;
+                }
+            }
+            else
+            {
+                if (_outputLevel - 2 >= 0)
+                {
+                    _outputLevel -= 2;
+                }
+            }
+        }
+
+        // 2. The right shift register is clocked.
+        _rightShiftRegister = _rightShiftRegister >> 1;
+
+        // 3. The bits-remaining counter is decremented. If it becomes zero, a new output cycle is started.
+        --_remainingBits;
+        if (_remainingBits == 0)
+        {
+            _remainingBits = 8;
+            if (_sampleBuffer == 0)
+            {
+                _silenceFlag = true;
+            }
+            else
+            {
+                _silenceFlag = false;
+                _rightShiftRegister = _sampleBuffer;
+                _sampleBuffer = 0;
+            }
+        }
     }
 }
 

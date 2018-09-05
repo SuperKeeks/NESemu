@@ -20,4 +20,8 @@ public:
 private:
     Divider _timer;
     int _outputLevel;
+    int _remainingBits;
+    bool _silenceFlag;
+    int _rightShiftRegister;
+    int _sampleBuffer;
 };
