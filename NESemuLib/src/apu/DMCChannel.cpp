@@ -18,7 +18,7 @@ void DMCChannel::WriteMem(uint16_t address, uint8_t value)
 
         static const int rateTable[16] = { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54 };
         const int rateIndex = BitwiseUtils::GetBitRange(value, 4, 4);
-        _timer.SetPeriod(rateTable[rateIndex]);
+        _timer.SetPeriod(rateTable[rateIndex] / 2);
     }
     else if (address == 0x4011)
     {
