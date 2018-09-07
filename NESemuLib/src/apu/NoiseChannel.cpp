@@ -98,3 +98,8 @@ int NoiseChannel::GetOutput() const
         return _envelope.GetOutput();
     }
 }
+
+bool NoiseChannel::IsLengthCounterZero() const
+{
+    return _lengthCounter.IsZero();
+}

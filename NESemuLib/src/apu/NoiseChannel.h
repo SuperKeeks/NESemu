@@ -19,6 +19,8 @@ public:
     virtual void HalfFrameTick();
     virtual int GetOutput() const;
 
+    bool IsLengthCounterZero() const;
+
 private:
     Envelope _envelope;
     Divider _timer;

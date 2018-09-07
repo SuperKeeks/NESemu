@@ -51,6 +51,7 @@ private:
 
     CPU* _cpu;
     FrameCounterMode _frameCounterMode;
+    bool _frameInterruptFlag;
     bool _irqEnabled;
     int _cpuCycles;
     bool _isEvenCPUCycle;

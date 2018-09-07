@@ -133,3 +133,8 @@ int SquareChannel::GetOutput() const
         return envelopeOutput;
     }
 }
+
+bool SquareChannel::IsLengthCounterZero() const
+{
+    return _lengthCounter.IsZero();
+}

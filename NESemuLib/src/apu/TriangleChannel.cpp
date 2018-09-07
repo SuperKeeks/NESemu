@@ -76,3 +76,8 @@ int TriangleChannel::GetOutput() const
 {
     return kSequenceValues[_sequencerStep];
 }
+
+bool TriangleChannel::IsLengthCounterZero() const
+{
+    return _lengthCounter.IsZero();
+}

@@ -19,9 +19,35 @@ APU::~APU()
 
 uint8_t APU::ReadMem(uint16_t address)
 {
-    // TODO
-    OMBAssert(false, "Unimplemented");
-    return 0;
+    if (address == 0x4015)
+    {
+        const int squareChannel1Bit = _squareChannel1.IsLengthCounterZero() ? 0 : 1;
+        const int squareChannel2Bit = _squareChannel2.IsLengthCounterZero() ? 0 : 1;
+        const int triangleChannelBit = _triangleChannel.IsLengthCounterZero() ? 0 : 1;
+        const int noiseChannelBit = _noiseChannel.IsLengthCounterZero() ? 0 : 1;
+        const int dmcChannelBit = _dmcChannel.IsBytesRemainingZero() ? 0 : 1;
+        const int frameInterruptFlagBit = _frameInterruptFlag ? 1 : 0;
+        const int dmcInterruptFlagBit = _dmcChannel.IsInterruptFlagSet() ? 1 : 0;
+
+        const int value =
+            squareChannel1Bit << 0 |
+            squareChannel2Bit << 1 |
+            triangleChannelBit << 2 |
+            noiseChannelBit << 3 |
+            dmcChannelBit << 4 |
+            frameInterruptFlagBit << 6 |
+            dmcInterruptFlagBit << 7;
+
+        // "Reading this register clears the frame interrupt flag (but not the DMC interrupt flag)."
+        _frameInterruptFlag = false;
+
+        return value;
+    }
+    else
+    {
+        OMBAssert(false, "Unimplemented");
+        return 0;
+    }
 }
 
 void APU::WriteMem(uint16_t address, uint8_t value)
@@ -43,6 +69,10 @@ void APU::WriteMem(uint16_t address, uint8_t value)
     {
         _frameCounterMode = BitwiseUtils::IsFlagSet(value, FrameCounterFlags::Mode) ? FrameCounterMode::FiveStep : FrameCounterMode::FourStep;
         _irqEnabled = BitwiseUtils::IsFlagSet(value, FrameCounterFlags::IRQInhibit) ? false : true;
+        if (!_irqEnabled)
+        {
+            _frameInterruptFlag = false;
+        }
         ResetCPUCycles();
 
         if (_frameCounterMode == FrameCounterMode::FiveStep)
@@ -90,6 +120,7 @@ void APU::Reset(CPU* cpu, MemoryMapper* memoryMapper)
 {
     _cpu = cpu;
     _frameCounterMode = FrameCounterMode::FourStep;
+    _frameInterruptFlag = false;
     _irqEnabled = false;
     _isEvenCPUCycle = false;
     _nextBufferIndex = 0;
@@ -204,6 +235,11 @@ void APU::Tick()
             ++_nextBufferIndex;
         }
     }
+
+    if (_frameInterruptFlag)
+    {
+        _cpu->ExecuteIRQ();
+    }
 }
 
 double* APU::GetBuffer()
@@ -230,7 +266,7 @@ void APU::TrySetInterruptFlag()
 {
     if (_frameCounterMode == FrameCounterMode::FourStep && _irqEnabled)
     {
-        _cpu->ExecuteIRQ();
+        _frameInterruptFlag = true;
     }
 }
 

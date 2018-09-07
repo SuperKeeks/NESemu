@@ -21,6 +21,8 @@ public:
     virtual void HalfFrameTick();
     virtual int GetOutput() const;
 
+    bool IsLengthCounterZero() const;
+
 private:
     int _channelNumber;
     Envelope _envelope;

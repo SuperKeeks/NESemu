@@ -20,6 +20,7 @@ public:
     virtual int GetOutput() const;
 
     bool IsInterruptFlagSet() const;
+    bool IsBytesRemainingZero() const;
 
 private:
     Divider _timer;

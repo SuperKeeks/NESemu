@@ -91,13 +91,18 @@ void DMCChannel::HalfFrameTick()
 
 int DMCChannel::GetOutput() const
 {
-    OMBAssert(_outputLevel < 0x80, "Output level should be 7-bit!");
+    OMBAssert(_outputLevel >= 0 && _outputLevel < 0x80, "Output level should be 7-bit!");
     return _outputLevel;
 }
 
 bool DMCChannel::IsInterruptFlagSet() const
 {
     return _interruptFlag;
+}
+
+bool DMCChannel::IsBytesRemainingZero() const
+{
+    return _bytesRemaining == 0;
 }
 
 void DMCChannel::TickMemoryReader()
