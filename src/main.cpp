@@ -95,6 +95,8 @@ int main(int argc, char* args[])
             //emu.Load("mariobros.nes");
             //emu.Load("popeye.nes");
             emu.Load("smb.nes");
+            //emu.Load("dmc.nes");
+            //emu.Load("gb.nes");
             //emu.Load("zelda_title.nes");            
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
@@ -169,17 +171,16 @@ int main(int argc, char* args[])
                     SDL_RenderPresent(renderer);
                 }
 
-                // Audio test
-                APU* apu = emu.GetAPU();
-                const int bufferFilledLength = apu->GetBufferFilledLength();
-                double* emulatorBuffer = apu->GetBuffer();
+                // Audio test             
+                auto& buffer = emu.GetAPU()->GetBuffer();
+                const int bufferFilledLength = (int)buffer.GetLength();
                 OMBAssert(sizeofarray(audioOutputBuffer) >= bufferFilledLength, "Emulator buffer too big for current SDL output buffer");
                 for (int i = 0; i < bufferFilledLength && i < sizeofarray(audioOutputBuffer); ++i)
                 {
-                    OMBAssert(emulatorBuffer[i] >= 0 && emulatorBuffer[i] <= 1.0, "Wrong output value");
-                    audioOutputBuffer[i] = (int16_t)(emulatorBuffer[i] * std::numeric_limits<int16_t>::max());
+                    double sample = buffer.Read();
+                    OMBAssert(sample >= 0 && sample <= 1.0, "Wrong output value");
+                    audioOutputBuffer[i] = (int16_t)(sample * std::numeric_limits<int16_t>::max());
                 }
-                apu->ClearBuffer();
                 
                 if (bufferFilledLength > 0)
                 {

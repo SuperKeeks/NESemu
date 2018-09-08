@@ -227,6 +227,7 @@
     <ClInclude Include="src\apu\DMCChannel.h">
       <Filter>apu</Filter>
     </ClInclude>
+    <ClInclude Include="src\RingBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

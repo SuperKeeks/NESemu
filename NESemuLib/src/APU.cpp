@@ -123,7 +123,7 @@ void APU::Reset(CPU* cpu, MemoryMapper* memoryMapper)
     _frameInterruptFlag = false;
     _irqEnabled = false;
     _isEvenCPUCycle = false;
-    _nextBufferIndex = 0;
+    _outputBuffer.Reset();
     _cyclesSinceLastSample = 0;
     ResetCPUCycles();
 
@@ -228,12 +228,8 @@ void APU::Tick()
     if (_cyclesSinceLastSample >= _cyclesPerSample)
     {
         _cyclesSinceLastSample = 0;
-        OMBAssert(_nextBufferIndex < sizeofarray(_outputBuffer), "Buffer is filled!");
-        if (_nextBufferIndex < sizeofarray(_outputBuffer))
-        {
-            _outputBuffer[_nextBufferIndex] = GenerateSample();
-            ++_nextBufferIndex;
-        }
+        OMBAssert(_outputBuffer.IsFull(), "Buffer is full!");
+        _outputBuffer.Write(GenerateSample());
     }
 
     if (_frameInterruptFlag)
@@ -242,19 +238,9 @@ void APU::Tick()
     }
 }
 
-double* APU::GetBuffer()
+RingBuffer<double, APU::kBufferSize>& APU::GetBuffer()
 {
     return _outputBuffer;
-}
-
-int APU::GetBufferFilledLength() const
-{
-    return _nextBufferIndex;
-}
-
-void APU::ClearBuffer()
-{
-    _nextBufferIndex = 0;
 }
 
 void APU::ResetCPUCycles()

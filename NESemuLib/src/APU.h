@@ -6,6 +6,7 @@
 #include "apu/NoiseChannel.h"
 #include "apu/SquareChannel.h"
 #include "apu/TriangleChannel.h"
+#include "RingBuffer.h"
 
 class CPU;
 class MemoryMapper;
@@ -13,6 +14,8 @@ class MemoryMapper;
 class APU : public MemoryHandler
 {
 public:
+    static const uint64_t kBufferSize = 1024;
+
     APU();
     virtual ~APU();
 
@@ -23,7 +26,7 @@ public:
 
     void SetOutputFrequency(int frequency);
     void Tick();
-    double* GetBuffer();
+    RingBuffer<double, kBufferSize>& GetBuffer();
     int GetBufferFilledLength() const;
     void ClearBuffer();
 
@@ -55,8 +58,7 @@ private:
     bool _irqEnabled;
     int _cpuCycles;
     bool _isEvenCPUCycle;
-    double _outputBuffer[2048];
-    int _nextBufferIndex;
+    RingBuffer<double, kBufferSize> _outputBuffer;
     double _cyclesPerSample;
     double _cyclesSinceLastSample;
 
