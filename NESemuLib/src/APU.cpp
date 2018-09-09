@@ -138,7 +138,7 @@ void APU::Reset(CPU* cpu, MemoryMapper* memoryMapper)
 
 void APU::SetOutputFrequency(int frequency)
 {
-    _cyclesPerSample = (21477272 / 12) / frequency; // CPU frequency divided by output frequency
+    _cyclesPerSample = (21477272.0 / 12) / frequency; // CPU frequency divided by output frequency
 }
 
 void APU::Tick()
@@ -227,7 +227,7 @@ void APU::Tick()
     ++_cyclesSinceLastSample;
     if (_cyclesSinceLastSample >= _cyclesPerSample)
     {
-        _cyclesSinceLastSample = 0;
+        _cyclesSinceLastSample -= _cyclesPerSample;
         OMBAssert(_outputBuffer.IsFull(), "Buffer is full!");
         _outputBuffer.Write(GenerateSample());
     }
