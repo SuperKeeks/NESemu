@@ -238,7 +238,7 @@ void APU::Tick()
     }
 }
 
-RingBuffer<double, APU::kBufferSize>& APU::GetBuffer()
+APU::OutputBuffer& APU::GetBuffer()
 {
     return _outputBuffer;
 }

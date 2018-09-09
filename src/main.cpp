@@ -7,13 +7,14 @@
 
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
-const int AUDIO_FREQUENCY = 48000;
-const int AUDIO_BUFFER_SIZE = 2048;
+const int AUDIO_FREQUENCY = 44100;
+const int AUDIO_BUFFER_SIZE = 1024;
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
 void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event, bool invertAB);
 void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_Event event);
+void SDLAudioCallback(void* userData, Uint8* audioData, int length);
 
 int main(int argc, char* args[])
 {
@@ -65,28 +66,6 @@ int main(int argc, char* args[])
             renderer = SDL_CreateRenderer(window, -1, 0);
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
 
-            // Audio initialisation
-            const int bytesPerSample = sizeof(int16_t);
-            int16_t audioOutputBuffer[AUDIO_BUFFER_SIZE];
-            SDL_AudioSpec audioSettings;
-            SDL_zero(audioSettings);
-            audioSettings.freq = AUDIO_FREQUENCY;
-            audioSettings.format = AUDIO_S16LSB;
-            audioSettings.channels = 1;
-            audioSettings.samples = AUDIO_BUFFER_SIZE;
-            SDL_OpenAudio(&audioSettings, 0);
-
-            if (audioSettings.format != AUDIO_S16LSB)
-            {
-                Log::Error("Got an unexpected audio format");
-                SDL_CloseAudio();
-            }
-            else
-            {
-                Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
-                SDL_PauseAudio(0);
-            }
-
             NESemu emu;
             //emu.Load("arkanoid.nes");
             //emu.Load("color_test.nes");
@@ -97,10 +76,31 @@ int main(int argc, char* args[])
             emu.Load("smb.nes");
             //emu.Load("dmc.nes");
             //emu.Load("gb.nes");
-            //emu.Load("zelda_title.nes");            
+            //emu.Load("zelda_title.nes");
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
             emu.GetAPU()->SetOutputFrequency(AUDIO_FREQUENCY);
+
+            // Audio initialisation
+            SDL_AudioSpec audioSettings;
+            SDL_zero(audioSettings);
+            audioSettings.freq = AUDIO_FREQUENCY;
+            audioSettings.format = AUDIO_S16;
+            audioSettings.channels = 1;
+            audioSettings.samples = AUDIO_BUFFER_SIZE;
+            audioSettings.userdata = &(emu.GetAPU()->GetBuffer());
+            audioSettings.callback = &SDLAudioCallback;
+            SDL_OpenAudio(&audioSettings, 0);
+            if (audioSettings.format != AUDIO_S16)
+            {
+                Log::Error("Got an unexpected audio format");
+                SDL_CloseAudio();
+            }
+            else
+            {
+                Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
+                SDL_PauseAudio(0);
+            }
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint32 now = SDL_GetTicks();
@@ -161,7 +161,10 @@ int main(int argc, char* args[])
 
                 emu.SetControllerState(1, controller1State);
                 emu.SetControllerState(2, controller2State);
+
+                SDL_LockAudio();
                 emu.Update(deltaTime);
+                SDL_UnlockAudio();
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
                 {
@@ -169,22 +172,6 @@ int main(int argc, char* args[])
                     SDL_RenderClear(renderer);
                     SDL_RenderCopy(renderer, texture, NULL, NULL);
                     SDL_RenderPresent(renderer);
-                }
-
-                // Audio test             
-                auto& buffer = emu.GetAPU()->GetBuffer();
-                const int bufferFilledLength = (int)buffer.GetLength();
-                OMBAssert(sizeofarray(audioOutputBuffer) >= bufferFilledLength, "Emulator buffer too big for current SDL output buffer");
-                for (int i = 0; i < bufferFilledLength && i < sizeofarray(audioOutputBuffer); ++i)
-                {
-                    double sample = buffer.Read();
-                    OMBAssert(sample >= 0 && sample <= 1.0, "Wrong output value");
-                    audioOutputBuffer[i] = (int16_t)(sample * std::numeric_limits<int16_t>::max());
-                }
-                
-                if (bufferFilledLength > 0)
-                {
-                    SDL_QueueAudio(1, audioOutputBuffer, bufferFilledLength * bytesPerSample);
                 }
             }
         }
@@ -358,5 +345,25 @@ void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_
             controllerState.Up = false;
             controllerState.Down = false;
         }
+    }
+}
+
+void SDLAudioCallback(void* userData, Uint8* audioData, int length)
+{
+    int16_t* output = reinterpret_cast<int16_t*>(audioData);
+    const int samplesToWrite = length / sizeof(int16_t);
+    APU::OutputBuffer& emuBuffer = *((APU::OutputBuffer*)userData);
+    const int emuBufferLength = (int)emuBuffer.GetLength();
+    for (int i = 0; i < samplesToWrite && i < emuBufferLength; ++i)
+    {
+        const double sample = emuBuffer.Read();
+        OMBAssert(sample >= 0 && sample <= 1.0, "Wrong output value");
+        output[i] = (int16_t)(sample * std::numeric_limits<int16_t>::max());
+    }
+
+    // If the emulator buffer is not long enough, fill the SDL one with the last sample
+    for (int i = 0; i < samplesToWrite - emuBufferLength; ++i)
+    {
+        output[i] = output[emuBufferLength - 1];
     }
 }

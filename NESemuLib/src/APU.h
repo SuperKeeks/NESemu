@@ -14,7 +14,7 @@ class MemoryMapper;
 class APU : public MemoryHandler
 {
 public:
-    static const uint64_t kBufferSize = 1024;
+    typedef RingBuffer<double, 2048> OutputBuffer;
 
     APU();
     virtual ~APU();
@@ -26,9 +26,7 @@ public:
 
     void SetOutputFrequency(int frequency);
     void Tick();
-    RingBuffer<double, kBufferSize>& GetBuffer();
-    int GetBufferFilledLength() const;
-    void ClearBuffer();
+    OutputBuffer& GetBuffer();
 
 private:
     enum StatusFlags
@@ -58,7 +56,7 @@ private:
     bool _irqEnabled;
     int _cpuCycles;
     bool _isEvenCPUCycle;
-    RingBuffer<double, kBufferSize> _outputBuffer;
+    OutputBuffer _outputBuffer;
     double _cyclesPerSample;
     double _cyclesSinceLastSample;
 
