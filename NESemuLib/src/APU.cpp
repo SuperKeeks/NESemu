@@ -123,7 +123,7 @@ void APU::Reset(CPU* cpu, MemoryMapper* memoryMapper)
     _frameInterruptFlag = false;
     _irqEnabled = false;
     _isEvenCPUCycle = false;
-    _outputBuffer.Reset();
+    _outputBuffer.Clear();
     _cyclesSinceLastSample = 0;
     ResetCPUCycles();
 

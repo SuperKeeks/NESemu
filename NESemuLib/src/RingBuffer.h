@@ -10,25 +10,24 @@ class RingBuffer
 public:
     RingBuffer()
     {
-        Reset();
+        Clear();
     }
     
     void Write(T data)
     {
         _data[_writeIndex++] = data;
-        if (_writeIndex + 1 >= size)
+        if (_writeIndex == size)
         {
             _writeIndex = 0;
-        }
-
-        if (_length < size)
-        {
-            ++_length;
         }
 
         if (_length == size)
         {
             IncReadIndex();
+        }
+        else
+        {
+            ++_length;
         }
     }
     
@@ -43,7 +42,7 @@ public:
         return _data[currentReadIndex];
     }
 
-    void Reset()
+    void Clear()
     {
         _writeIndex = 0;
         _readIndex = 0;
@@ -62,7 +61,7 @@ private:
     void IncReadIndex()
     {
         ++_readIndex;
-        if (_readIndex + 1 >= size)
+        if (_readIndex == size)
         {
             _readIndex = 0;
         }

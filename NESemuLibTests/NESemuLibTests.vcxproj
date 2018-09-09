@@ -197,6 +197,7 @@
     <ClCompile Include="PHPPLPTest.cpp" />
     <ClCompile Include="PPUTest.cpp" />
     <ClCompile Include="RAMTest.cpp" />
+    <ClCompile Include="RingBufferTest.cpp" />
     <ClCompile Include="ROLTest.cpp" />
     <ClCompile Include="RORTest.cpp" />
     <ClCompile Include="SBCTest.cpp" />
