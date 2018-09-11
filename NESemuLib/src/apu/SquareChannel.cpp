@@ -38,6 +38,7 @@ void SquareChannel::WriteMem(uint16_t address, uint8_t value)
         int period = _timer.GetPeriod();
         period = (period & 0xFF) | highTimerBits << 8; // Set the high 3 bits (keeping the low 8 bits)
         _timer.SetPeriod(period);
+        _timer.Reset(); // NOTE: I'm not sure why this is needed. According to the wiki it shouldn't, but if I don't do it, some sounds stop working after a while...
 
         const int lenghtCounterLoad = BitwiseUtils::GetBitRange(value, 7, 5);
         _lengthCounter.SetLoad(lenghtCounterLoad);
