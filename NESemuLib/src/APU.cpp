@@ -158,9 +158,7 @@ void APU::Tick()
         _dmcChannel.Tick();
         if (_dmcChannel.IsInterruptFlagSet())
         {
-            // "At any time, if the interrupt flag is set, the CPU's IRQ line is continuously asserted 
-            // until the interrupt flag is cleared. The processor will continue on from where it was stalled."
-            _cpu->ExecuteIRQ();
+            _frameInterruptFlag = true;
         }
     }
 
@@ -232,6 +230,8 @@ void APU::Tick()
         _outputBuffer.Write(GenerateSample());
     }
 
+    // "At any time, if the interrupt flag is set, the CPU's IRQ line is continuously asserted 
+    // until the interrupt flag is cleared. The processor will continue on from where it was stalled."
     if (_frameInterruptFlag)
     {
         _cpu->ExecuteIRQ();
