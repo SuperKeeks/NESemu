@@ -9,7 +9,6 @@ Sweep::Sweep() :
     _enabled(false),
     _negateFlag(false),
     _shiftCount(0),
-    _channelTimer(nullptr),
     _reload(false),
     _hasOverflowed(false)
 {

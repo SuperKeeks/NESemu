@@ -18,7 +18,6 @@ private:
     int _period;
     bool _negateFlag;
     int _shiftCount;
-    Divider* _channelTimer;
     bool _reload;
     bool _hasOverflowed;
 };
