@@ -21,7 +21,7 @@ void NoiseChannel::WriteMem(uint16_t address, uint8_t value)
     {
         _modeFlag = BitwiseUtils::GetBitRange(value, 7, 1);
 
-        const int periodValues[] = { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 };
+        static const int periodValues[] = { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 };
         const int periodIndex = BitwiseUtils::GetBitRange(value, 3, 4);
         _timer.SetPeriod(periodValues[periodIndex]);
     }
