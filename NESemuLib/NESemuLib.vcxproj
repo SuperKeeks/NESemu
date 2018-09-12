@@ -23,32 +23,32 @@
     <ProjectGuid>{AD430D2B-5563-4D47-A58B-36868563EA24}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>NESemuLib</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -152,6 +152,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
+    <ClInclude Include="src\apu\AudioChannel.h" />
+    <ClInclude Include="src\apu\Divider.h" />
+    <ClInclude Include="src\apu\DMCChannel.h" />
+    <ClInclude Include="src\apu\Envelope.h" />
+    <ClInclude Include="src\apu\LengthCounter.h" />
+    <ClInclude Include="src\apu\LinearCounter.h" />
+    <ClInclude Include="src\apu\NoiseChannel.h" />
+    <ClInclude Include="src\apu\SquareChannel.h" />
+    <ClInclude Include="src\apu\Sweep.h" />
+    <ClInclude Include="src\apu\TriangleChannel.h" />
     <ClInclude Include="src\Assert.h" />
     <ClInclude Include="src\BitwiseUtils.h" />
     <ClInclude Include="src\CHRROM.h" />
@@ -169,12 +179,22 @@
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\RAM.h" />
     <ClInclude Include="src\PRGROM.h" />
+    <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\SizeOfArray.h" />
     <ClInclude Include="src\SRAM.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\APU.cpp" />
+    <ClCompile Include="src\apu\Divider.cpp" />
+    <ClCompile Include="src\apu\DMCChannel.cpp" />
+    <ClCompile Include="src\apu\Envelope.cpp" />
+    <ClCompile Include="src\apu\LengthCounter.cpp" />
+    <ClCompile Include="src\apu\LinearCounter.cpp" />
+    <ClCompile Include="src\apu\NoiseChannel.cpp" />
+    <ClCompile Include="src\apu\SquareChannel.cpp" />
+    <ClCompile Include="src\apu\Sweep.cpp" />
+    <ClCompile Include="src\apu\TriangleChannel.cpp" />
     <ClCompile Include="src\BitwiseUtils.cpp" />
     <ClCompile Include="src\CHRROM.cpp" />
     <ClCompile Include="src\CPU.cpp" />

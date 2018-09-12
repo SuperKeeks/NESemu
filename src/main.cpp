@@ -7,11 +7,14 @@
 
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
+const int AUDIO_FREQUENCY = 44100;
+const int AUDIO_BUFFER_SIZE = 1024;
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
 void HandleGameControllerButtonEvent(Input::ControllerState& controllerState, SDL_Event event, bool invertAB);
 void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_Event event);
+void SDLAudioCallback(void* userData, Uint8* audioData, int length);
 
 int main(int argc, char* args[])
 {
@@ -25,7 +28,7 @@ int main(int argc, char* args[])
     }
     bool invertAB = true; // Used for NES Mini controllers
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0)
     {
         Log::Error("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
@@ -59,11 +62,9 @@ int main(int argc, char* args[])
                 }
             }
 
+            // Rendering initialisation
             renderer = SDL_CreateRenderer(window, -1, 0);
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
-
-            bool quit = false;
-            SDL_Event e;
 
             NESemu emu;
             //emu.Load("arkanoid.nes");
@@ -73,9 +74,33 @@ int main(int argc, char* args[])
             //emu.Load("mariobros.nes");
             //emu.Load("popeye.nes");
             emu.Load("smb.nes");
-            //emu.Load("zelda_title.nes");            
+            //emu.Load("dmc.nes");
+            //emu.Load("gb.nes");
+            //emu.Load("zelda_title.nes");
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
+            emu.GetAPU()->SetOutputFrequency(AUDIO_FREQUENCY);
+
+            // Audio initialisation
+            SDL_AudioSpec audioSettings;
+            SDL_zero(audioSettings);
+            audioSettings.freq = AUDIO_FREQUENCY;
+            audioSettings.format = AUDIO_S16;
+            audioSettings.channels = 1;
+            audioSettings.samples = AUDIO_BUFFER_SIZE;
+            audioSettings.userdata = &(emu.GetAPU()->GetBuffer());
+            audioSettings.callback = &SDLAudioCallback;
+            SDL_OpenAudio(&audioSettings, 0);
+            if (audioSettings.format != AUDIO_S16)
+            {
+                Log::Error("Got an unexpected audio format");
+                SDL_CloseAudio();
+            }
+            else
+            {
+                Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
+                SDL_PauseAudio(0);
+            }
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint32 now = SDL_GetTicks();
@@ -85,28 +110,30 @@ int main(int argc, char* args[])
             Input::ControllerState controller2State;
             bool enableOpcodeInfoPrinting = false;
 
+            bool quit = false;
+            SDL_Event inputEvent;
             while (!quit)
             {
                 last = now;
                 now = SDL_GetTicks();
                 deltaTime = (float)(now - last) / 1000;
 
-                while (SDL_PollEvent(&e) != 0)
+                while (SDL_PollEvent(&inputEvent) != 0)
                 {
-                    if (e.type == SDL_QUIT || (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE))
+                    if (inputEvent.type == SDL_QUIT || (inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_ESCAPE))
                     {
                         quit = true;
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_r))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_r))
                     {
                         emu.Reset();
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_d))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_d))
                     {
                         enableOpcodeInfoPrinting = !enableOpcodeInfoPrinting;
                         emu.GetCPU()->EnableOpcodeInfoPrinting(enableOpcodeInfoPrinting);
                     }
-                    else if ((e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_i))
+                    else if ((inputEvent.type == SDL_KEYUP && inputEvent.key.keysym.sym == SDLK_i))
                     {
                         invertAB = !invertAB;
                         if (invertAB)
@@ -118,23 +145,26 @@ int main(int argc, char* args[])
                             Log::Info("Restored A and B buttons mappings");
                         }
                     }
-                    else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+                    else if (inputEvent.type == SDL_KEYDOWN || inputEvent.type == SDL_KEYUP)
                     {
-                        HandleKeyboardButtonEvent(SelectControllerState(e, controller1State, controller2State), e);
+                        HandleKeyboardButtonEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent);
                     }
-                    else if (e.type == SDL_CONTROLLERBUTTONDOWN || e.type == SDL_CONTROLLERBUTTONUP)
+                    else if (inputEvent.type == SDL_CONTROLLERBUTTONDOWN || inputEvent.type == SDL_CONTROLLERBUTTONUP)
                     {
-                        HandleGameControllerButtonEvent(SelectControllerState(e, controller1State, controller2State), e, invertAB);
+                        HandleGameControllerButtonEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent, invertAB);
                     }
-                    else if (e.type == SDL_CONTROLLERAXISMOTION)
+                    else if (inputEvent.type == SDL_CONTROLLERAXISMOTION)
                     {
-                        HandleGameControllerAxisEvent(SelectControllerState(e, controller1State, controller2State), e);
+                        HandleGameControllerAxisEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent);
                     }
                 }
 
                 emu.SetControllerState(1, controller1State);
                 emu.SetControllerState(2, controller2State);
+
+                SDL_LockAudio();
                 emu.Update(deltaTime);
+                SDL_UnlockAudio();
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
                 {
@@ -155,6 +185,7 @@ int main(int argc, char* args[])
         }
     }
 
+    SDL_CloseAudio();
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -314,5 +345,25 @@ void HandleGameControllerAxisEvent(Input::ControllerState& controllerState, SDL_
             controllerState.Up = false;
             controllerState.Down = false;
         }
+    }
+}
+
+void SDLAudioCallback(void* userData, Uint8* audioData, int length)
+{
+    int16_t* output = reinterpret_cast<int16_t*>(audioData);
+    const int samplesToWrite = length / sizeof(int16_t);
+    APU::OutputBuffer& emuBuffer = *((APU::OutputBuffer*)userData);
+    const int emuBufferLength = (int)emuBuffer.GetLength();
+    for (int i = 0; i < samplesToWrite && i < emuBufferLength; ++i)
+    {
+        const double sample = emuBuffer.Read();
+        OMBAssert(sample >= 0 && sample <= 1.0, "Wrong output value");
+        output[i] = (int16_t)(sample * std::numeric_limits<int16_t>::max());
+    }
+
+    // If the emulator buffer is not long enough, fill the SDL one with the last sample
+    for (int i = 0; i < samplesToWrite - emuBufferLength; ++i)
+    {
+        output[i] = output[emuBufferLength - 1];
     }
 }
