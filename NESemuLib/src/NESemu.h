@@ -3,6 +3,7 @@
 #include "Hardware.h"
 #include "INESParser.h"
 
+#include <functional>
 #include <stdint.h>
 
 class MemoryMapper;
@@ -16,7 +17,7 @@ public:
     void Load(const char* path);
     void Load(const uint8_t rom[], uint16_t romSize); // For testing purposes
     void Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize); // For testing purposes
-    void Update(double delta);
+    void Update(double delta, std::function<void()> lockAudio, std::function<void()> unlockAudio);
     void Reset();
     void SetControllerState(int controllerNumber, const Input::ControllerState& state);
 

@@ -8,6 +8,8 @@
 #include "apu/TriangleChannel.h"
 #include "RingBuffer.h"
 
+#include <functional>
+
 class CPU;
 class MemoryMapper;
 
@@ -25,7 +27,7 @@ public:
     virtual void Reset(CPU* cpu, MemoryMapper* memoryMapper);
 
     void SetOutputFrequency(int frequency);
-    void Tick();
+    void Tick(std::function<void()> lockAudio, std::function<void()> unlockAudio);
     OutputBuffer& GetBuffer();
 
 private:

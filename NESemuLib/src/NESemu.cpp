@@ -66,7 +66,7 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[],
     Load(rom, romSize);
 }
 
-void NESemu::Update(double delta)
+void NESemu::Update(double delta, std::function<void()> lockAudio, std::function<void()> unlockAudio)
 {
 // Prevent big deltas while debugging (otherwise we might get stuck here for too long)
 #if _DEBUG
@@ -85,7 +85,7 @@ void NESemu::Update(double delta)
         {
             // For every 3 PPU cycles, the CPU and APU run one
             _hw.cpu.Tick();
-            _hw.apu.Tick();
+            _hw.apu.Tick(lockAudio, unlockAudio);
         }
 
         _hw.ppu.Tick();

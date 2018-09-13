@@ -162,9 +162,7 @@ int main(int argc, char* args[])
                 emu.SetControllerState(1, controller1State);
                 emu.SetControllerState(2, controller2State);
 
-                SDL_LockAudio();
-                emu.Update(deltaTime);
-                SDL_UnlockAudio();
+                emu.Update(deltaTime, SDL_LockAudio, SDL_UnlockAudio);
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
                 {

@@ -141,7 +141,7 @@ void APU::SetOutputFrequency(int frequency)
     _cyclesPerSample = (21477272.0 / 12) / frequency; // CPU frequency divided by output frequency
 }
 
-void APU::Tick()
+void APU::Tick(std::function<void()> lockAudio, std::function<void()> unlockAudio)
 {
     OMBAssert(_cyclesPerSample > 0, "Output frequency hasn't been set");
 
@@ -227,7 +227,9 @@ void APU::Tick()
     {
         _cyclesSinceLastSample -= _cyclesPerSample;
         OMBAssert(_outputBuffer.IsFull(), "Buffer is full!");
+        lockAudio();
         _outputBuffer.Write(GenerateSample());
+        unlockAudio();
     }
 
     // "At any time, if the interrupt flag is set, the CPU's IRQ line is continuously asserted 
