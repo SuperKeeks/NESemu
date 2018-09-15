@@ -73,8 +73,8 @@ int main(int argc, char* args[])
             //emu.Load("galaga.nes");
             //emu.Load("mariobros.nes");
             //emu.Load("popeye.nes");
-            emu.Load("smb.nes");
-            //emu.Load("smb3.nes");
+            //emu.Load("smb.nes");
+            emu.Load("smb3.nes");
             //emu.Load("dmc.nes");
             //emu.Load("gb.nes");
             //emu.Load("zelda_title.nes");

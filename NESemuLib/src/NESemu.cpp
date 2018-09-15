@@ -2,8 +2,9 @@
 
 #include "SizeOfArray.h"
 
-#include "mappers\IM000_NROM.h"
-#include "mappers\IM003_CNROM.h"
+#include "mappers/IM000_NROM.h"
+#include "mappers/IM003_CNROM.h"
+#include "mappers/IM004_MMC3.h"
 
 NESemu::NESemu()
 {
@@ -30,6 +31,9 @@ void NESemu::Load(const char* path)
             break;
         case 3:
             _mapper = new IM003_CNROM(_hw);
+            break;
+        case 4:
+            _mapper = new IM004_MMC3(_hw);
             break;
         default:
             OMBAssert(false, "Unsupported memory mapper #%03d", _parser.GetMapperNumber());
