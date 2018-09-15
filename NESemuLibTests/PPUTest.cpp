@@ -17,14 +17,14 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
             uint8_t chrRom[MemoryMapper::kCHRROMPageSize];
             for (int i = 0; i < MemoryMapper::kCHRROMPageSize; ++i)
             {
                 chrRom[i] = i % 256;
             }
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize, chrRom, IM000_NROM::kMaxCHRROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize, chrRom, IM000_NROM::kMaxCHRROMSize);
 
             // Verify PatternTable in VRAM and its shadows
             for (int i = 0; i < 4; ++i)
@@ -51,9 +51,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             // Read 0x2002 to reset PPUAddr status
             emu.ReadMem(PPU::kPPUStatusAddress);
@@ -246,9 +246,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             emu.ReadMem(PPU::kPPUStatusAddress);
             emu.WriteMem(PPU::kPPUAddrAddress, 0x3F);
@@ -320,9 +320,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             // Write OAM data
             emu.WriteMem(PPU::kOAMAddress, 0x00);
@@ -343,9 +343,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             // Init RAM with values to transfer
             for (int i = 0; i <= 0x0700; i += 0x100)

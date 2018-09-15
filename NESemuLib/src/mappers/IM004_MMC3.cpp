@@ -8,12 +8,6 @@ IM004_MMC3::IM004_MMC3(Hardware& hw) :
 {
 }
 
-uint8_t IM004_MMC3::ReadMem(uint16_t address)
-{
-    MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Read);
-    return handler.ReadMem(address);
-}
-
 uint8_t IM004_MMC3::ReadCHRROMMem(uint16_t address)
 {
     if (address <= 0x03FF)
@@ -179,6 +173,12 @@ void IM004_MMC3::Reset()
     _bankRegisterToUpdate = 0;
     _prgROMBankMode = 0;
     _chrInversion = 0;
+}
+
+uint8_t IM004_MMC3::ReadPRGROMMem(uint16_t address)
+{
+    OMBAssert(false, "TODO");
+    return 0;
 }
 
 uint8_t IM004_MMC3::GetCHRROMDataBasedOnRegister(int registerIndex, uint16_t address)

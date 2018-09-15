@@ -4,6 +4,19 @@ MemoryMapper::MemoryMapper(Hardware& hw) : _hw(hw)
 {
 }
 
+uint8_t MemoryMapper::ReadMem(uint16_t address)
+{
+    if (address >= 0x8000 && address <= 0xFFFF)
+    {
+        return ReadPRGROMMem(address);
+    }
+    else
+    {
+        MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Read);
+        return handler.ReadMem(address);
+    }
+}
+
 MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address, AccessMode mode)
 {
     if (address >= 0x0 && address < 0x2000)
@@ -25,10 +38,6 @@ MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address, Access
     else if (address >= 0x6000 && address < 0x8000)
     {
         return _hw.sram;
-    }
-    else if (address >= 0x8000 && address <= 0xFFFF)
-    {
-        return _hw.prgRom;
     }
     else
     {

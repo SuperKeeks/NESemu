@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 
-class PRGROM;
 class MemoryMapper;
 
 class INESParser
@@ -12,7 +11,7 @@ class INESParser
 public:
     ~INESParser();
     void ParseHeader(const char* path);
-    void ParseROMs(const char* path, MemoryMapper& memoryMapper, PRGROM& prgRom);
+    void ParseROMs(const char* path, MemoryMapper& memoryMapper);
 
     void PrintInfo() const;
     uint8_t GetPRGROMPageCount() const;

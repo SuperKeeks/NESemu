@@ -4,7 +4,6 @@
 #include "CPU.h"
 #include "Input.h"
 #include "PPU.h"
-#include "PRGROM.h"
 #include "RAM.h"
 #include "SRAM.h"
 
@@ -16,7 +15,6 @@ struct Hardware
     APU apu;
     Input input;
     SRAM sram;
-    PRGROM prgRom;
 
     void PowerOn()
     {
@@ -26,7 +24,6 @@ struct Hardware
         apu.PowerOn();
         input.PowerOn();
         sram.PowerOn();
-        prgRom.PowerOn();
     }
     
     void Reset(MemoryMapper* memoryMapper, MirroringMode mirroringMode)
@@ -37,6 +34,5 @@ struct Hardware
         apu.Reset(&cpu, memoryMapper);
         input.Reset();
         sram.Reset();
-        prgRom.Reset();
     }
 };

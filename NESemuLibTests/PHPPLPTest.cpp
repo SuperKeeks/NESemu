@@ -14,16 +14,16 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
-            rom[CPU::kResetVectorAddressL - PRGROM::kStartAddress] = 0;
-            rom[CPU::kResetVectorAddressH - PRGROM::kStartAddress] = PRGROM::kStartAddress >> 8;
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
+            rom[CPU::kResetVectorAddressL - MemoryMapper::kPGRROMStartAddress] = 0;
+            rom[CPU::kResetVectorAddressH - MemoryMapper::kPGRROMStartAddress] = MemoryMapper::kPGRROMStartAddress >> 8;
             int cycles;
             int codeIndex = 0;
 
             rom[codeIndex++] = 0x08; // PHP
             rom[codeIndex++] = 0x28; // PLP
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             cpu.SetAccumulator(0xFF);
             cpu.SetFlag(CPU::Flag::Carry, true);

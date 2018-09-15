@@ -1,12 +1,11 @@
 #pragma once
 
+#include "MemoryMapper.h"
 #include "Hardware.h"
 #include "INESParser.h"
 
 #include <functional>
 #include <stdint.h>
-
-class MemoryMapper;
 
 class NESemu
 {

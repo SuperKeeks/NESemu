@@ -141,7 +141,6 @@
       <Filter>mappers</Filter>
     </ClCompile>
     <ClCompile Include="src\MemoryMapper.cpp" />
-    <ClCompile Include="src\PRGROM.cpp" />
     <ClCompile Include="src\apu\SquareChannel.cpp">
       <Filter>apu</Filter>
     </ClCompile>
@@ -197,7 +196,6 @@
     <ClInclude Include="src\mappers\IM003_CNROM.h">
       <Filter>mappers</Filter>
     </ClInclude>
-    <ClInclude Include="src\PRGROM.h" />
     <ClInclude Include="src\apu\AudioChannel.h">
       <Filter>apu</Filter>
     </ClInclude>

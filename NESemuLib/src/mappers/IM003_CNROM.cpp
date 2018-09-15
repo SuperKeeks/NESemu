@@ -4,12 +4,6 @@ IM003_CNROM::IM003_CNROM(Hardware& hw) : MemoryMapper(hw)
 {
 }
 
-uint8_t IM003_CNROM::ReadMem(uint16_t address)
-{
-    MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Read);
-    return handler.ReadMem(address);
-}
-
 uint8_t IM003_CNROM::ReadCHRROMMem(uint16_t address)
 {
     return _chrROM[(_chrROMPageIndex * kPageCHRROMSize) + address];
@@ -33,12 +27,16 @@ void IM003_CNROM::Reset()
     _chrROMPageIndex = 0;
 }
 
-size_t IM003_CNROM::GetCHRROMMaxSize() const
+uint8_t IM003_CNROM::ReadPRGROMMem(uint16_t address)
 {
-    return kMaxCHRROMSize;
-}
-
-uint8_t* IM003_CNROM::GetCHRROMPtr()
-{
-    return _chrROM;
+    size_t index;
+    if (_pgrROMPageCount == 1)
+    {
+        index = (address - kPGRROMStartAddress) % 16384;
+    }
+    else
+    {
+        index = address - kPGRROMStartAddress;
+    }
+    return _pgrROM[index];
 }

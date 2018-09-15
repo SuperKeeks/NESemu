@@ -39,7 +39,7 @@ void NESemu::Load(const char* path)
             OMBAssert(false, "Unsupported memory mapper #%03d", _parser.GetMapperNumber());
             _mapper = nullptr;
     }
-    _parser.ParseROMs(path, *_mapper, _hw.prgRom);
+    _parser.ParseROMs(path, *_mapper);
 
     _parser.PrintInfo();
     _hw.sram.SetEnabled(_parser.IsSRAMEnabled());
@@ -49,7 +49,7 @@ void NESemu::Load(const char* path)
 
 void NESemu::Load(const uint8_t rom[], uint16_t romSize)
 {
-    OMBAssert(romSize == PRGROM::kMaxPRGROMSize || romSize == PRGROM::kMaxPRGROMSize / 2, "Unsupported ROM size");
+    OMBAssert(romSize == IM000_NROM::kMaxPRGROMSize || romSize == IM000_NROM::kMaxPRGROMSize / 2, "Unsupported ROM size");
     if (_mapper == nullptr)
     {
         _mapper = new IM000_NROM(_hw);
@@ -57,9 +57,9 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize)
     
     for (int i = 0; i < romSize; ++i)
     {
-        _hw.prgRom.GetROMPtr()[i] = rom[i];
+        _mapper->GetPGRROMPtr()[i] = rom[i];
     }
-    _hw.prgRom.SetIs16KBROM(romSize == PRGROM::kMaxPRGROMSize / 2);
+    _mapper->SetPGRROMPageCount(romSize / MemoryMapper::kPRGROMPageSize);
 
     Reset();
 }

@@ -178,7 +178,6 @@
     <ClInclude Include="src\NESemu.h" />
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\RAM.h" />
-    <ClInclude Include="src\PRGROM.h" />
     <ClInclude Include="src\RingBuffer.h" />
     <ClInclude Include="src\SizeOfArray.h" />
     <ClInclude Include="src\SRAM.h" />
@@ -248,7 +247,6 @@
     <ClCompile Include="src\opcodes\TXX.cpp" />
     <ClCompile Include="src\PPU.cpp" />
     <ClCompile Include="src\RAM.cpp" />
-    <ClCompile Include="src\PRGROM.cpp" />
     <ClCompile Include="src\SRAM.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
