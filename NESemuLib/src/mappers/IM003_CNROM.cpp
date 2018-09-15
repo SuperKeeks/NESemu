@@ -10,16 +10,35 @@ uint8_t IM003_CNROM::ReadMem(uint16_t address)
     return handler.ReadMem(address);
 }
 
+uint8_t IM003_CNROM::ReadCHRROMMem(uint16_t address)
+{
+    return _chrROM[(_chrROMPageIndex * kPageCHRROMSize) + address];
+}
+
 void IM003_CNROM::WriteMem(uint16_t address, uint8_t value)
 {
     if (address >= 0x8000 && address <= 0xFFFF)
     {
-        int page = value & 0x3;
-        _hw.chrRom.SelectPage(page);
+        _chrROMPageIndex = value & 0x3;
     }
     else
     {
         MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Write);
         handler.WriteMem(address, value);
     }
+}
+
+void IM003_CNROM::Reset()
+{
+    _chrROMPageIndex = 0;
+}
+
+size_t IM003_CNROM::GetCHRROMMaxSize() const
+{
+    return kMaxCHRROMSize;
+}
+
+uint8_t* IM003_CNROM::GetCHRROMPtr()
+{
+    return _chrROM;
 }

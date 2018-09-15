@@ -1,5 +1,7 @@
 #include "CppUnitTest.h"
 
+#include "mappers/IM000_NROM.h"
+#include "MemoryMapper.h"
 #include "NESemu.h"
 #include "SizeOfArray.h"
 
@@ -16,13 +18,13 @@ namespace NESemuLibTests
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
             uint8_t rom[PRGROM::kMaxPRGROMSize];
-            uint8_t chrRom[CHRROM::kPageCHRROMSize];
-            for (int i = 0; i < CHRROM::kPageCHRROMSize; ++i)
+            uint8_t chrRom[MemoryMapper::kCHRROMPageSize];
+            for (int i = 0; i < MemoryMapper::kCHRROMPageSize; ++i)
             {
                 chrRom[i] = i % 256;
             }
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize, chrRom, CHRROM::kMaxCHRROMSize);
+            emu.Load(rom, PRGROM::kMaxPRGROMSize, chrRom, IM000_NROM::kMaxCHRROMSize);
 
             // Verify PatternTable in VRAM and its shadows
             for (int i = 0; i < 4; ++i)
@@ -38,7 +40,7 @@ namespace NESemuLibTests
                 emu.ReadMem(PPU::kPPUDataAddress);
 
                 // Verify all values
-                for (int i = 0; i < CHRROM::kPageCHRROMSize; ++i)
+                for (int i = 0; i < MemoryMapper::kCHRROMPageSize; ++i)
                 {
                     Assert::AreEqual(i % 256, (int)emu.ReadMem(PPU::kPPUDataAddress));
                 }

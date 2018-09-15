@@ -10,8 +10,23 @@ uint8_t IM000_NROM::ReadMem(uint16_t address)
     return handler.ReadMem(address);
 }
 
+uint8_t IM000_NROM::ReadCHRROMMem(uint16_t address)
+{
+    return _chrROM[address];
+}
+
 void IM000_NROM::WriteMem(uint16_t address, uint8_t value)
 {
     MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Write);
     handler.WriteMem(address, value);
+}
+
+size_t IM000_NROM::GetCHRROMMaxSize() const
+{
+    return kMaxCHRROMSize;
+}
+
+uint8_t* IM000_NROM::GetCHRROMPtr()
+{
+    return _chrROM;
 }

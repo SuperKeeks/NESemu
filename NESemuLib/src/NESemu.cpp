@@ -16,15 +16,13 @@ NESemu::~NESemu()
 
 void NESemu::Load(const char* path)
 {
-    _parser.Parse(path, _hw.prgRom, _hw.chrRom);
-    _parser.PrintInfo();
-    _hw.sram.SetEnabled(_parser.IsSRAMEnabled());
-
     if (_mapper != nullptr)
     {
         delete _mapper;
     }
 
+    _parser.ParseHeader(path);
+    
     switch (_parser.GetMapperNumber())
     {
         case 0:
@@ -37,6 +35,10 @@ void NESemu::Load(const char* path)
             OMBAssert(false, "Unsupported memory mapper #%03d", _parser.GetMapperNumber());
             _mapper = nullptr;
     }
+    _parser.ParseROMs(path, *_mapper, _hw.prgRom);
+
+    _parser.PrintInfo();
+    _hw.sram.SetEnabled(_parser.IsSRAMEnabled());
 
     Reset();
 }
@@ -44,7 +46,11 @@ void NESemu::Load(const char* path)
 void NESemu::Load(const uint8_t rom[], uint16_t romSize)
 {
     OMBAssert(romSize == PRGROM::kMaxPRGROMSize || romSize == PRGROM::kMaxPRGROMSize / 2, "Unsupported ROM size");
-    _mapper = new IM000_NROM(_hw);
+    if (_mapper == nullptr)
+    {
+        _mapper = new IM000_NROM(_hw);
+    }
+    
     for (int i = 0; i < romSize; ++i)
     {
         _hw.prgRom.GetROMPtr()[i] = rom[i];
@@ -56,11 +62,11 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize)
 
 void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize)
 {
-    OMBAssert(chrRomSize == CHRROM::kMaxCHRROMSize, "Unsupported CHR-ROM size");
+    OMBAssert(chrRomSize == IM000_NROM::kMaxCHRROMSize, "Unsupported CHR-ROM size");
     _mapper = new IM000_NROM(_hw);
     for (int i = 0; i < chrRomSize; ++i)
     {
-        _hw.chrRom.GetCHRROMPtr()[i] = chrRom[i];
+        _mapper->GetCHRROMPtr()[i] = chrRom[i];
     }
 
     Load(rom, romSize);

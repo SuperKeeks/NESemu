@@ -1,7 +1,6 @@
 #pragma once
 
 #include "APU.h"
-#include "CHRROM.h"
 #include "CPU.h"
 #include "Input.h"
 #include "PPU.h"
@@ -18,7 +17,6 @@ struct Hardware
     Input input;
     SRAM sram;
     PRGROM prgRom;
-    CHRROM chrRom;
 
     void PowerOn()
     {
@@ -29,18 +27,16 @@ struct Hardware
         input.PowerOn();
         sram.PowerOn();
         prgRom.PowerOn();
-        chrRom.PowerOn();
     }
     
     void Reset(MemoryMapper* memoryMapper, MirroringMode mirroringMode)
     {
         cpu.Reset(memoryMapper);
         ram.Reset();
-        ppu.Reset(memoryMapper, &cpu, &chrRom, mirroringMode);
+        ppu.Reset(memoryMapper, &cpu, mirroringMode);
         apu.Reset(&cpu, memoryMapper);
         input.Reset();
         sram.Reset();
         prgRom.Reset();
-        chrRom.Reset();
     }
 };

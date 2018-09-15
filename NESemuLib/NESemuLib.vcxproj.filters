@@ -133,7 +133,6 @@
     <ClCompile Include="src\opcodes\NOP.cpp">
       <Filter>opcodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\CHRROM.cpp" />
     <ClCompile Include="src\BitwiseUtils.cpp" />
     <ClCompile Include="src\mappers\IM000_NROM.cpp">
       <Filter>mappers</Filter>
@@ -170,6 +169,9 @@
     <ClCompile Include="src\apu\DMCChannel.cpp">
       <Filter>apu</Filter>
     </ClCompile>
+    <ClCompile Include="src\mappers\IM004_MMC3.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\APU.h" />
@@ -185,7 +187,6 @@
     <ClInclude Include="src\SRAM.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="src\LogUtils.h" />
-    <ClInclude Include="src\CHRROM.h" />
     <ClInclude Include="src\MirroringMode.h" />
     <ClInclude Include="src\BitwiseUtils.h" />
     <ClInclude Include="src\MemoryMapper.h" />
@@ -228,6 +229,9 @@
       <Filter>apu</Filter>
     </ClInclude>
     <ClInclude Include="src\RingBuffer.h" />
+    <ClInclude Include="src\mappers\IM004_MMC3.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
