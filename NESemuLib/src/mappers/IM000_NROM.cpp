@@ -1,6 +1,7 @@
 #include "IM000_NROM.h"
 
-IM000_NROM::IM000_NROM(Hardware& hw) : MemoryMapper(hw)
+IM000_NROM::IM000_NROM(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) : 
+    MemoryMapper(hw, pgrPageCount, chrPageCount)
 {
 }
 

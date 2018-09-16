@@ -27,13 +27,13 @@ void NESemu::Load(const char* path)
     switch (_parser.GetMapperNumber())
     {
         case 0:
-            _mapper = new IM000_NROM(_hw);
+            _mapper = new IM000_NROM(_hw, _parser.GetPRGROMPageCount(), _parser.GetCHRROMPageCount());
             break;
         case 3:
-            _mapper = new IM003_CNROM(_hw);
+            _mapper = new IM003_CNROM(_hw, _parser.GetPRGROMPageCount(), _parser.GetCHRROMPageCount());
             break;
         case 4:
-            _mapper = new IM004_MMC3(_hw);
+            _mapper = new IM004_MMC3(_hw, _parser.GetPRGROMPageCount(), _parser.GetCHRROMPageCount());
             break;
         default:
             OMBAssert(false, "Unsupported memory mapper #%03d", _parser.GetMapperNumber());
@@ -52,14 +52,13 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize)
     OMBAssert(romSize == IM000_NROM::kMaxPRGROMSize || romSize == IM000_NROM::kMaxPRGROMSize / 2, "Unsupported ROM size");
     if (_mapper == nullptr)
     {
-        _mapper = new IM000_NROM(_hw);
+        _mapper = new IM000_NROM(_hw, romSize / MemoryMapper::kPRGROMPageSize, 1);
     }
     
     for (int i = 0; i < romSize; ++i)
     {
         _mapper->GetPGRROMPtr()[i] = rom[i];
     }
-    _mapper->SetPGRROMPageCount(romSize / MemoryMapper::kPRGROMPageSize);
 
     Reset();
 }
@@ -67,7 +66,7 @@ void NESemu::Load(const uint8_t rom[], uint16_t romSize)
 void NESemu::Load(const uint8_t rom[], uint16_t romSize, const uint8_t chrRom[], uint16_t chrRomSize)
 {
     OMBAssert(chrRomSize == IM000_NROM::kMaxCHRROMSize, "Unsupported CHR-ROM size");
-    _mapper = new IM000_NROM(_hw);
+    _mapper = new IM000_NROM(_hw, romSize / MemoryMapper::kPRGROMPageSize, chrRomSize / MemoryMapper::kCHRROMPageSize);
     for (int i = 0; i < chrRomSize; ++i)
     {
         _mapper->GetCHRROMPtr()[i] = chrRom[i];

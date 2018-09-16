@@ -43,7 +43,6 @@ void INESParser::ParseROMs(const char* path, MemoryMapper& memoryMapper)
     OMBAssert(prgROMSize <= memoryMapper.GetPGRROMMaxSize(), "Trying to load PRG-ROM bigger than it is supported");
     const size_t readPRGROMSize = fread_s(memoryMapper.GetPGRROMPtr(), memoryMapper.GetPGRROMMaxSize(), sizeof(uint8_t), prgROMSize, file);
     OMBAssert(readPRGROMSize == prgROMSize, "Unexpected PRG-ROM size");
-    memoryMapper.SetPGRROMPageCount(GetPRGROMPageCount());
 
     // CHR-ROM
     const size_t chrROMSize = MemoryMapper::kCHRROMPageSize * GetCHRROMPageCount();

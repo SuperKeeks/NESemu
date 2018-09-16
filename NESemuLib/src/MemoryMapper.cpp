@@ -1,12 +1,15 @@
 #include "MemoryMapper.h"
 
-MemoryMapper::MemoryMapper(Hardware& hw) : _hw(hw)
+MemoryMapper::MemoryMapper(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) : 
+    _hw(hw),
+    _pgrROMPageCount(pgrPageCount),
+    _chrPageCount(chrPageCount)
 {
 }
 
 uint8_t MemoryMapper::ReadMem(uint16_t address)
 {
-    if (address >= 0x8000 && address <= 0xFFFF)
+    if (address >= 0x8000)
     {
         return ReadPRGROMMem(address);
     }

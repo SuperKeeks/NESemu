@@ -10,7 +10,7 @@ public:
     static const size_t kMaxPageCount = 4;
     static const size_t kMaxCHRROMSize = kMaxPageCount * kPageCHRROMSize;
 
-    IM003_CNROM(Hardware& hw);
+    IM003_CNROM(Hardware& hw, size_t pgrPageCount, size_t chrPageCount);
     virtual uint8_t ReadCHRROMMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
     virtual void PowerOn() {}

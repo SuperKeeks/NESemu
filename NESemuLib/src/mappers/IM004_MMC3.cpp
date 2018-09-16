@@ -2,10 +2,23 @@
 
 #include "BitwiseUtils.h"
 
-IM004_MMC3::IM004_MMC3(Hardware& hw) : 
-    MemoryMapper(hw),
+IM004_MMC3::IM004_MMC3(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) :
+    MemoryMapper(hw, pgrPageCount, chrPageCount),
     _bankRegisterToUpdate(0)
 {
+}
+
+uint8_t IM004_MMC3::ReadMem(uint16_t address)
+{
+    const bool isPRGRAMAddress = address >= 0x6000 && address < 0x8000;
+    if (isPRGRAMAddress && !_enablePRGRAM)
+    {
+        return 0;
+    }
+    else
+    {
+        return MemoryMapper::ReadMem(address);
+    }
 }
 
 uint8_t IM004_MMC3::ReadCHRROMMem(uint16_t address)
@@ -130,12 +143,13 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     else if (address >= 0xA000 && address <= 0xBFFE && isEvenAddress)
     {
         // Mirroring ($A000-$BFFE, even)
-        OMBAssert(false, "TODO");
+        // Do nothing (this is set in the iNES header)
     }
     else if (address >= 0xA001 && address <= 0xBFFF)
     {
         // PRG RAM protect ($A001-$BFFF, odd)
-        OMBAssert(false, "TODO");
+        _allowPRGRAMWrites = BitwiseUtils::GetBitRange(value, 6, 1);
+        _enablePRGRAM = BitwiseUtils::GetBitRange(value, 7, 1);
     }
     else if (address >= 0xC000 && address <= 0xDFFE && isEvenAddress)
     {
@@ -150,10 +164,17 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     else if (address >= 0xE000 && address <= 0xFFFE && isEvenAddress)
     {
         // IRQ disable ($E000-$FFFE, even)
+        _enableIRQ = false;
+        // TODO: Acknowledge any pending interrupts
     }
     else if (address >= 0xE001 && address <= 0xFFFF)
     {
         // IRQ enable ($E001-$FFFF, odd)
+        _enableIRQ = true;
+    }
+    else if (address >= 0x6000 && address < 0x8000 && (!_enablePRGRAM || !_allowPRGRAMWrites))
+    {
+        // Do nothing
     }
     else
     {
@@ -177,8 +198,48 @@ void IM004_MMC3::Reset()
 
 uint8_t IM004_MMC3::ReadPRGROMMem(uint16_t address)
 {
-    OMBAssert(false, "TODO");
-    return 0;
+    if (address < kPGRROMStartAddress)
+    {
+        OMBAssert(false, "Invalid PRG ROM address!");
+        return 0;
+    }
+
+    if (address <= 0x9FFF)
+    {
+        if (_prgROMBankMode == 0)
+        {
+            return _pgrROM[(_registers[6] * kPGRROMBankSize) + (address - kPGRROMStartAddress)];
+        }
+        else
+        {
+            const size_t secondLast8KBPageIndex = (_pgrROMPageCount * 2) - 2;
+            const size_t index = (secondLast8KBPageIndex * kPGRROMBankSize) + (address - kPGRROMStartAddress);
+            return _pgrROM[index];
+        }
+    }
+    else if (address <= 0xBFFF)
+    {
+        return _pgrROM[(_registers[7] * kPGRROMBankSize) + (address - 0xA000)];
+    }
+    else if (address <= 0xDFFF)
+    {
+        if (_prgROMBankMode == 0)
+        {
+            const size_t secondLast8KBPageIndex = (_pgrROMPageCount * 2) - 2;
+            const size_t index = (secondLast8KBPageIndex * kPGRROMBankSize) + (address - 0xC000);
+            return _pgrROM[index];
+        }
+        else
+        {
+            return _pgrROM[(_registers[6] * kPGRROMBankSize) + (address - 0xC000)];
+        }
+    }
+    else
+    {
+        const size_t last8KBPageIndex = (_pgrROMPageCount * 2) - 1;
+        const size_t index = (last8KBPageIndex * kPGRROMBankSize) + (address - 0xE000);
+        return _pgrROM[index];
+    }
 }
 
 uint8_t IM004_MMC3::GetCHRROMDataBasedOnRegister(int registerIndex, uint16_t address)

@@ -8,7 +8,7 @@ public:
     static const uint16_t kMaxPRGROMSize = 2 * kPRGROMPageSize;
     static const size_t kMaxCHRROMSize = 8192;
 
-    IM000_NROM(Hardware& hw);
+    IM000_NROM(Hardware& hw, size_t pgrPageCount, size_t chrPageCount);
     virtual uint8_t ReadCHRROMMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
     virtual void PowerOn() {}

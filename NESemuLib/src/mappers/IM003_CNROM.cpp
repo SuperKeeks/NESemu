@@ -1,6 +1,7 @@
 #include "IM003_CNROM.h"
 
-IM003_CNROM::IM003_CNROM(Hardware& hw) : MemoryMapper(hw)
+IM003_CNROM::IM003_CNROM(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) : 
+    MemoryMapper(hw, pgrPageCount, chrPageCount)
 {
 }
 
