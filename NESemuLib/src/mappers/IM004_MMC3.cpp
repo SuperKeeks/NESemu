@@ -190,7 +190,6 @@ void IM004_MMC3::PowerOn()
 
 void IM004_MMC3::Reset()
 {
-    //int _registers[8];
     _bankRegisterToUpdate = 0;
     _prgROMBankMode = 0;
     _chrInversion = 0;
