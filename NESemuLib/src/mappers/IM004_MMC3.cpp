@@ -244,5 +244,12 @@ uint8_t IM004_MMC3::ReadPRGROMMem(uint16_t address)
 
 uint8_t IM004_MMC3::GetCHRROMDataBasedOnRegister(int registerIndex, uint16_t address)
 {
-    return _chrROM[(_registers[registerIndex] * kCHRROMBankSize) + address];
+    int registerValue = _registers[registerIndex];
+    if ((registerIndex == 0 || registerIndex == 1) && registerValue % 2 != 0)
+    {
+        // "2KB banks may only select even numbered CHR banks. (The lowest bit is ignored.)"
+        registerValue = registerValue & ~(0x1);
+    }
+
+    return _chrROM[(registerValue * kCHRROMBankSize) + address];
 }
