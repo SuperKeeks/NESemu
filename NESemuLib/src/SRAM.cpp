@@ -28,7 +28,7 @@ uint8_t SRAM::ReadMem(uint16_t address)
 
 void SRAM::WriteMem(uint16_t address, uint8_t value)
 {
-    if (_enabled)
+    if (_enabled && _allowWrite)
     {
         uint16_t index = ConvertToIndex(address);
         _sram[index] = value;
@@ -52,6 +52,11 @@ void SRAM::Reset()
 void SRAM::SetEnabled(bool enabled)
 {
     _enabled = enabled;
+}
+
+void SRAM::SetAllowWrite(bool allowWrite)
+{
+    _allowWrite = allowWrite;
 }
 
 void SRAM::Load(const char* path)

@@ -8,19 +8,6 @@ IM004_MMC3::IM004_MMC3(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) :
 {
 }
 
-uint8_t IM004_MMC3::ReadMem(uint16_t address)
-{
-    const bool isPRGRAMAddress = address >= 0x6000 && address < 0x8000;
-    if (isPRGRAMAddress && !_enablePRGRAM)
-    {
-        return 0;
-    }
-    else
-    {
-        return MemoryMapper::ReadMem(address);
-    }
-}
-
 uint8_t IM004_MMC3::ReadCHRROMMem(uint16_t address)
 {
     if (address <= 0x03FF)
@@ -149,8 +136,10 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     else if (address >= 0xA001 && address <= 0xBFFF)
     {
         // PRG RAM protect ($A001-$BFFF, odd)
-        _allowPRGRAMWrites = BitwiseUtils::GetBitRange(value, 6, 1);
-        _enablePRGRAM = BitwiseUtils::GetBitRange(value, 7, 1);
+        const bool allowPRGRAMWrites = BitwiseUtils::GetBitRange(value, 6, 1) == 0;
+        const bool enablePRGRAM = BitwiseUtils::GetBitRange(value, 7, 1) == 1;
+        _hw.sram.SetEnabled(enablePRGRAM);
+        _hw.sram.SetAllowWrite(allowPRGRAMWrites);
     }
     else if (address >= 0xC000 && address <= 0xDFFE && isEvenAddress)
     {
@@ -172,10 +161,6 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     {
         // IRQ enable ($E001-$FFFF, odd)
         _enableIRQ = true;
-    }
-    else if (address >= 0x6000 && address < 0x8000 && (!_enablePRGRAM || !_allowPRGRAMWrites))
-    {
-        // Do nothing
     }
     else
     {

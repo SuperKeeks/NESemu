@@ -19,11 +19,13 @@ public:
     virtual void Reset();
 
     void SetEnabled(bool enabled);
+    void SetAllowWrite(bool allowWrite);
     void Load(const char* path);
     void Save(const char* path);
 
 private:
     bool _enabled = false;
+    bool _allowWrite = true; // Also requires _enabled = true
     uint8_t _sram[kSize];
 
     uint16_t ConvertToIndex(uint16_t address) const;

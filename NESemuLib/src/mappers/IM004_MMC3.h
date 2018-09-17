@@ -11,7 +11,6 @@ public:
     static const size_t kMaxCHRROMSize = 256 * 1024;
 
     IM004_MMC3(Hardware& hw, size_t pgrPageCount, size_t chrPageCount);
-    virtual uint8_t ReadMem(uint16_t address);
     virtual uint8_t ReadCHRROMMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
     virtual void PowerOn();
@@ -29,8 +28,6 @@ private:
     int _bankRegisterToUpdate;
     int _prgROMBankMode;
     int _chrInversion;
-    bool _allowPRGRAMWrites;
-    bool _enablePRGRAM;
     bool _enableIRQ;
 
     virtual uint8_t ReadPRGROMMem(uint16_t address);
