@@ -143,7 +143,8 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     else if (address >= 0xA000 && address <= 0xBFFE && isEvenAddress)
     {
         // Mirroring ($A000-$BFFE, even)
-        // Do nothing (this is set in the iNES header)
+        const bool isHorizontalMirroring = BitwiseUtils::GetBitRange(value, 0, 1);
+        _hw.ppu.SetMirroringMode(isHorizontalMirroring ? MirroringMode::Horizontal : MirroringMode::Vertical);
     }
     else if (address >= 0xA001 && address <= 0xBFFF)
     {
