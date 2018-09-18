@@ -13,6 +13,7 @@ public:
     IM004_MMC3(Hardware& hw, size_t pgrPageCount, size_t chrPageCount);
     virtual uint8_t ReadCHRROMMem(uint16_t address);
     virtual void WriteMem(uint16_t address, uint8_t value);
+    virtual void OnVisibleScanlineEnd();
     virtual void PowerOn();
     virtual void Reset();
 
@@ -29,6 +30,9 @@ private:
     int _prgROMBankMode;
     int _chrInversion;
     bool _enableIRQ;
+    uint8_t _counter;
+    uint8_t _counterReloadValue;
+    bool _counterReloadFlag;
 
     virtual uint8_t ReadPRGROMMem(uint16_t address);
     uint8_t GetCHRROMDataBasedOnRegister(int registerIndex, uint16_t address);

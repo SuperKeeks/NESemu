@@ -24,6 +24,7 @@ public:
     virtual uint8_t ReadMem(uint16_t address);
     virtual uint8_t ReadCHRROMMem(uint16_t address) = 0;
     virtual void WriteMem(uint16_t address, uint8_t value) {}
+    virtual void OnVisibleScanlineEnd() {}
     virtual void PowerOn() = 0;
     virtual void Reset() = 0;
 

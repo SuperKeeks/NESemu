@@ -213,6 +213,10 @@ void PPU::Tick()
     if (_scanlineCycleIndex >= kCyclesPerScanline)
     {
         _scanlineCycleIndex = 0;
+        if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
+        {
+            _memoryMapper->OnVisibleScanlineEnd();
+        }
         ++_currentScanline;
         if (_currentScanline > kVerticalBlankingScanlinesEnd)
         {

@@ -144,18 +144,17 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     else if (address >= 0xC000 && address <= 0xDFFE && isEvenAddress)
     {
         // IRQ latch ($C000-$DFFE, even)
-        OMBAssert(false, "TODO");
+        _counterReloadValue = value;
     }
     else if (address >= 0xC001 && address <= 0xDFFF)
     {
         // IRQ reload ($C001-$DFFF, odd)
-        OMBAssert(false, "TODO");
+        _counterReloadFlag = true;
     }
     else if (address >= 0xE000 && address <= 0xFFFE && isEvenAddress)
     {
         // IRQ disable ($E000-$FFFE, even)
         _enableIRQ = false;
-        // TODO: Acknowledge any pending interrupts
     }
     else if (address >= 0xE001 && address <= 0xFFFF)
     {
@@ -169,6 +168,23 @@ void IM004_MMC3::WriteMem(uint16_t address, uint8_t value)
     }
 }
 
+void IM004_MMC3::OnVisibleScanlineEnd()
+{
+    if (_counter == 0 || _counterReloadFlag)
+    {
+        _counter = _counterReloadValue;
+        _counterReloadFlag = false;
+    }
+    else
+    {
+        --_counter;
+        if (_counter == 0 && _enableIRQ)
+        {
+            _hw.cpu.ExecuteIRQ();
+        }
+    }
+}
+
 void IM004_MMC3::PowerOn()
 {
     Reset();
@@ -179,6 +195,9 @@ void IM004_MMC3::Reset()
     _bankRegisterToUpdate = 0;
     _prgROMBankMode = 0;
     _chrInversion = 0;
+    _counter = 0;
+    _counterReloadValue = 0;
+    _counterReloadFlag = false;
 }
 
 uint8_t IM004_MMC3::ReadPRGROMMem(uint16_t address)
