@@ -4,14 +4,14 @@
 
 #include <stdint.h>
 
-class CHRROM;
-class PRGROM;
+class MemoryMapper;
 
 class INESParser
 {
 public:
     ~INESParser();
-    void Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom);
+    void ParseHeader(const char* path);
+    void ParseROMs(const char* path, MemoryMapper& memoryMapper);
 
     void PrintInfo() const;
     uint8_t GetPRGROMPageCount() const;

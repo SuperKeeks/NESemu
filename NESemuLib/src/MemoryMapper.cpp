@@ -1,7 +1,23 @@
 #include "MemoryMapper.h"
 
-MemoryMapper::MemoryMapper(Hardware& hw) : _hw(hw)
+MemoryMapper::MemoryMapper(Hardware& hw, size_t pgrPageCount, size_t chrPageCount) : 
+    _hw(hw),
+    _pgrROMPageCount(pgrPageCount),
+    _chrPageCount(chrPageCount)
 {
+}
+
+uint8_t MemoryMapper::ReadMem(uint16_t address)
+{
+    if (address >= 0x8000)
+    {
+        return ReadPRGROMMem(address);
+    }
+    else
+    {
+        MemoryHandler& handler = GetMemoryHandlerForAddress(address, AccessMode::Read);
+        return handler.ReadMem(address);
+    }
 }
 
 MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address, AccessMode mode)
@@ -25,10 +41,6 @@ MemoryHandler& MemoryMapper::GetMemoryHandlerForAddress(uint16_t address, Access
     else if (address >= 0x6000 && address < 0x8000)
     {
         return _hw.sram;
-    }
-    else if (address >= 0x8000 && address <= 0xFFFF)
-    {
-        return _hw.prgRom;
     }
     else
     {

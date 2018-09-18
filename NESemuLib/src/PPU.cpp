@@ -2,7 +2,6 @@
 
 #include "Assert.h"
 #include "BitwiseUtils.h"
-#include "CHRROM.h"
 #include "CPU.h"
 #include "LogUtils.h"
 #include "MemoryMapper.h"
@@ -156,11 +155,10 @@ void PPU::PowerOn()
     ResetInternal(true);
 }
 
-void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, CHRROM* chrRom, MirroringMode mirroringMode)
+void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, MirroringMode mirroringMode)
 {
     _memoryMapper = memoryMapper;
     _cpu = cpu;
-    _chrRom = chrRom;
     _mirroringMode = mirroringMode;
 
     ResetInternal(false);
@@ -215,6 +213,10 @@ void PPU::Tick()
     if (_scanlineCycleIndex >= kCyclesPerScanline)
     {
         _scanlineCycleIndex = 0;
+        if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
+        {
+            _memoryMapper->OnVisibleScanlineEnd();
+        }
         ++_currentScanline;
         if (_currentScanline > kVerticalBlankingScanlinesEnd)
         {
@@ -312,7 +314,7 @@ uint8_t PPU::ReadPPUMem(uint16_t address)
 {
     if (address < kNametable0StartAddress)
     {
-        return _chrRom->ReadMem(address);
+        return _memoryMapper->ReadCHRROMMem(address);
     }
     else if (address < kMirrorStartAddress)
     {

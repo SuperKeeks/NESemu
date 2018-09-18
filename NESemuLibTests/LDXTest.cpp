@@ -14,9 +14,9 @@ namespace NESemuLibTests
         {
             NESemu emu;
             CPU& cpu = *emu.GetCPU();
-            uint8_t rom[PRGROM::kMaxPRGROMSize];
-            rom[CPU::kResetVectorAddressL - PRGROM::kStartAddress] = 0;
-            rom[CPU::kResetVectorAddressH - PRGROM::kStartAddress] = PRGROM::kStartAddress >> 8;
+            uint8_t rom[MemoryMapper::kUnitTestPGRROMSize];
+            rom[CPU::kResetVectorAddressL - MemoryMapper::kPGRROMStartAddress] = 0;
+            rom[CPU::kResetVectorAddressH - MemoryMapper::kPGRROMStartAddress] = MemoryMapper::kPGRROMStartAddress >> 8;
             int cycles;
 
             // Immediate
@@ -54,7 +54,7 @@ namespace NESemuLibTests
             rom[codeIndex++] = 0x33; // Low part of address
             rom[codeIndex++] = 0x12; // High part of address
 
-            emu.Load(rom, PRGROM::kMaxPRGROMSize);
+            emu.Load(rom, MemoryMapper::kUnitTestPGRROMSize);
 
             ////////////
             // Immediate

@@ -1,9 +1,8 @@
 #include "INESParser.h"
 
 #include "Assert.h"
-#include "CHRROM.h"
 #include "LogUtils.h"
-#include "PRGROM.h"
+#include "MemoryMapper.h"
 #include "SizeOfArray.h"
 
 #include <cstdlib>
@@ -13,11 +12,11 @@ INESParser::~INESParser()
 {
 }
 
-void INESParser::Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom)
+void INESParser::ParseHeader(const char* path)
 {
     FILE* file;
     fopen_s(&file, path, "rb");
-    
+
     // Header
     const size_t headerSize = fread_s(_header, sizeof(_header), sizeof(uint8_t), sizeofarray(_header), file);
     OMBAssert(headerSize == 16, "Unexpected header size");
@@ -30,17 +29,25 @@ void INESParser::Parse(const char* path, PRGROM& prgRom, CHRROM& chrRom)
         OMBAssert(_header[i] == 0, "Unsupported ROM format");
     }
 
+    fclose(file);
+}
+
+void INESParser::ParseROMs(const char* path, MemoryMapper& memoryMapper)
+{
+    FILE* file;
+    fopen_s(&file, path, "rb");
+    fseek(file, sizeof(uint8_t) * sizeofarray(_header), 0);
+
     // PRG-ROM
-    const size_t prgROMSize = PRGROM::kPRGROMPageSize * GetPRGROMPageCount();
-    OMBAssert(prgROMSize <= PRGROM::kMaxPRGROMSize, "Trying to load PRG-ROM bigger than it is supported");
-    const size_t readPRGROMSize = fread_s(prgRom.GetROMPtr(), PRGROM::kMaxPRGROMSize, sizeof(uint8_t), prgROMSize, file);
+    const size_t prgROMSize = MemoryMapper::kPRGROMPageSize * GetPRGROMPageCount();
+    OMBAssert(prgROMSize <= memoryMapper.GetPGRROMMaxSize(), "Trying to load PRG-ROM bigger than it is supported");
+    const size_t readPRGROMSize = fread_s(memoryMapper.GetPGRROMPtr(), memoryMapper.GetPGRROMMaxSize(), sizeof(uint8_t), prgROMSize, file);
     OMBAssert(readPRGROMSize == prgROMSize, "Unexpected PRG-ROM size");
-    prgRom.SetIs16KBROM(GetPRGROMPageCount() == 1);
 
     // CHR-ROM
-    const size_t chrROMSize = CHRROM::kPageCHRROMSize * GetCHRROMPageCount();
-    OMBAssert(chrROMSize <= CHRROM::kMaxCHRROMSize, "Trying to load CHR-ROM bigger than it is supported");
-    const size_t readCHRROMSize = fread_s(chrRom.GetCHRROMPtr(), CHRROM::kMaxCHRROMSize, sizeof(uint8_t), chrROMSize, file);
+    const size_t chrROMSize = MemoryMapper::kCHRROMPageSize * GetCHRROMPageCount();
+    OMBAssert(chrROMSize <= memoryMapper.GetCHRROMMaxSize(), "Trying to load CHR-ROM bigger than it is supported");
+    const size_t readCHRROMSize = fread_s(memoryMapper.GetCHRROMPtr(), memoryMapper.GetCHRROMMaxSize(), sizeof(uint8_t), chrROMSize, file);
     OMBAssert(readCHRROMSize == chrROMSize, "Unexpected CHR-ROM size");
     
     fclose(file);
