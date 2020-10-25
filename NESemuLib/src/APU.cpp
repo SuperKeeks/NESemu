@@ -226,7 +226,6 @@ void APU::Tick(std::function<void()> lockAudio, std::function<void()> unlockAudi
     if (_cyclesSinceLastSample >= _cyclesPerSample)
     {
         _cyclesSinceLastSample -= _cyclesPerSample;
-        OMBAssert(_outputBuffer.IsFull(), "Buffer is full!");
         lockAudio();
         _outputBuffer.Write(GenerateSample());
         unlockAudio();
