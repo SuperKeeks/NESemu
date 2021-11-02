@@ -1,10 +1,10 @@
 # SuperKeeks's NES Emulator #
 
-I've always found emulators fascinating. The fact you can play one platform within a completely different hardware architecture was magic to me. For this reason, I decided to write my own emulator, so I could get a decent grasp of how they work in the inside.
+I've always found emulators fascinating. The fact you can play one platform within a completely different hardware architecture was magic to me. For this reason, I decided to write my own emulator, so I could get a decent grasp of how they work under the hood.
 
 As for the platform, I picked the NES. It felt the right balance between complexity for the job (easy and well documented hardware and features) and nostalgia (the NES was my first ever console)
 
-During this trip I learned things like:
+During this trip I learnt things like:
 
 * How old game systems used to work and how games were made for them.
 * Refreshed my assembly language knowledge (which I haven't used since uni) and learnt 6502 assembly.
