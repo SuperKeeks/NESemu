@@ -66,18 +66,27 @@ int main(int argc, char* args[])
             renderer = SDL_CreateRenderer(window, -1, 0);
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, PPU::kHorizontalResolution, PPU::kVerticalResolution);
 
+            // Check if ROM name has been passed as an argument
+            if (argc == 1)
+            {
+                Log::Error("No ROM name specified. Usage: NESemu <ROM name> (e.g. \"NESemu smb\")");
+                return 0;
+            }            
+
+            // Check if ROM actually exists
+            std::string romFileName = args[1];
+            romFileName.append(".nes");
+            FILE* file;
+            fopen_s(&file, romFileName.c_str(), "rb");
+            if (file == NULL)
+            {
+                Log::Error("ROM %s not found!", romFileName.c_str());
+                return 0;
+            }                
+            fclose(file);
+
             NESemu emu;
-            //emu.Load("arkanoid.nes");
-            //emu.Load("color_test.nes");
-            //emu.Load("donkey.nes");
-            //emu.Load("galaga.nes");
-            //emu.Load("mariobros.nes");
-            //emu.Load("popeye.nes");
-            //emu.Load("smb.nes");
-            emu.Load("smb3.nes");
-            //emu.Load("dmc.nes");
-            //emu.Load("gb.nes");
-            //emu.Load("zelda_title.nes");
+            emu.Load(romFileName.c_str());
             
             emu.GetPPU()->SetWaitToShowFrameBuffer(true);
             emu.GetAPU()->SetOutputFrequency(AUDIO_FREQUENCY);
