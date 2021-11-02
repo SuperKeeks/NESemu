@@ -29,6 +29,12 @@ After having the Emulator basics (graphics and input but no audio) working, I ga
 * Support for 001, 003 and 004 [memory mappers](https://wiki.nesdev.com/w/index.php/Mapper) which allow to play games like Super Mario Bros 1 and 3, Galaga, Donkey Kong, Original Mario Bros...
 * Unit testing of all of the CPU instructions.
 
+# Usage #
+
+To run a supported ROM, just pass the ROM name as an argument.
+
+e.g. `NESemu smb`
+
 # Default input #
 Keyboard input (hardcoded):
 * D-Pad: Arrow keys
@@ -38,9 +44,6 @@ Keyboard input (hardcoded):
 * Start: Enter
 
 There's also gamepad support (mappings thanks to [SDL_GameControllerDB](https://github.com/gabomdq/SDL_GameControllerDB))
-
-# Architecture #
-TODO
 
 # Project setup #
 
