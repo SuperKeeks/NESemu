@@ -74,7 +74,7 @@ int main(int argc, char* args[])
             }            
 
             // Check if ROM actually exists
-            std::string romFileName = args[1];
+            std::string romFileName(args[1]);
             romFileName.append(".nes");
             FILE* file;
             fopen_s(&file, romFileName.c_str(), "rb");
