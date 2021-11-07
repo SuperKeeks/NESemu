@@ -52,7 +52,6 @@ int main(int argc, char* args[])
         {
             // Initialise game controllers
             const int gameControllerCount = SDL_NumJoysticks();
-            Log::Info("%d joysticks were found.\n", gameControllerCount);
             for (int i = 0; i < gameControllerCount && i < sizeofarray(gameControllers); i++)
             {
                 gameControllers[i] = SDL_GameControllerOpen(i);
@@ -82,7 +81,7 @@ int main(int argc, char* args[])
             {
                 Log::Error("ROM %s not found!", romFileName.c_str());
                 return 0;
-            }                
+            }
             fclose(file);
 
             NESemu emu;
