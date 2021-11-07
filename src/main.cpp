@@ -2,13 +2,33 @@
 #include "NESemu.h"
 #include "SizeOfArray.h"
 
+#include <d3d11.h>
+
 #include <SDL.h>
+#include <SDL_syswm.h>
+
+#include <imgui.h>
+#include <imgui_impl_sdl.h>
+#include <imgui_impl_dx11.h>
+
 #include <stdio.h>
+
+static ID3D11Device*  g_pd3dDevice = NULL;
+static ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
+static IDXGISwapChain* g_pSwapChain = NULL;
+static ID3D11RenderTargetView* g_mainRenderTargetView = NULL;
 
 const int SCALE = 2;
 const int JOYSTICK_DEAD_ZONE = 8000;
 const int AUDIO_FREQUENCY = 44100;
 const int AUDIO_BUFFER_SIZE = 1024;
+
+bool CreateDeviceD3D(HWND hWnd);
+void CleanupDeviceD3D();
+void CreateRenderTarget();
+void CleanupRenderTarget();
+
+void InitImGui(SDL_Window* window);
 
 Input::ControllerState& SelectControllerState(SDL_Event event, Input::ControllerState& controllerState1, Input::ControllerState& controllerState2);
 void HandleKeyboardButtonEvent(Input::ControllerState& controllerState, SDL_Event event);
@@ -50,9 +70,19 @@ int main(int argc, char* args[])
         }
         else
         {
+            SDL_SysWMinfo wmInfo;
+            SDL_VERSION(&wmInfo.version);
+            SDL_GetWindowWMInfo(window, &wmInfo);
+            HWND hwnd = (HWND)wmInfo.info.win.window;
+            // Initialize Direct3D
+            if (!CreateDeviceD3D(hwnd))
+            {
+                CleanupDeviceD3D();
+                return 1;
+            }
+
             // Initialise game controllers
             const int gameControllerCount = SDL_NumJoysticks();
-            Log::Info("%d joysticks were found.\n", gameControllerCount);
             for (int i = 0; i < gameControllerCount && i < sizeofarray(gameControllers); i++)
             {
                 gameControllers[i] = SDL_GameControllerOpen(i);
@@ -71,7 +101,7 @@ int main(int argc, char* args[])
             {
                 Log::Error("No ROM name specified. Usage: NESemu <ROM name> (e.g. \"NESemu smb\")");
                 return 0;
-            }            
+            }
 
             // Check if ROM actually exists
             std::string romFileName(args[1]);
@@ -111,6 +141,8 @@ int main(int argc, char* args[])
                 Log::Info("Initialised an Audio device at frequency %d Hz, %d Channels\n", audioSettings.freq, audioSettings.channels);
                 SDL_PauseAudio(0);
             }
+
+            InitImGui(window);
 
             // Timing code from https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
             Uint32 now = SDL_GetTicks();
@@ -173,13 +205,42 @@ int main(int argc, char* args[])
                 emu.SetControllerState(2, controller2State);
 
                 emu.Update(deltaTime, SDL_LockAudio, SDL_UnlockAudio);
+
+                // Start the Dear ImGui frame
+                ImGui_ImplDX11_NewFrame();
+                ImGui_ImplSDL2_NewFrame();
+                ImGui::NewFrame();
+
+                // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+                //bool show_demo_window = true;
+                //ImGui::ShowDemoWindow(&show_demo_window);
+
+                ImGui::Begin("Hello, world!");
+                ImGui::Text("This is some useful text.");
+                ImGui::End();
+
+                // Rendering
+                ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+                ImGui::Render();
+                /*const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+                g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
+                g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+                ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+                g_pSwapChain->Present(1, 0); // Present with vsync*/
                 
                 if (emu.GetPPU()->IsWaitingToShowFrameBuffer())
                 {
                     SDL_UpdateTexture(texture, NULL, emu.GetPPU()->GetFrameBuffer(), PPU::kHorizontalResolution * sizeof(Uint32));
                     SDL_RenderClear(renderer);
                     SDL_RenderCopy(renderer, texture, NULL, NULL);
-                    SDL_RenderPresent(renderer);
+
+                    const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+                    g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
+                    g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+                    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+                    g_pSwapChain->Present(1, 0); // Present with vsync
+
+                    //SDL_RenderPresent(renderer);
                 }
             }
         }
@@ -196,19 +257,89 @@ int main(int argc, char* args[])
     SDL_CloseAudio();
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
+    CleanupDeviceD3D();
     SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;
 }
 
+bool CreateDeviceD3D(HWND hWnd)
+{
+    // Setup swap chain
+    DXGI_SWAP_CHAIN_DESC sd;
+    ZeroMemory(&sd, sizeof(sd));
+    sd.BufferCount = 2;
+    sd.BufferDesc.Width = 0;
+    sd.BufferDesc.Height = 0;
+    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sd.BufferDesc.RefreshRate.Numerator = 60;
+    sd.BufferDesc.RefreshRate.Denominator = 1;
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.OutputWindow = hWnd;
+    sd.SampleDesc.Count = 1;
+    sd.SampleDesc.Quality = 0;
+    sd.Windowed = TRUE;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+    UINT createDeviceFlags = 0;
+    //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+    D3D_FEATURE_LEVEL featureLevel;
+    const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
+    if (D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext) != S_OK)
+        return false;
+
+    CreateRenderTarget();
+    return true;
+}
+
+void CleanupDeviceD3D()
+{
+    CleanupRenderTarget();
+    if (g_pSwapChain) { g_pSwapChain->Release(); g_pSwapChain = NULL; }
+    if (g_pd3dDeviceContext) { g_pd3dDeviceContext->Release(); g_pd3dDeviceContext = NULL; }
+    if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = NULL; }
+}
+
+void CreateRenderTarget()
+{
+    ID3D11Texture2D* pBackBuffer;
+    g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+    g_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_mainRenderTargetView);
+    pBackBuffer->Release();
+}
+
+void CleanupRenderTarget()
+{
+    if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
+}
+
+void InitImGui(SDL_Window* window)
+{
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL2_InitForD3D(window);
+    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+}
+
 Input::ControllerState& SelectControllerState(
     SDL_Event event,
-    Input::ControllerState& controllerState1, 
+    Input::ControllerState& controllerState1,
     Input::ControllerState& controllerState2)
 {
-    if (event.type == SDL_CONTROLLERBUTTONDOWN || 
-        event.type == SDL_CONTROLLERBUTTONUP || 
+    if (event.type == SDL_CONTROLLERBUTTONDOWN ||
+        event.type == SDL_CONTROLLERBUTTONUP ||
         event.type == SDL_CONTROLLERAXISMOTION)
     {
         if (event.cdevice.which == 0)
@@ -366,7 +497,7 @@ void SDLAudioCallback(void* userData, Uint8* audioData, int length)
     {
         const double sample = emuBuffer.Read();
         OMBAssert(sample >= 0 && sample <= 1.0, "Wrong output value");
-        output[i] = (int16_t)(sample * std::numeric_limits<int16_t>::max());
+        output[i] = (int16_t)(sample * 0x7FFF /*std::numeric_limits<int16_t>::max()*/);
     }
 
     // If the emulator buffer is not long enough, fill the SDL one with the last sample
