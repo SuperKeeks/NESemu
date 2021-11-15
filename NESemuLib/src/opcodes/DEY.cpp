@@ -2,8 +2,8 @@
 
 int CPU::DEY(AddressingMode mode)
 {
-    --_y;
-    SetFlag(Flag::Sign, IsValueNegative(_y));
-    SetFlag(Flag::Zero, _y == 0);
+    --_state._y;
+    SetFlag(Flag::Sign, IsValueNegative(_state._y));
+    SetFlag(Flag::Zero, _state._y == 0);
     return 2;
 }

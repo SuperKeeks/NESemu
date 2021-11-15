@@ -10,12 +10,12 @@
 void CPU::PowerOn()
 {
     // http://wiki.nesdev.com/w/index.php/CPU_power_up_state
-    _programCounter = 0xFFFF;
-    _stackPointer = 0;
-    _status = 0x34;
-    _accumulator = 0;
-    _x = 0;
-    _y = 0;
+    _state._programCounter = 0xFFFF;
+    _state._stackPointer = 0;
+    _state._status = 0x34;
+    _state._accumulator = 0;
+    _state._x = 0;
+    _state._y = 0;
 }
 
 void CPU::Reset(MemoryMapper* memoryMapper)
@@ -23,11 +23,11 @@ void CPU::Reset(MemoryMapper* memoryMapper)
     _memoryMapper = memoryMapper;
 
     // Load program start address in program counter
-    _programCounter = _memoryMapper->ReadMem(kResetVectorAddressL) + (_memoryMapper->ReadMem(kResetVectorAddressH) << 8) - 1;
-    _ticksUntilNextInstruction = 0;
+    _state._programCounter = _memoryMapper->ReadMem(kResetVectorAddressL) + (_memoryMapper->ReadMem(kResetVectorAddressH) << 8) - 1;
+    _state._ticksUntilNextInstruction = 0;
     
     // "After reset S was decremented by 3 (but nothing was written to the stack)" from http://wiki.nesdev.com/w/index.php/CPU_power_up_state
-    _stackPointer -= 0x3;
+    _state._stackPointer -= 0x3;
     
     // https://stackoverflow.com/questions/16913423/why-is-the-initial-state-of-the-interrupt-flag-of-the-6502-a-1
     SetFlag(Flag::InterruptDisable, true);
@@ -35,17 +35,17 @@ void CPU::Reset(MemoryMapper* memoryMapper)
 
 void CPU::Tick()
 {
-    --_ticksUntilNextInstruction;
-    if (_ticksUntilNextInstruction <= 0)
+    --_state._ticksUntilNextInstruction;
+    if (_state._ticksUntilNextInstruction <= 0)
     {
-        _ticksUntilNextInstruction = ExecuteNextInstruction() - 1;
+        _state._ticksUntilNextInstruction = ExecuteNextInstruction() - 1;
     }
 }
 
 int CPU::ExecuteNextInstruction()
 {
     // Fetch next opcode
-    const uint8_t opcode = _memoryMapper->ReadMem(++_programCounter);
+    const uint8_t opcode = _memoryMapper->ReadMem(++_state._programCounter);
 
     switch (opcode)
     {
@@ -143,20 +143,20 @@ int CPU::ExecuteNextInstruction()
         case 0x40: PrintOpcodeInfo(opcode, "RTI", AddressingMode::Implied); return RTI(AddressingMode::Implied);
 
         // Compare instructions
-        case 0xC9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _accumulator);
-        case 0xC5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _accumulator);
-        case 0xD5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPageX); return CMP(AddressingMode::ZeroPageX, _accumulator);
-        case 0xCD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _accumulator);
-        case 0xDD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteX); return CMP(AddressingMode::AbsoluteX, _accumulator);
-        case 0xD9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteY); return CMP(AddressingMode::AbsoluteY, _accumulator);
-        case 0xC1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectX); return CMP(AddressingMode::IndirectX, _accumulator);
-        case 0xD1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectY); return CMP(AddressingMode::IndirectY, _accumulator);
-        case 0xE0: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _x);
-        case 0xE4: PrintOpcodeInfo(opcode, "CPX", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _x);
-        case 0xEC: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _x);
-        case 0xC0: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _y);
-        case 0xC4: PrintOpcodeInfo(opcode, "CPY", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _y);
-        case 0xCC: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _y);
+        case 0xC9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _state._accumulator);
+        case 0xC5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _state._accumulator);
+        case 0xD5: PrintOpcodeInfo(opcode, "CMP", AddressingMode::ZeroPageX); return CMP(AddressingMode::ZeroPageX, _state._accumulator);
+        case 0xCD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _state._accumulator);
+        case 0xDD: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteX); return CMP(AddressingMode::AbsoluteX, _state._accumulator);
+        case 0xD9: PrintOpcodeInfo(opcode, "CMP", AddressingMode::AbsoluteY); return CMP(AddressingMode::AbsoluteY, _state._accumulator);
+        case 0xC1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectX); return CMP(AddressingMode::IndirectX, _state._accumulator);
+        case 0xD1: PrintOpcodeInfo(opcode, "CMP", AddressingMode::IndirectY); return CMP(AddressingMode::IndirectY, _state._accumulator);
+        case 0xE0: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _state._x);
+        case 0xE4: PrintOpcodeInfo(opcode, "CPX", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _state._x);
+        case 0xEC: PrintOpcodeInfo(opcode, "CPX", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _state._x);
+        case 0xC0: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Immediate); return CMP(AddressingMode::Immediate, _state._y);
+        case 0xC4: PrintOpcodeInfo(opcode, "CPY", AddressingMode::ZeroPage); return CMP(AddressingMode::ZeroPage, _state._y);
+        case 0xCC: PrintOpcodeInfo(opcode, "CPY", AddressingMode::Absolute); return CMP(AddressingMode::Absolute, _state._y);
 
         // Logic instructions
         case 0x24: PrintOpcodeInfo(opcode, "BIT", AddressingMode::ZeroPage); return BIT(AddressingMode::ZeroPage);
@@ -219,12 +219,12 @@ int CPU::ExecuteNextInstruction()
         case 0x10: PrintOpcodeInfo(opcode, "BPL", AddressingMode::Relative); return BXX(AddressingMode::Relative, !GetFlag(Flag::Sign));
 
         // Transfer instructions
-        case 0x9A: PrintOpcodeInfo(opcode, "TXS", AddressingMode::Implied); return TXX(AddressingMode::Implied, _x, _stackPointer);
-        case 0xBA: PrintOpcodeInfo(opcode, "TSX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _stackPointer, _x);
-        case 0xAA: PrintOpcodeInfo(opcode, "TAX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _accumulator, _x);
-        case 0x8A: PrintOpcodeInfo(opcode, "TXA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _x, _accumulator);
-        case 0xA8: PrintOpcodeInfo(opcode, "TAY", AddressingMode::Implied); return TXX(AddressingMode::Implied, _accumulator, _y);
-        case 0x98: PrintOpcodeInfo(opcode, "TYA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _y, _accumulator);
+        case 0x9A: PrintOpcodeInfo(opcode, "TXS", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._x, _state._stackPointer);
+        case 0xBA: PrintOpcodeInfo(opcode, "TSX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._stackPointer, _state._x);
+        case 0xAA: PrintOpcodeInfo(opcode, "TAX", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._accumulator, _state._x);
+        case 0x8A: PrintOpcodeInfo(opcode, "TXA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._x, _state._accumulator);
+        case 0xA8: PrintOpcodeInfo(opcode, "TAY", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._accumulator, _state._y);
+        case 0x98: PrintOpcodeInfo(opcode, "TYA", AddressingMode::Implied); return TXX(AddressingMode::Implied, _state._y, _state._accumulator);
         case 0x48: PrintOpcodeInfo(opcode, "PHA", AddressingMode::Implied); return PHA(AddressingMode::Implied);
         case 0x68: PrintOpcodeInfo(opcode, "PLA", AddressingMode::Implied); return PLA(AddressingMode::Implied);
         case 0x08: PrintOpcodeInfo(opcode, "PHP", AddressingMode::Implied); return PHP(AddressingMode::Implied);
@@ -240,13 +240,13 @@ int CPU::ExecuteNextInstruction()
 
 void CPU::Interrupt(bool breakFlagValue, uint16_t jumpAddressL)
 {
-    uint8_t newStatus = _status | (1 << Flag::Unused);
+    uint8_t newStatus = _state._status | (1 << Flag::Unused);
     BitwiseUtils::SetFlag(newStatus, Flag::Break, breakFlagValue);
-    Push(GetHighByte(_programCounter));
-    Push(GetLowByte(_programCounter));
+    Push(GetHighByte(_state._programCounter));
+    Push(GetLowByte(_state._programCounter));
     Push(newStatus);
     SetFlag(Flag::InterruptDisable, true);
-    _programCounter = _memoryMapper->ReadMem(jumpAddressL) +
+    _state._programCounter = _memoryMapper->ReadMem(jumpAddressL) +
         (_memoryMapper->ReadMem(jumpAddressL + 1) << 8) - 1;
 }
 
@@ -266,9 +266,9 @@ void CPU::ExecuteIRQ()
 
 void CPU::SetAccumulator(uint8_t value)
 {
-    _accumulator = value;
-    SetFlag(Flag::Sign, IsValueNegative(_accumulator));
-    SetFlag(Flag::Zero, _accumulator == 0);
+    _state._accumulator = value;
+    SetFlag(Flag::Sign, IsValueNegative(_state._accumulator));
+    SetFlag(Flag::Zero, _state._accumulator == 0);
 }
 
 void CPU::SetFlag(Flag flag, bool value)
@@ -279,7 +279,7 @@ void CPU::SetFlag(Flag flag, bool value)
         return;
     }
 
-    BitwiseUtils::SetFlag(_status, flag, value);
+    BitwiseUtils::SetFlag(_state._status, flag, value);
 }
 
 bool CPU::GetFlag(Flag flag) const
@@ -296,13 +296,13 @@ bool CPU::GetFlag(Flag flag) const
     }
     else
     {
-        return BitwiseUtils::IsFlagSet(_status, flag);
+        return BitwiseUtils::IsFlagSet(_state._status, flag);
     }
 }
 
 uint8_t CPU::PeekStack(int index)
 {
-    return _memoryMapper->ReadMem(kStackAddressStart + _stackPointer + 1 + index);
+    return _memoryMapper->ReadMem(kStackAddressStart + _state._stackPointer + 1 + index);
 }
 
 uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
@@ -312,48 +312,48 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
     {
         case AddressingMode::Accumulator:
         {
-            value = _accumulator;
+            value = _state._accumulator;
             cycles += 0; // Not sure about this one. Only used for shift and rotate instructions.
             break;
         }
         case AddressingMode::Immediate:
         {
-            value = _memoryMapper->ReadMem(++_programCounter);
+            value = _memoryMapper->ReadMem(++_state._programCounter);
             cycles += 1;
             break;
         }
         case AddressingMode::ZeroPage:
         {
-            _lastReadAddress = _memoryMapper->ReadMem(++_programCounter);
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            _state._lastReadAddress = _memoryMapper->ReadMem(++_state._programCounter);
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 2;
             break;
         }
         case AddressingMode::ZeroPageX:
         case AddressingMode::ZeroPageY:
         {
-            const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
-            _lastReadAddress = _memoryMapper->ReadMem(++_programCounter) + regValue;
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _state._x : _state._y;
+            _state._lastReadAddress = _memoryMapper->ReadMem(++_state._programCounter) + regValue;
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 3;
             break;
         }
         case AddressingMode::Absolute:
         {
-            _lastReadAddress = _memoryMapper->ReadMem(++_programCounter) + (_memoryMapper->ReadMem(++_programCounter) << 8);
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            _state._lastReadAddress = _memoryMapper->ReadMem(++_state._programCounter) + (_memoryMapper->ReadMem(++_state._programCounter) << 8);
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 3;
             break;
         }
         case AddressingMode::AbsoluteX:
         case AddressingMode::AbsoluteY:
         {
-            const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
-            const uint8_t loByte = _memoryMapper->ReadMem(++_programCounter);
+            const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _state._x : _state._y;
+            const uint8_t loByte = _memoryMapper->ReadMem(++_state._programCounter);
             const uint16_t loBytePlusReg = loByte + regValue;
-            const uint8_t hiByte = _memoryMapper->ReadMem(++_programCounter);
-            _lastReadAddress = loBytePlusReg + (hiByte << 8);
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            const uint8_t hiByte = _memoryMapper->ReadMem(++_state._programCounter);
+            _state._lastReadAddress = loBytePlusReg + (hiByte << 8);
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 3;
             if (loBytePlusReg != (uint8_t)loBytePlusReg)
             {
@@ -364,20 +364,20 @@ uint8_t CPU::GetValueWithMode(AddressingMode mode, int& cycles)
         }
         case AddressingMode::IndirectX:
         {
-            const uint16_t address = _memoryMapper->ReadMem(++_programCounter) + _x;
-            _lastReadAddress = _memoryMapper->ReadMem(address) + (_memoryMapper->ReadMem(address + 1) << 8);
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            const uint16_t address = _memoryMapper->ReadMem(++_state._programCounter) + _state._x;
+            _state._lastReadAddress = _memoryMapper->ReadMem(address) + (_memoryMapper->ReadMem(address + 1) << 8);
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 5;
             break;
         }
         case AddressingMode::IndirectY:
         {
-            const uint8_t address = _memoryMapper->ReadMem(++_programCounter);
+            const uint8_t address = _memoryMapper->ReadMem(++_state._programCounter);
             const uint8_t loByte = _memoryMapper->ReadMem(address);
-            const uint16_t loBytePlusReg = loByte + _y;
+            const uint16_t loBytePlusReg = loByte + _state._y;
             const uint8_t hiByte = _memoryMapper->ReadMem(address + 1);
-            _lastReadAddress = loBytePlusReg + (hiByte << 8);
-            value = _memoryMapper->ReadMem(_lastReadAddress);
+            _state._lastReadAddress = loBytePlusReg + (hiByte << 8);
+            value = _memoryMapper->ReadMem(_state._lastReadAddress);
             cycles += 4;
             if (loBytePlusReg != (uint8_t)loBytePlusReg)
             {
@@ -400,7 +400,7 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
     {
         case AddressingMode::ZeroPage:
         {
-            const uint16_t address = _memoryMapper->ReadMem(++_programCounter);
+            const uint16_t address = _memoryMapper->ReadMem(++_state._programCounter);
             _memoryMapper->WriteMem(address, value);
             cycles += 2;
             break;
@@ -408,15 +408,15 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         case AddressingMode::ZeroPageX:
         case AddressingMode::ZeroPageY:
         {
-            const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _x : _y;
-            const uint16_t address = _memoryMapper->ReadMem(++_programCounter) + regValue;
+            const uint8_t regValue = (mode == AddressingMode::ZeroPageX) ? _state._x : _state._y;
+            const uint16_t address = _memoryMapper->ReadMem(++_state._programCounter) + regValue;
             _memoryMapper->WriteMem(address, value);
             cycles += 3;
             break;
         }
         case AddressingMode::Absolute:
         {
-            const uint16_t address = _memoryMapper->ReadMem(++_programCounter) + (_memoryMapper->ReadMem(++_programCounter) << 8);
+            const uint16_t address = _memoryMapper->ReadMem(++_state._programCounter) + (_memoryMapper->ReadMem(++_state._programCounter) << 8);
             _memoryMapper->WriteMem(address, value);
             cycles += 3;
             break;
@@ -424,10 +424,10 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         case AddressingMode::AbsoluteX:
         case AddressingMode::AbsoluteY:
         {
-            const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _x : _y;
-            const uint8_t loByte = _memoryMapper->ReadMem(++_programCounter);
+            const uint8_t regValue = (mode == AddressingMode::AbsoluteX) ? _state._x : _state._y;
+            const uint8_t loByte = _memoryMapper->ReadMem(++_state._programCounter);
             const uint16_t loBytePlusReg = loByte + regValue;
-            const uint8_t hiByte = _memoryMapper->ReadMem(++_programCounter);
+            const uint8_t hiByte = _memoryMapper->ReadMem(++_state._programCounter);
             const uint16_t address = loBytePlusReg + (hiByte << 8);
             _memoryMapper->WriteMem(address, value);
             cycles += 4;
@@ -435,7 +435,7 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         }
         case AddressingMode::IndirectX:
         {
-            const uint16_t address = _memoryMapper->ReadMem(++_programCounter) + _x;
+            const uint16_t address = _memoryMapper->ReadMem(++_state._programCounter) + _state._x;
             const uint16_t finalAddress = _memoryMapper->ReadMem(address) + (_memoryMapper->ReadMem(address + 1) << 8);
             _memoryMapper->WriteMem(finalAddress, value);
             cycles += 5;
@@ -443,9 +443,9 @@ void CPU::SetValueWithMode(AddressingMode mode, uint8_t value, int& cycles)
         }
         case AddressingMode::IndirectY:
         {
-            const uint8_t address = _memoryMapper->ReadMem(++_programCounter);
+            const uint8_t address = _memoryMapper->ReadMem(++_state._programCounter);
             const uint8_t loByte = _memoryMapper->ReadMem(address);
-            const uint16_t loBytePlusReg = loByte + _y;
+            const uint16_t loBytePlusReg = loByte + _state._y;
             const uint8_t hiByte = _memoryMapper->ReadMem(address + 1);
             const uint16_t finalAddress = loBytePlusReg + (hiByte << 8);
             _memoryMapper->WriteMem(finalAddress, value);
@@ -471,22 +471,22 @@ void CPU::SaveShiftOperationResult(AddressingMode mode, uint8_t result)
         SetFlag(Flag::Sign, IsValueNegative(result));
         SetFlag(Flag::Zero, result == 0);
 
-        _memoryMapper->WriteMem(_lastReadAddress, result);
+        _memoryMapper->WriteMem(_state._lastReadAddress, result);
     }
 }
 
 void CPU::Push(uint8_t value)
 {
-    _memoryMapper->WriteMem(kStackAddressStart + _stackPointer, value);
-    OMBAssert(_stackPointer > 0, "Stack overflow!");
-    --_stackPointer;
+    _memoryMapper->WriteMem(kStackAddressStart + _state._stackPointer, value);
+    OMBAssert(_state._stackPointer > 0, "Stack overflow!");
+    --_state._stackPointer;
 }
 
 uint8_t CPU::Pop()
 {
-    OMBAssert(_stackPointer < 0xFF, "Stack overflow!");
-    ++_stackPointer;
-    return _memoryMapper->ReadMem(kStackAddressStart + _stackPointer);
+    OMBAssert(_state._stackPointer < 0xFF, "Stack overflow!");
+    ++_state._stackPointer;
+    return _memoryMapper->ReadMem(kStackAddressStart + _state._stackPointer);
 }
 
 uint8_t CPU::GetLowByte(uint16_t value) const

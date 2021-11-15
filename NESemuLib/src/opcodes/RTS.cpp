@@ -2,6 +2,6 @@
 
 int CPU::RTS(AddressingMode mode)
 {
-    _programCounter = Pop() + (Pop() << 8);
+    _state._programCounter = Pop() + (Pop() << 8);
     return 6;
 }

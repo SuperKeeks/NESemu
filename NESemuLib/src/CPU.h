@@ -45,6 +45,19 @@ public:
         IndirectY
     };
 
+    struct CPUState
+    {
+        uint16_t _programCounter;
+        uint8_t _stackPointer;
+        uint8_t _status;
+        uint8_t _accumulator;
+        uint8_t _x;
+        uint8_t _y;
+
+        int _ticksUntilNextInstruction = 0;
+        uint16_t _lastReadAddress;
+    };
+
     void PowerOn();
     void Reset(MemoryMapper* memoryMapper);
 
@@ -54,33 +67,29 @@ public:
     void ExecuteIRQ();
 
     // Internal or for testing purposes (hence the publicness) Don't use these without a good reason
-    uint16_t GetProgramCounter() const { return _programCounter; }
-    void SetProgramCounter(uint16_t value) { _programCounter = value; }
-    uint8_t GetStatus() const { return _status; }
-    uint8_t GetAccumulator() const { return _accumulator; }
-    uint8_t GetX() const { return _x; }
-    uint8_t GetY() const { return _y; }
+    uint16_t GetProgramCounter() const { return _state._programCounter; }
+    void SetProgramCounter(uint16_t value) { _state._programCounter = value; }
+    uint8_t GetStatus() const { return _state._status; }
+    uint8_t GetAccumulator() const { return _state._accumulator; }
+    uint8_t GetX() const { return _state._x; }
+    uint8_t GetY() const { return _state._y; }
     void SetAccumulator(uint8_t value);
-    void SetX(uint8_t value) { _x = value; }
-    void SetY(uint8_t value) { _y = value; }
+    void SetX(uint8_t value) { _state._x = value; }
+    void SetY(uint8_t value) { _state._y = value; }
     void SetFlag(Flag flag, bool value);
     bool GetFlag(Flag flag) const;
     uint8_t PeekStack(int index);
-    uint8_t GetStackPointer() const { return _stackPointer; }
-    void SetStackPointer(uint8_t value) { _stackPointer = value; }
+    uint8_t GetStackPointer() const { return _state._stackPointer; }
+    void SetStackPointer(uint8_t value) { _state._stackPointer = value; }
     void EnableOpcodeInfoPrinting(bool value) { _enableOpcodeInfoPrinting = value; }
 
+    CPUState GetSnapshot() { return _state; }
+    void LoadSnapshot(CPUState snapshot) { _state = snapshot; }
+
 private:
-    uint16_t _programCounter;
-    uint8_t _stackPointer;
-    uint8_t _status;
-    uint8_t _accumulator;
-    uint8_t _x;
-    uint8_t _y;
+    CPUState _state;
 
     MemoryMapper* _memoryMapper = nullptr;
-    int _ticksUntilNextInstruction = 0;
-    uint16_t _lastReadAddress;
 
     bool _enableOpcodeInfoPrinting = false;
 

@@ -3,7 +3,7 @@
 int CPU::STA(AddressingMode mode)
 {
     int cycles = 1;
-    SetValueWithMode(mode, _accumulator, cycles);
+    SetValueWithMode(mode, _state._accumulator, cycles);
 
     return cycles;
 }

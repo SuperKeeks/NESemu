@@ -20,27 +20,27 @@ uint8_t PPU::ReadMem(uint16_t address)
     if (address == 0x2002)
     {
         // Reset PPU Scroll and Addr write toggle so next write to any of them sets the high byte
-        _w = false;
+        _state._w = false;
 
         // Reset VBlank flag
-        const uint8_t statusBeforeVBlankReset = _ppuStatus;
-        if (_ppuStatus != 0)
+        const uint8_t statusBeforeVBlankReset = _state._ppuStatus;
+        if (_state._ppuStatus != 0)
         {
-            BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
+            BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::VBlank, false);
         }
 
         return statusBeforeVBlankReset;
     }
     else if (address == 0x2004)
     {
-        return _oam[_oamAddr];
+        return _state._oam[_state._oamAddr];
     }
     else if (address == 0x2007)
     {
-        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_v);
-        _v += GetAddressIncrement();
-        const uint8_t prevReadBuffer = _readBuffer;
-        _readBuffer = ReadPPUMem(ppuAddress);
+        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_state._v);
+        _state._v += GetAddressIncrement();
+        const uint8_t prevReadBuffer = _state._readBuffer;
+        _state._readBuffer = ReadPPUMem(ppuAddress);
 
         if (ppuAddress < kPaletteStartAddress)
         {
@@ -50,7 +50,7 @@ uint8_t PPU::ReadMem(uint16_t address)
         else
         {
             // Palette values are returned immediately (although also cached)
-            return _readBuffer;
+            return _state._readBuffer;
         }
     }
     else if (address >= 0x2008 && address < 0x4000)
@@ -69,67 +69,67 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
 {
     if (address == 0x2000)
     {
-        const bool wasNMIFlagSet = BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank);
-        _ppuCtrl = value;
+        const bool wasNMIFlagSet = BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank);
+        _state._ppuCtrl = value;
 
         // Set nametable bits of t
-        _t = (_t & 0xF3FF) | ((value & 0x3) << 10);
+        _state._t = (_state._t & 0xF3FF) | ((value & 0x3) << 10);
 
         // "When turning on the NMI flag in bit 7, if the PPU is currently in vertical blank 
         // and the PPUSTATUS ($2002) vblank flag is set, an NMI will be generated immediately"
-        if (!wasNMIFlagSet && BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank) && BitwiseUtils::IsFlagSet(_ppuStatus, PPUStatusFlags::VBlank))
+        if (!wasNMIFlagSet && BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank) && BitwiseUtils::IsFlagSet(_state._ppuStatus, PPUStatusFlags::VBlank))
         {
             _cpu->ExecuteNMI();
         }
     }
     else if (address == 0x2001)
     {
-        _ppuMask = value;
+        _state._ppuMask = value;
     }
     else if (address == 0x2003)
     {
-        _oamAddr = value;
+        _state._oamAddr = value;
     }
     else if (address == 0x2004)
     {
-        _oam[_oamAddr++] = value;
+        _state._oam[_state._oamAddr++] = value;
     }
     else if (address == 0x2005)
     {
-        if (_w)
+        if (_state._w)
         {
             // "$2005 second write (w is 1)"
-            _t = (_t & 0x8C1F) | ((value & 0x7) << 12) | ((value & 0xF8) << 2);
+            _state._t = (_state._t & 0x8C1F) | ((value & 0x7) << 12) | ((value & 0xF8) << 2);
         }
         else
         {
             // "$2005 first write (w is 0)"
-            _t = (_t & 0xFFE0) | (value >> 3);
-            _x = value & 0x7;
+            _state._t = (_state._t & 0xFFE0) | (value >> 3);
+            _state._x = value & 0x7;
         }
 
-        _w = !_w;
+        _state._w = !_state._w;
     }
     else if (address == 0x2006)
     {
-        if (_w)
+        if (_state._w)
         {
             // "$2006 second write (w is 1)"
-            _t = (_t & 0xFF00) | value;
-            _v = _t;
+            _state._t = (_state._t & 0xFF00) | value;
+            _state._v = _state._t;
         }
         else
         {
             // "$2006 first write (w is 0)"
-            _t = (_t & 0x80FF) | ((value & 0x3F) << 8);
+            _state._t = (_state._t & 0x80FF) | ((value & 0x3F) << 8);
         }
         
-        _w = !_w;
+        _state._w = !_state._w;
     }
     else if (address == 0x2007)
     {
-        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_v);
-        _v += GetAddressIncrement();
+        const uint16_t ppuAddress = ConvertToRealVRAMAddress(_state._v);
+        _state._v += GetAddressIncrement();
         WritePPUMem(ppuAddress, value);
     }
     else if (address >= 0x2008 && address < 0x4000)
@@ -139,9 +139,9 @@ void PPU::WriteMem(uint16_t address, uint8_t value)
     }
     else if (address == kDMARegisterAddress)
     {
-        for (int i = 0; i < sizeofarray(_oam); ++i)
+        for (int i = 0; i < sizeofarray(_state._oam); ++i)
         {
-            _oam[i] = _memoryMapper->ReadMem((value << 8) + i);
+            _state._oam[i] = _memoryMapper->ReadMem((value << 8) + i);
         }
     }
     else
@@ -159,7 +159,7 @@ void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, MirroringMode mirroringMod
 {
     _memoryMapper = memoryMapper;
     _cpu = cpu;
-    _mirroringMode = mirroringMode;
+    _state._mirroringMode = mirroringMode;
 
     ResetInternal(false);
 }
@@ -167,33 +167,33 @@ void PPU::Reset(MemoryMapper* memoryMapper, CPU* cpu, MirroringMode mirroringMod
 void PPU::ResetInternal(bool fullReset)
 {
     // See http://wiki.nesdev.com/w/index.php/PPU_power_up_state
-    _ppuCtrl = 0;
-    _ppuMask = 0;
-    _w = false;
-    _readBuffer = 0;
+    _state._ppuCtrl = 0;
+    _state._ppuMask = 0;
+    _state._w = false;
+    _state._readBuffer = 0;
 
-    _currentScanline = -1;
-    _scanlineCycleIndex = -1;
-    _isOddFrame = true;
-    _waitingToShowFrameBuffer = false;
+    _state._currentScanline = -1;
+    _state._scanlineCycleIndex = -1;
+    _state._isOddFrame = true;
+    _state._waitingToShowFrameBuffer = false;
 
     if (fullReset)
     {
-        _ppuStatus = 0;
-        _oamAddr = 0;
-        _v = 0;
-        _t = 0;
-        _x = 0;
-        _waitToShowFrameBuffer = false;
+        _state._ppuStatus = 0;
+        _state._oamAddr = 0;
+        _state._v = 0;
+        _state._t = 0;
+        _state._x = 0;
+        _state._waitToShowFrameBuffer = false;
 
-        for (int i = 0; i < sizeofarray(_vram); ++i)
+        for (int i = 0; i < sizeofarray(_state._vram); ++i)
         {
-            _vram[i] = 0;
+            _state._vram[i] = 0;
         }
 
-        for (int i = 0; i < sizeofarray(_oam); ++i)
+        for (int i = 0; i < sizeofarray(_state._oam); ++i)
         {
-            _oam[i] = 0;
+            _state._oam[i] = 0;
         }
     }
 }
@@ -203,38 +203,38 @@ void PPU::Tick()
     // Main reference for this function implementation: http://wiki.nesdev.com/w/index.php/PPU_rendering
 
     // Exit early if the last finished frame hasn't been shown yet to avoid tearing
-    if (_waitingToShowFrameBuffer)
+    if (_state._waitingToShowFrameBuffer)
     {
         return;
     }
 
     // Increment cycle/scanline as appropriate
-    ++_scanlineCycleIndex;
-    if (_scanlineCycleIndex >= kCyclesPerScanline)
+    ++_state._scanlineCycleIndex;
+    if (_state._scanlineCycleIndex >= kCyclesPerScanline)
     {
-        _scanlineCycleIndex = 0;
-        if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
+        _state._scanlineCycleIndex = 0;
+        if (_state._currentScanline >= kVisibleScanlinesStart && _state._currentScanline <= kVisibleScanlinesEnd)
         {
             _memoryMapper->OnVisibleScanlineEnd();
         }
-        ++_currentScanline;
-        if (_currentScanline > kVerticalBlankingScanlinesEnd)
+        ++_state._currentScanline;
+        if (_state._currentScanline > kVerticalBlankingScanlinesEnd)
         {
-            _currentScanline = kPreRenderScanline;
-            _isOddFrame = !_isOddFrame;
+            _state._currentScanline = kPreRenderScanline;
+            _state._isOddFrame = !_state._isOddFrame;
         }
     }
 
     // NOTE: Scanlines not handled here are just idle
-    if (_currentScanline == kPreRenderScanline)
+    if (_state._currentScanline == kPreRenderScanline)
     {
         PreRenderScanlineTick();
     }
-    else if (_currentScanline >= kVisibleScanlinesStart && _currentScanline <= kVisibleScanlinesEnd)
+    else if (_state._currentScanline >= kVisibleScanlinesStart && _state._currentScanline <= kVisibleScanlinesEnd)
     {
         VisibleScanlineTick();
     }
-    else if (_currentScanline == kVerticalBlankingScanlinesStart)
+    else if (_state._currentScanline == kVerticalBlankingScanlinesStart)
     {
         VerticalBlankingStartScanlineTick();
     }
@@ -242,13 +242,13 @@ void PPU::Tick()
 
 uint32_t* PPU::GetFrameBuffer()
 {
-    _waitingToShowFrameBuffer = false;
+    _state._waitingToShowFrameBuffer = false;
     return _frameBuffer;
 }
 
 void PPU::SetMirroringMode(MirroringMode mirroringMode)
 {
-    _mirroringMode = mirroringMode;
+    _state._mirroringMode = mirroringMode;
 }
 
 uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
@@ -258,7 +258,7 @@ uint16_t PPU::ConvertToRealVRAMAddress(uint16_t address) const
 
 uint8_t PPU::GetAddressIncrement() const
 {
-    if (!BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::AddressIncrement))
+    if (!BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::AddressIncrement))
     {
         return 1;
     }
@@ -272,36 +272,36 @@ uint8_t* PPU::GetNametableMem(uint16_t address)
 {
     if (address >= kNametable0StartAddress && address < kNametable1StartAddress)
     {
-        return &_vram[address - kNametable0StartAddress];
+        return &_state._vram[address - kNametable0StartAddress];
     }
     else if (address >= kNametable1StartAddress && address < kNametable2StartAddress)
     {
         const int offset = address % kNametable1StartAddress;
-        if (_mirroringMode == MirroringMode::Vertical)
+        if (_state._mirroringMode == MirroringMode::Vertical)
         {
-            return &_vram[kNametableSize + offset];
+            return &_state._vram[kNametableSize + offset];
         }
         else
         {
-            return &_vram[offset];
+            return &_state._vram[offset];
         }
     }
     else if (address >= kNametable2StartAddress && address < kNametable3StartAddress)
     {
         const int offset = address % kNametable2StartAddress;
-        if (_mirroringMode == MirroringMode::Vertical)
+        if (_state._mirroringMode == MirroringMode::Vertical)
         {
-            return &_vram[offset];
+            return &_state._vram[offset];
         }
         else
         {
-            return &_vram[kNametableSize + offset];
+            return &_state._vram[kNametableSize + offset];
         }
     }
     else if (address >= kNametable3StartAddress && address < kMirrorStartAddress)
     {
         const int offset = address % kNametable3StartAddress;
-        return &_vram[kNametableSize + offset];
+        return &_state._vram[kNametableSize + offset];
     }
     else
     {
@@ -327,7 +327,7 @@ uint8_t PPU::ReadPPUMem(uint16_t address)
     else if (address < 0x4000)
     {
         const uint8_t index = ConvertAddressToPaletteIndex(address);
-        return _palettes[index];
+        return _state._palettes[index];
     }
     else
     {
@@ -349,7 +349,7 @@ void PPU::WritePPUMem(uint16_t address, uint8_t value)
     else if (address >= kPaletteStartAddress && address < 0x4000)
     {
         const uint8_t index = ConvertAddressToPaletteIndex(address);
-        _palettes[index] = value;
+        _state._palettes[index] = value;
     }
     else
     {
@@ -399,7 +399,7 @@ uint8_t PPU::ConvertAddressToPaletteIndex(uint16_t address) const
         OMBAssert(false, "Address out of palette space");
     }
 
-    OMBAssert(index >= 0 && index <= sizeofarray(_palettes), "Index out of bounds!");
+    OMBAssert(index >= 0 && index <= sizeofarray(_state._palettes), "Index out of bounds!");
     return index;
 }
 
@@ -418,7 +418,7 @@ void PPU::RenderPixel(int x, int y)
         spritePixelColour != kTransparentPixelColour &&
         bkgPixelColour != kTransparentPixelColour)
     {
-        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, true);
+        BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::Sprite0Hit, true);
     }
 
     if (spritePixelColour != kTransparentPixelColour &&
@@ -445,7 +445,7 @@ void PPU::SetPixelInFrameBuffer(int x, int y, uint8_t paletteIndex)
 
 uint16_t PPU::GetBkgPatternTableBaseAddress() const
 {
-    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::BkgPatternTableAddress))
+    if (BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::BkgPatternTableAddress))
     {
         return kPatternTable1Address;
     }
@@ -458,7 +458,7 @@ uint16_t PPU::GetBkgPatternTableBaseAddress() const
 uint16_t PPU::GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const
 {
     // 8x16 sprite mode
-    if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize))
+    if (BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::SpriteSize))
     {
         if ((spriteIndexNumber & 0x1) == 1)
         {
@@ -472,7 +472,7 @@ uint16_t PPU::GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const
     }
     else
     {
-        if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpritePatternTableAddress))
+        if (BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::SpritePatternTableAddress))
         {
             return kPatternTable1Address;
         }
@@ -485,16 +485,16 @@ uint16_t PPU::GetSpritePatternTableBaseAddress(uint8_t& spriteIndexNumber) const
 
 int PPU::GetSpriteHeight() const
 {
-    return BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize) ? 16 : 8;
+    return BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::SpriteSize) ? 16 : 8;
 }
 
 void PPU::ClearSecondaryOAM()
 {
-    _secondaryOAMSpriteCount = 0;
-    _isSpriteZeroInSecondaryOAM = false;
-    for (int i = 0; i < sizeofarray(_secondaryOAM); ++i)
+    _state._secondaryOAMSpriteCount = 0;
+    _state._isSpriteZeroInSecondaryOAM = false;
+    for (int i = 0; i < sizeofarray(_state._secondaryOAM); ++i)
     {
-        _secondaryOAM[i] = 0xFF;
+        _state._secondaryOAM[i] = 0xFF;
     }
 }
 
@@ -505,21 +505,21 @@ void PPU::FindSpritesInScanline(int index)
 
     const int spriteHeight = GetSpriteHeight();
 
-    for (int i = 0; i < kOAMSize && _secondaryOAMSpriteCount < kMaxSpritesInSecondaryOAM; i += kSpriteSize)
+    for (int i = 0; i < kOAMSize && _state._secondaryOAMSpriteCount < kMaxSpritesInSecondaryOAM; i += kSpriteSize)
     {
         // Add +1 to spriteY because "Sprite data is delayed by one scanline; 
         // you must subtract 1 from the sprite's Y coordinate before writing it here"
-        const uint8_t spriteY = _oam[i + kSpriteYPosOffset] + 1;
+        const uint8_t spriteY = _state._oam[i + kSpriteYPosOffset] + 1;
         if (spriteY > 0 && index >= spriteY && index < spriteY + spriteHeight)
         {
-            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 0] = _oam[i + 0];
-            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 1] = _oam[i + 1];
-            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 2] = _oam[i + 2];
-            _secondaryOAM[_secondaryOAMSpriteCount * kSpriteSize + 3] = _oam[i + 3];
-            ++_secondaryOAMSpriteCount;
+            _state._secondaryOAM[_state._secondaryOAMSpriteCount * kSpriteSize + 0] = _state._oam[i + 0];
+            _state._secondaryOAM[_state._secondaryOAMSpriteCount * kSpriteSize + 1] = _state._oam[i + 1];
+            _state._secondaryOAM[_state._secondaryOAMSpriteCount * kSpriteSize + 2] = _state._oam[i + 2];
+            _state._secondaryOAM[_state._secondaryOAMSpriteCount * kSpriteSize + 3] = _state._oam[i + 3];
+            ++_state._secondaryOAMSpriteCount;
             if (i == 0)
             {
-                _isSpriteZeroInSecondaryOAM = true;
+                _state._isSpriteZeroInSecondaryOAM = true;
             }
         }
     }
@@ -527,18 +527,18 @@ void PPU::FindSpritesInScanline(int index)
 
 uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isSprite0)
 {
-    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) &&
-        (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteClipping)))
+    if (BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::SpriteVisibility) &&
+        (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::SpriteClipping)))
     {
-        for (int i = 0; i < _secondaryOAMSpriteCount * kSpriteSize; i += kSpriteSize)
+        for (int i = 0; i < _state._secondaryOAMSpriteCount * kSpriteSize; i += kSpriteSize)
         {
-            const uint8_t spriteX = _secondaryOAM[i + kSpriteXPosOffset];
+            const uint8_t spriteX = _state._secondaryOAM[i + kSpriteXPosOffset];
             if (x >= spriteX && x < spriteX + kTileWidth)
             {
-                const uint8_t spriteY = _secondaryOAM[i + kSpriteYPosOffset] + 1;
-                uint8_t patternIndex = _secondaryOAM[i + kSpriteTileIndexOffset];
+                const uint8_t spriteY = _state._secondaryOAM[i + kSpriteYPosOffset] + 1;
+                uint8_t patternIndex = _state._secondaryOAM[i + kSpriteTileIndexOffset];
                 const uint16_t patternTableBaseAddress = GetSpritePatternTableBaseAddress(patternIndex);
-                const uint8_t attributes = _secondaryOAM[i + kSpriteAttributesOffset];
+                const uint8_t attributes = _state._secondaryOAM[i + kSpriteAttributesOffset];
                 
                 const uint8_t paletteNumber = attributes & 0x3;
                 const bool flipHorizontally = (attributes & (1 << 6)) != 0;
@@ -557,7 +557,7 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
                     patternPixelY = kTileHeight - 1 - patternPixelY;
                 }
 
-                if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::SpriteSize))
+                if (BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::SpriteSize))
                 {
                     // Normally the second half of the sprite is located 0x10 bytes later
                     // than the first half. But when flipping verticallya 8x16 sprite
@@ -583,7 +583,7 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
                 const uint8_t paletteIndex = (1 << 4) | paletteNumber << 2 | paletteColour;
                 const uint8_t colourIndex = ReadPPUMem(kPaletteStartAddress + paletteIndex);
 
-                isSprite0 = (i == 0) && _isSpriteZeroInSecondaryOAM;
+                isSprite0 = (i == 0) && _state._isSpriteZeroInSecondaryOAM;
                 return colourIndex;
             }
         }
@@ -596,17 +596,17 @@ uint8_t PPU::CalculateSpriteColourAt(int x, int y, SpriteLayer& layer, bool& isS
 
 uint8_t PPU::CalculateBkgColourAt(int x, int y)
 {
-    if (BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility) &&
-        (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgClipping)))
+    if (BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::BkgVisibility) &&
+        (x >= kLeftClippingPixelCount || BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::BkgClipping)))
     {
         // "Tile and attribute fetching" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling
-        const uint16_t nametableAddress = 0x2000 | (_v & 0x0FFF);
-        const uint16_t attributeAddress = 0x23C0 | (_v & 0x0C00) | ((_v >> 4) & 0x38) | ((_v >> 2) & 0x07);
+        const uint16_t nametableAddress = 0x2000 | (_state._v & 0x0FFF);
+        const uint16_t attributeAddress = 0x23C0 | (_state._v & 0x0C00) | ((_state._v >> 4) & 0x38) | ((_state._v >> 2) & 0x07);
 
-        const uint8_t nametableTileX = _v & 0x1F;
-        const uint8_t nametableTileY = (_v & 0x3E0) >> 5;
-        const uint8_t fineX = (_x + x) % kTileWidth;
-        const uint8_t fineY = (_v & 0x7000) >> 12;
+        const uint8_t nametableTileX = _state._v & 0x1F;
+        const uint8_t nametableTileY = (_state._v & 0x3E0) >> 5;
+        const uint8_t fineX = (_state._x + x) % kTileWidth;
+        const uint8_t fineY = (_state._v & 0x7000) >> 12;
 
         const uint8_t patternIndex = ReadPPUMem(nametableAddress);
         const uint16_t patternTableBaseAddress = GetBkgPatternTableBaseAddress();
@@ -636,78 +636,78 @@ uint8_t PPU::CalculateBkgColourAt(int x, int y)
 void PPU::PreRenderScanlineTick()
 {
     const bool isRenderingEnabled =
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
+        BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::SpriteVisibility) ||
+        BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::BkgVisibility);
 
-    if (_scanlineCycleIndex == 1)
+    if (_state._scanlineCycleIndex == 1)
     {
-        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::SpriteOverflow, false);
-        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::Sprite0Hit, false);
-        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, false);
+        BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::SpriteOverflow, false);
+        BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::Sprite0Hit, false);
+        BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::VBlank, false);
         ClearSecondaryOAM();
     }
-    else if (isRenderingEnabled && _scanlineCycleIndex == 257)
+    else if (isRenderingEnabled && _state._scanlineCycleIndex == 257)
     {
         // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v
-        _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
+        _state._v = (_state._v & 0xFBE0) | (_state._t & ~0xFBE0);
     }
-    else if (isRenderingEnabled && _scanlineCycleIndex >= 280 && _scanlineCycleIndex <= 304)
+    else if (isRenderingEnabled && _state._scanlineCycleIndex >= 280 && _state._scanlineCycleIndex <= 304)
     {
         // "If rendering is enabled, at the end of vblank, shortly after the horizontal bits are copied from 
         // t to v at dot 257, the PPU will repeatedly copy the vertical bits from t to v from dots 280 to 304, 
         // completing the full initialization of v from t
-        _v = (_v & 0x841F) | (_t & ~0x841F);
+        _state._v = (_state._v & 0x841F) | (_state._t & ~0x841F);
     }
-    else if (_isOddFrame && _scanlineCycleIndex + 2 == kCyclesPerScanline)
+    else if (_state._isOddFrame && _state._scanlineCycleIndex + 2 == kCyclesPerScanline)
     {
         // "For odd frames, the cycle at the end of the scanline is skipped"
-        ++_scanlineCycleIndex;
+        ++_state._scanlineCycleIndex;
     }
 }
 
 void PPU::VisibleScanlineTick()
 {
     const bool isRenderingEnabled =
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::SpriteVisibility) ||
-        BitwiseUtils::IsFlagSet(_ppuMask, PPUMaskFlags::BkgVisibility);
+        BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::SpriteVisibility) ||
+        BitwiseUtils::IsFlagSet(_state._ppuMask, PPUMaskFlags::BkgVisibility);
 
-    if (_scanlineCycleIndex >= 1 && _scanlineCycleIndex <= kHorizontalResolution)
+    if (_state._scanlineCycleIndex >= 1 && _state._scanlineCycleIndex <= kHorizontalResolution)
     {
         if (isRenderingEnabled)
         {
-            const int xPlusScroll = _scanlineCycleIndex - 1 + _x;
+            const int xPlusScroll = _state._scanlineCycleIndex - 1 + _state._x;
             const bool gotToNextTile = (xPlusScroll >= 8) && (xPlusScroll % 8 == 0);
-            if (gotToNextTile && _scanlineCycleIndex < kHorizontalResolution)
+            if (gotToNextTile && _state._scanlineCycleIndex < kHorizontalResolution)
             {
                 // "Coarse X increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
-                if ((_v & 0x001F) == 31)    // if coarse X == 31
+                if ((_state._v & 0x001F) == 31)    // if coarse X == 31
                 {
-                    _v &= ~0x001F;          // coarse X = 0
-                    _v ^= 0x0400;           // switch horizontal nametable
+                    _state._v &= ~0x001F;          // coarse X = 0
+                    _state._v ^= 0x0400;           // switch horizontal nametable
                 }
                 else
                 {
-                    _v += 1;                // increment coarse X
+                    _state._v += 1;                // increment coarse X
                 }
             }
-            else if (_scanlineCycleIndex == kHorizontalResolution)
+            else if (_state._scanlineCycleIndex == kHorizontalResolution)
             {
                 // If rendering is enabled, the PPU increments the vertical position in v.
                 // The effective Y scroll coordinate is incremented, which is a complex operation 
                 // that will correctly skip the attribute table memory regions, and wrap to the next nametable appropriately
                 // See "Y increment" @ http://wiki.nesdev.com/w/index.php/PPU_scrolling#Wrapping_around
-                if ((_v & 0x7000) != 0x7000)            // if fine Y < 7
+                if ((_state._v & 0x7000) != 0x7000)            // if fine Y < 7
                 {
-                    _v += 0x1000;                       // increment fine Y
+                    _state._v += 0x1000;                       // increment fine Y
                 }
                 else
                 {
-                    _v &= ~0x7000;                      // fine Y = 0
-                    uint16_t y = (_v & 0x03E0) >> 5;    // let y = coarse Y
+                    _state._v &= ~0x7000;                      // fine Y = 0
+                    uint16_t y = (_state._v & 0x03E0) >> 5;    // let y = coarse Y
                     if (y == 29)
                     {
                         y = 0;                          // coarse Y = 0
-                        _v ^= 0x0800;                   // switch vertical nametable
+                        _state._v ^= 0x0800;                   // switch vertical nametable
                     }
                     else if (y == 31)
                     {
@@ -717,44 +717,44 @@ void PPU::VisibleScanlineTick()
                     {
                         y += 1;                         // increment coarse Y
                     }
-                    _v = (_v & ~0x03E0) | (y << 5);     // put coarse Y back into v
+                    _state._v = (_state._v & ~0x03E0) | (y << 5);     // put coarse Y back into v
                 }
             }
         }
 
-        RenderPixel(_scanlineCycleIndex - 1, _currentScanline);
+        RenderPixel(_state._scanlineCycleIndex - 1, _state._currentScanline);
     }
-    else if (_scanlineCycleIndex >= 257 && _scanlineCycleIndex <= 320)
+    else if (_state._scanlineCycleIndex >= 257 && _state._scanlineCycleIndex <= 320)
     {
-        if (isRenderingEnabled && _scanlineCycleIndex == 257)
+        if (isRenderingEnabled && _state._scanlineCycleIndex == 257)
         {
             // "If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-            _v = (_v & 0xFBE0) | (_t & ~0xFBE0);
+            _state._v = (_state._v & 0xFBE0) | (_state._t & ~0xFBE0);
         }
-        else if (isRenderingEnabled && _scanlineCycleIndex == 320)
+        else if (isRenderingEnabled && _state._scanlineCycleIndex == 320)
         {
             // "The tile data for the sprites on the next scanline are fetched here."
-            FindSpritesInScanline(_currentScanline + 1);
+            FindSpritesInScanline(_state._currentScanline + 1);
         }
     }
 }
 
 void PPU::VerticalBlankingStartScanlineTick()
 {
-    if (_scanlineCycleIndex == 1)
+    if (_state._scanlineCycleIndex == 1)
     {
         // "The VBlank flag of the PPU is set at tick 1 (the second tick) of scanline 241..."
-        BitwiseUtils::SetFlag(_ppuStatus, PPUStatusFlags::VBlank, true);
+        BitwiseUtils::SetFlag(_state._ppuStatus, PPUStatusFlags::VBlank, true);
 
         // "...where the VBlank NMI also occurs"
-        if (BitwiseUtils::IsFlagSet(_ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
+        if (BitwiseUtils::IsFlagSet(_state._ppuCtrl, PPUCtrlFlags::ExecuteNMIOnVBlank))
         {
             _cpu->ExecuteNMI();
         }
 
-        if (_waitToShowFrameBuffer)
+        if (_state._waitToShowFrameBuffer)
         {
-            _waitingToShowFrameBuffer = true;
+            _state._waitingToShowFrameBuffer = true;
         }
     }
 }

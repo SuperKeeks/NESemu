@@ -5,7 +5,7 @@
 int CPU::PHP(AddressingMode mode)
 {
     int cycles = 0;
-    Push(_status);
+    Push(_state._status);
 
     return 3;
 }

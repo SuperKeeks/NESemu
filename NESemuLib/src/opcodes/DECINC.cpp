@@ -5,9 +5,9 @@
 int CPU::DECINC(AddressingMode mode, int delta)
 {
     int cycles = 0;
-    const uint16_t programCounterBeforeGetValue = _programCounter;
+    const uint16_t programCounterBeforeGetValue = _state._programCounter;
     uint8_t value = GetValueWithMode(mode, cycles);
-    _programCounter = programCounterBeforeGetValue;
+    _state._programCounter = programCounterBeforeGetValue;
     value += delta;
     SetValueWithMode(mode, value, cycles);
     SetFlag(Flag::Sign, IsValueNegative(value) != 0);

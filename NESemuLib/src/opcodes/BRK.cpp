@@ -4,7 +4,7 @@
 
 int CPU::BRK(AddressingMode mode)
 {
-    ++_programCounter;
+    ++_state._programCounter;
     Interrupt(true, kInterruptBreakVectorAddressL);
 
     return 7;

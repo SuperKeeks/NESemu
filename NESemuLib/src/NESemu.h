@@ -27,6 +27,9 @@ public:
     uint8_t ReadMem(uint16_t address);
     void WriteMem(uint16_t address, uint8_t value);
 
+    HardwareStateSnapshot GetSnapshot();
+    void LoadSnapshot(HardwareStateSnapshot snapShot);
+
 private:
     const int kMasterClockSpeed = 21477272; // Hz
 

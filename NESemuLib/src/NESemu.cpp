@@ -120,3 +120,21 @@ void NESemu::WriteMem(uint16_t address, uint8_t value)
 {
     _mapper->WriteMem(address, value);
 }
+
+HardwareStateSnapshot NESemu::GetSnapshot()
+{
+    HardwareStateSnapshot snapShot;
+
+    snapShot.cpuState = _hw.cpu.GetSnapshot();
+    snapShot.ramState = _hw.ram.GetSnapshot();
+    snapShot.ppuState = _hw.ppu.GetSnapshot();
+
+    return snapShot;
+}
+
+void NESemu::LoadSnapshot(HardwareStateSnapshot snapShot)
+{
+    _hw.cpu.LoadSnapshot(snapShot.cpuState);
+    _hw.ram.LoadSnapshot(snapShot.ramState);
+    _hw.ppu.LoadSnapshot(snapShot.ppuState);
+}

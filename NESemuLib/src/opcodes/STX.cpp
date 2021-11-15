@@ -3,7 +3,7 @@
 int CPU::STX(AddressingMode mode)
 {
     int cycles = 1;
-    SetValueWithMode(mode, _x, cycles);
+    SetValueWithMode(mode, _state._x, cycles);
 
     return cycles;
 }

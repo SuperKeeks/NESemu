@@ -5,7 +5,7 @@
 int CPU::PLP(AddressingMode mode)
 {
     int cycles = 0;
-    _status = Pop();
+    _state._status = Pop();
 
     return 4;
 }

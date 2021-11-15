@@ -19,6 +19,11 @@ public:
     static const int kTileWidth = 8;
     static const int kTileHeight = 8;
 
+    static const int kVRAMSize = 2048;
+    static const int kPaletteArraySize = 1 + 4 * 3 + 1 * 3 + 4 * 3; // 1 for Bkg colour + 4 Background palettes with extra data between them + 4 Sprite palettes
+    static const int kMaxSpritesInSecondaryOAM = 8;
+    static const int kSecondaryOAMSize = kMaxSpritesInSecondaryOAM * kSpriteSize;
+
     static const int kDMARegisterAddress = 0x4014;
     static const int kPPUCtrlAddress = 0x2000;
     static const int kPPUStatusAddress = 0x2002;
@@ -30,6 +35,47 @@ public:
     static const int kNametable1StartAddress = 0x2400;
     static const int kNametable2StartAddress = 0x2800;
     static const int kNametable3StartAddress = 0x2C00;
+
+    struct PPUState
+    {
+        // Registers
+        uint8_t _ppuCtrl;
+        uint8_t _ppuMask;
+        uint8_t _ppuStatus;
+        uint8_t _oamAddr;
+
+        /*
+            http://wiki.nesdev.com/w/index.php/PPU_scrolling
+
+            The 15 bit registers t and v are composed this way during rendering:
+
+            yyy NN YYYYY XXXXX
+            ||| || ||||| +++++-- coarse X scroll
+            ||| || +++++-------- coarse Y scroll
+            ||| ++-------------- nametable select
+            +++----------------- fine Y scroll
+        */
+        uint16_t _v;
+        uint16_t _t;
+        uint8_t _x;
+        bool _w; //false: Next write to 0x2005 and 0x2006 sets upper byte, true: Next write sets lower byte
+
+        uint8_t _readBuffer;
+        int _currentScanline = -1;
+        int _scanlineCycleIndex;
+        bool _isOddFrame;
+        bool _waitingToShowFrameBuffer = false;
+        bool _waitToShowFrameBuffer = false; // If true, the PPU won't start rendering the next frame until GetFrameBuffer() is called
+
+        uint8_t _vram[kVRAMSize];
+        uint8_t _oam[kOAMSize];
+        uint8_t _secondaryOAM[kSecondaryOAMSize];
+        uint8_t _palettes[kPaletteArraySize];
+
+        MirroringMode _mirroringMode;
+        int _secondaryOAMSpriteCount;
+        bool _isSpriteZeroInSecondaryOAM;
+    };
 
     PPU();
     virtual ~PPU();
@@ -44,9 +90,12 @@ public:
 
     void Tick();
 
+    PPUState GetSnapshot() { return _state; }
+    void LoadSnapshot(PPUState snapshot) { _state = snapshot; }
+
     uint32_t* GetFrameBuffer();
-    void SetWaitToShowFrameBuffer(bool value) { _waitToShowFrameBuffer = value; }
-    bool IsWaitingToShowFrameBuffer() const { return _waitingToShowFrameBuffer; }
+    void SetWaitToShowFrameBuffer(bool value) { _state._waitToShowFrameBuffer = value; }
+    bool IsWaitingToShowFrameBuffer() const { return _state._waitingToShowFrameBuffer; }
 
     // Internal and for testing purposes
     void SetMirroringMode(MirroringMode mirroringMode);
@@ -86,11 +135,6 @@ private:
         Front,
         Behind
     };
-
-    static const int kVRAMSize = 2048;
-    static const int kPaletteArraySize = 1 + 4*3 + 1*3 + 4*3; // 1 for Bkg colour + 4 Background palettes with extra data between them + 4 Sprite palettes
-    static const int kMaxSpritesInSecondaryOAM = 8;
-    static const int kSecondaryOAMSize = kMaxSpritesInSecondaryOAM * kSpriteSize;
     
     static const int kPatternTable0Address = 0x0000;
     static const int kPatternTable1Address = 0x1000;
@@ -185,46 +229,11 @@ private:
         0x000000FF,
     };
 
-    // Registers
-    uint8_t _ppuCtrl;
-    uint8_t _ppuMask;
-    uint8_t _ppuStatus;
-    uint8_t _oamAddr;
-
-    /*
-        http://wiki.nesdev.com/w/index.php/PPU_scrolling
-
-        The 15 bit registers t and v are composed this way during rendering:
-
-        yyy NN YYYYY XXXXX
-        ||| || ||||| +++++-- coarse X scroll
-        ||| || +++++-------- coarse Y scroll
-        ||| ++-------------- nametable select
-        +++----------------- fine Y scroll
-    */
-    uint16_t _v;
-    uint16_t _t;
-    uint8_t _x;
-    bool _w; // false: Next write to 0x2005 and 0x2006 sets upper byte, true: Next write sets lower byte
-
-    uint8_t _readBuffer;
-    int _currentScanline = -1;
-    int _scanlineCycleIndex;
-    bool _isOddFrame;
-    bool _waitingToShowFrameBuffer = false;
-    bool _waitToShowFrameBuffer = false; // If true, the PPU won't start rendering the next frame until GetFrameBuffer() is called
-
-    uint8_t _vram[kVRAMSize];
-    uint8_t _oam[kOAMSize];
-    uint8_t _secondaryOAM[kSecondaryOAMSize];
-    uint8_t _palettes[kPaletteArraySize];
+    PPUState _state;
     uint32_t _frameBuffer[PPU::kHorizontalResolution * PPU::kVerticalResolution];
 
     MemoryMapper* _memoryMapper;
     CPU* _cpu;
-    MirroringMode _mirroringMode;
-    int _secondaryOAMSpriteCount;
-    bool _isSpriteZeroInSecondaryOAM;
 
     void ResetInternal(bool fullReset);
     uint8_t* GetNametableMem(uint16_t address);

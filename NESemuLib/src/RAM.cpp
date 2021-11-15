@@ -13,13 +13,13 @@ RAM::~RAM()
 uint8_t RAM::ReadMem(uint16_t address)
 {
     const uint16_t realAddress = ConvertToRealAddress(address);
-    return _ram[realAddress];
+    return _state._ram[realAddress];
 }
 
 void RAM::WriteMem(uint16_t address, uint8_t value)
 {
     const uint16_t realAddress = ConvertToRealAddress(address);
-    _ram[realAddress] = value;
+    _state._ram[realAddress] = value;
 }
 
 uint16_t RAM::ConvertToRealAddress(uint16_t address) const
@@ -32,7 +32,7 @@ void RAM::PowerOn()
 {
     for (int i = 0; i < kRAMSize; ++i)
     {
-        _ram[i] = 0;
+        _state._ram[i] = 0;
     }
 }
 

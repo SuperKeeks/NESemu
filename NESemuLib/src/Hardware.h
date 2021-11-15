@@ -7,6 +7,13 @@
 #include "RAM.h"
 #include "SRAM.h"
 
+struct HardwareStateSnapshot
+{
+    CPU::CPUState cpuState;
+    RAM::RAMState ramState;
+    PPU::PPUState ppuState;
+};
+
 struct Hardware
 {
     CPU cpu;

@@ -18,6 +18,7 @@ void SDLAudioCallback(void* userData, Uint8* audioData, int length);
 
 int main(int argc, char* args[])
 {
+    HardwareStateSnapshot hardwareSnapShot;
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_Texture* texture = NULL;
@@ -157,6 +158,19 @@ int main(int argc, char* args[])
                     else if (inputEvent.type == SDL_KEYDOWN || inputEvent.type == SDL_KEYUP)
                     {
                         HandleKeyboardButtonEvent(SelectControllerState(inputEvent, controller1State, controller2State), inputEvent);
+                        if (inputEvent.type == SDL_KEYDOWN)
+                        {
+                            if (inputEvent.key.keysym.sym == SDLK_F6)
+                            {
+                                hardwareSnapShot = emu.GetSnapshot();
+                                Log::Info("Saved hardware state snapshot");
+                            }
+                            else if (inputEvent.key.keysym.sym == SDLK_F9)
+                            {
+                                Log::Info("Loading hardware state snapshot");
+                                emu.LoadSnapshot(hardwareSnapShot);
+                            }
+                        }
                     }
                     else if (inputEvent.type == SDL_CONTROLLERBUTTONDOWN || inputEvent.type == SDL_CONTROLLERBUTTONUP)
                     {
