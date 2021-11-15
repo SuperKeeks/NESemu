@@ -1,4 +1,4 @@
-# SuperKeeks's NES Emulator #
+# SuperKeeks' NES Emulator #
 
 I've always found emulators fascinating. The fact you can play one platform within a completely different hardware architecture was magic to me. For this reason, I decided to write my own emulator, so I could get a decent grasp of how they work under the hood.
 
