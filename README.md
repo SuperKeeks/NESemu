@@ -27,6 +27,7 @@ After having the Emulator basics (graphics and input but no audio) working, I ga
 * APU (audio chip) implementation.
 * SRAM (save RAM) supported, but untested.
 * Support for 001, 003 and 004 [memory mappers](https://wiki.nesdev.com/w/index.php/Mapper) which allow to play games like Super Mario Bros 1 and 3, Galaga, Donkey Kong, Original Mario Bros...
+* Basic implementation of save states.
 * Unit testing of all of the CPU instructions.
 
 # Usage #
