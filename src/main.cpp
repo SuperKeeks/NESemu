@@ -23,11 +23,14 @@ int main(int argc, char* args[])
     fclose(file);
 
     App app;
-    app.Init(romFileName);
-    while (!app.Update())
+    const bool initOk = app.Init(romFileName);
+    if (initOk)
     {
+        while (!app.Update())
+        {
+        }
+        app.End();
     }
-    app.End();
 
     return 0;
 }
