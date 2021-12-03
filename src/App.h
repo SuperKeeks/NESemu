@@ -18,6 +18,7 @@ public:
 
 private:
     NESemu _emu;
+    std::string _romFileName;
     Input::ControllerState _controller1State;
     Input::ControllerState _controller2State;
     HardwareStateSnapshot _hardwareSnapShot;
@@ -36,4 +37,7 @@ private:
     void HandleKeyboardButtonEvent(SDL_Event event);
     void HandleGameControllerButtonEvent(SDL_Event event);
     void HandleGameControllerAxisEvent(SDL_Event event);
+
+    void SaveState();
+    void TryLoadState();
 };

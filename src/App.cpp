@@ -22,7 +22,8 @@ App::App()
 bool App::Init(const std::string& romFileName)
 {
     // Initialise emulator
-    _emu.Load(romFileName.c_str());
+    _romFileName = romFileName;
+    _emu.Load((romFileName + ".nes").c_str());
     _emu.GetPPU()->SetWaitToShowFrameBuffer(true);
     _emu.GetAPU()->SetOutputFrequency(AUDIO_FREQUENCY);
 
@@ -126,13 +127,11 @@ bool App::Update()
             {
                 if (inputEvent.key.keysym.sym == SDLK_F6)
                 {
-                    _hardwareSnapShot = _emu.GetSnapshot();
-                    Log::Info("Saved hardware state snapshot");
+                    SaveState();
                 }
                 else if (inputEvent.key.keysym.sym == SDLK_F9)
                 {
-                    Log::Info("Loading hardware state snapshot");
-                    _emu.LoadSnapshot(_hardwareSnapShot);
+                    TryLoadState();
                 }
             }
         }
@@ -358,5 +357,42 @@ void App::HandleGameControllerAxisEvent(SDL_Event event)
             controllerState.Up = false;
             controllerState.Down = false;
         }
+    }
+}
+
+void App::SaveState()
+{
+    _hardwareSnapShot = _emu.GetSnapshot();
+
+    FILE* file;
+    fopen_s(&file, (_romFileName + ".save").c_str(), "wb");
+    fwrite(&_hardwareSnapShot, sizeof(HardwareStateSnapshot), 1, file);
+    fclose(file);
+
+    Log::Info("Saved hardware state snapshot");
+}
+
+void App::TryLoadState()
+{
+    Log::Info("Trying to load savestate");
+
+    bool error = true;
+    FILE* file;
+    fopen_s(&file, (_romFileName + ".save").c_str(), "rb");
+    if (file != NULL)
+    {
+        const size_t elementsRead = fread(&_hardwareSnapShot, sizeof(HardwareStateSnapshot), 1, file);
+        fclose(file);
+        if (elementsRead == 1)
+        {
+            _emu.LoadSnapshot(_hardwareSnapShot);
+            Log::Info("Successfully loaded savestate");
+            error = false;
+        }
+    }
+
+    if (error)
+    {
+        Log::Error("Can't load savestate for game %s, skipping", _romFileName.c_str());
     }
 }
